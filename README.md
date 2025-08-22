@@ -1,6 +1,7 @@
 # Robotics CTF
 
 A secure foundation for a robotics-themed Capture the Flag (CTF) platform built with Next.js, TypeScript, and Tailwind CSS.
+More information on the challenge can be found here https://docs.google.com/document/d/1GGjiT-Mqt2SwmtnR8Sl-mwafcmb8L8rvEv4A57VT8gY
 
 ## 🚀 Features
 

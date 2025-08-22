@@ -1,11 +1,12 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
+import Navigation from './components/Navigation';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'Robotics CTF',
-  description: 'A secure foundation for a robotics-themed CTF platform.',
+  title: 'RoboTech Industries - Advanced Robotics Manufacturing',
+  description: 'Leading manufacturer of industrial robotics and automation solutions for modern manufacturing.',
 };
 
 export default function RootLayout({
@@ -16,14 +17,34 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <header className="bg-gray-800 text-white p-4 text-center">
-          <h1 className="text-xl font-bold">Robotics CTF</h1>
-        </header>
-        <main className="min-h-screen p-6 bg-gray-900 text-gray-200">
+        <Navigation />
+        <main className="min-h-screen bg-gray-50 text-gray-900">
           {children}
         </main>
-        <footer className="bg-gray-800 text-white p-4 text-center text-sm">
-          <p>© 2025 Robotics CTF. All rights reserved.</p>
+        <footer className="bg-gray-800 text-white py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="col-span-1 md:col-span-2">
+                <h3 className="text-lg font-semibold mb-4">RoboTech Industries</h3>
+                <p className="text-gray-300 text-sm">
+                  Pioneering the future of manufacturing through advanced robotics and automation solutions.
+                  Our cutting-edge technology drives efficiency and innovation across industries.
+                </p>
+              </div>
+              <div>
+                <h4 className="text-md font-semibold mb-4">Quick Links</h4>
+                <ul className="text-gray-300 text-sm space-y-2">
+                  <li><a href="/about" className="hover:text-white">About Us</a></li>
+                  <li><a href="/solutions" className="hover:text-white">Solutions</a></li>
+                  <li><a href="/solutions#demo" className="hover:text-white">Request Demo</a></li>
+                  <li><a href="/about#contact" className="hover:text-white">Contact</a></li>
+                </ul>
+              </div>
+            </div>
+            <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300 text-sm">
+              <p>© 2025 RoboTech Industries. All rights reserved. | Privacy Policy | Terms of Service</p>
+            </div>
+          </div>
         </footer>
       </body>
     </html>
