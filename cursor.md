@@ -44,3 +44,4 @@ Maintain a Consistent Thread: Reference previous parts of the conversation to sh
 IMPORTANT:
 Whenever big changes happened after they have been finished run the tests with `npm run test` and run the app with `npm run dev` to check it launches correctly.
 Also make sure to update the README.md to reflect the new changes and keep good documentation.
+Do not keep unused pages and maintain the codebase free of unused code.

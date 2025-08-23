@@ -1,6 +1,7 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
 import Navigation from './components/Navigation';
+import { AuthProvider } from './contexts/AuthContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,10 +18,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Navigation />
-        <main className="min-h-screen bg-gray-50 text-gray-900">
-          {children}
-        </main>
+        <AuthProvider>
+          <Navigation />
+          <main className="min-h-screen bg-gray-50 text-gray-900">
+            {children}
+          </main>
+        </AuthProvider>
         <footer className="bg-gray-800 text-white py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -36,8 +39,8 @@ export default function RootLayout({
                 <ul className="text-gray-300 text-sm space-y-2">
                   <li><a href="/about" className="hover:text-white">About Us</a></li>
                   <li><a href="/solutions" className="hover:text-white">Solutions</a></li>
-                  <li><a href="/solutions#demo" className="hover:text-white">Request Demo</a></li>
-                  <li><a href="/about#contact" className="hover:text-white">Contact</a></li>
+                  <li><a href="/assembly-line" className="hover:text-white">Assembly Line Demo</a></li>
+                  <li><a href="/login" className="hover:text-white">Login</a></li>
                 </ul>
               </div>
             </div>

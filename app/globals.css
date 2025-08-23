@@ -2,27 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom global styles for Robotics CTF */
+/* Custom global styles */
 @layer base {
   html {
     scroll-behavior: smooth;
   }
   
-  body {
-    @apply bg-gray-900 text-gray-200;
-  }
-  
-  /* Custom scrollbar for the CTF theme */
+  /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-gray-800;
+    @apply bg-gray-200;
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-gray-600 rounded-full;
+    @apply bg-gray-400 rounded-full;
   }
   
   ::-webkit-scrollbar-thumb:hover {
@@ -33,11 +29,11 @@
 @layer components {
   /* Custom button styles */
   .btn-primary {
-    @apply bg-teal-600 hover:bg-teal-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200;
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200;
   }
   
   .btn-secondary {
-    @apply bg-gray-700 hover:bg-gray-600 text-gray-200 font-medium py-2 px-4 rounded-md transition-colors duration-200;
+    @apply bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200;
   }
   
   .btn-danger {
@@ -46,22 +42,46 @@
   
   /* Card styles */
   .card {
-    @apply bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700;
+    @apply bg-white rounded-lg shadow-lg p-6 border border-gray-200;
   }
   
-  /* Code block styles */
-  .code-block {
-    @apply bg-gray-900 border border-gray-700 rounded-md p-4 font-mono text-sm text-green-400;
+  /* Assembly line animations */
+  .assembly-line-running {
+    animation: assemblyLineMove 3s linear infinite;
+  }
+  
+  .part-bounce {
+    animation: partBounce 2s ease-in-out infinite;
+  }
+  
+  .conveyor-pulse {
+    animation: conveyorPulse 1.5s ease-in-out infinite;
   }
 }
 
 @layer utilities {
   /* Custom utility classes */
   .text-gradient {
-    @apply bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent;
   }
   
   .border-gradient {
-    @apply border border-transparent bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-border;
+    @apply border border-transparent bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-border;
   }
+}
+
+/* Assembly line keyframe animations */
+@keyframes assemblyLineMove {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes partBounce {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes conveyorPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }

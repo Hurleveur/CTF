@@ -34,16 +34,19 @@ export default function Navigation() {
               <Link href="/solutions" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">
                 Solutions
               </Link>
+              <Link href="/assembly-line" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">
+                Assembly Line
+              </Link>
             </div>
           </div>
 
           {/* CTA Button */}
           <div className="hidden md:block">
             <Link
-              href="/solutions#demo"
+              href="/login"
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
             >
-              Request Demo
+              Login
             </Link>
           </div>
 
@@ -78,8 +81,11 @@ export default function Navigation() {
             <Link href="/solutions" className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
               Solutions
             </Link>
-            <Link href="/solutions#demo" className="bg-blue-600 text-white block px-3 py-2 text-base font-medium rounded-md">
-              Request Demo
+            <Link href="/assembly-line" className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
+              Assembly Line
+            </Link>
+            <Link href="/login" className="bg-blue-600 text-white block px-3 py-2 text-base font-medium rounded-md">
+              Login
             </Link>
           </div>
         </div>

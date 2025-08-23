@@ -1,7 +1,7 @@
 # Robotics CTF
 
 A secure foundation for a robotics-themed Capture the Flag (CTF) platform built with Next.js, TypeScript, and Tailwind CSS.
-More information on the challenge can be found here https://docs.google.com/document/d/1GGjiT-Mqt2SwmtnR8Sl-mwafcmb8L8rvEv4A57VT8gY
+More information on the challenge can be found here https://docs.google.com/document/d1GGjiT-Mqt2SwmtnR8Sl-mwafcmb8L8rvEv4A57VT8gY
 
 ## 🚀 Features
 
@@ -19,19 +19,43 @@ More information on the challenge can be found here https://docs.google.com/docu
 .
 ├── app/                      # Next.js App Router directory
 │   ├── api/                  # API routes
+│   │   ├── auth/            # Authentication endpoints
+│   │   │   └── [...nextauth]/ # NextAuth.js configuration
 │   │   └── hello/           # Secure API endpoint example
 │   │       └── route.ts     # GET/POST handlers with validation
+│   ├── about/               # About page
+│   │   └── page.tsx         # Company information and contact
+│   ├── assembly-line/       # Assembly line demo page
+│   │   └── page.tsx         # Interactive robotics demo
+│   ├── components/          # Reusable React components
+│   │   └── Navigation.tsx   # Main navigation component
+│   ├── contexts/            # React context providers
+│   │   └── AuthContext.tsx  # Authentication context
+│   ├── login/               # Authentication page
+│   │   └── page.tsx         # Login form and authentication
+│   ├── solutions/           # Solutions showcase page
+│   │   └── page.tsx         # Product solutions and demos
 │   ├── layout.tsx           # Root layout with security headers
 │   ├── page.tsx             # Homepage component
 │   └── globals.css          # Global styles with Tailwind
 ├── __tests__/               # Jest test directory
-│   └── api.test.ts          # API security tests
+│   ├── api.test.ts          # API security tests
+│   └── setup.ts             # Test configuration
 ├── middleware.ts            # Global middleware for security
 ├── next.config.mjs          # Next.js configuration
 ├── tailwind.config.ts       # Tailwind CSS configuration
 ├── jest.config.ts           # Jest testing configuration
+├── jest.setup.ts            # Jest setup configuration
 └── package.json             # Dependencies and scripts
 ```
+
+## 🎯 Core Pages
+
+- **Homepage** (`/`) - Main landing page with company overview
+- **About** (`/about`) - Company information and contact details
+- **Solutions** (`/solutions`) - Product solutions and interactive demos
+- **Assembly Line** (`/assembly-line`) - Interactive robotics demonstration
+- **Login** (`/login`) - Authentication and user management
 
 ## 🛡️ Security Features
 
