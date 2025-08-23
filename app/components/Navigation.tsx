@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated, logout } = useAuth();
 
   return (
     <nav className="bg-white shadow-lg border-b border-gray-200">
@@ -42,12 +44,21 @@ export default function Navigation() {
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <Link
-              href="/login"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              Login
-            </Link>
+            {isAuthenticated ? (
+              <button
+                onClick={logout}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Login
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -84,9 +95,18 @@ export default function Navigation() {
             <Link href="/assembly-line" className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
               Assembly Line
             </Link>
-            <Link href="/login" className="bg-blue-600 text-white block px-3 py-2 text-base font-medium rounded-md">
-              Login
-            </Link>
+            {isAuthenticated ? (
+              <button
+                onClick={logout}
+                className="bg-red-600 text-white block px-3 py-2 text-base font-medium rounded-md w-full text-left"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link href="/login" className="bg-blue-600 text-white block px-3 py-2 text-base font-medium rounded-md">
+                Login
+              </Link>
+            )}
           </div>
         </div>
       )}

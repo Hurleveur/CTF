@@ -39,7 +39,7 @@ const COMPANIES = [
 ];
 
 export default function AssemblyLinePage() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const router = useRouter();
   const [selectedCompany, setSelectedCompany] = useState<typeof COMPANIES[0] | null>(null);
   const [assemblyStatus, setAssemblyStatus] = useState('idle');
@@ -70,10 +70,7 @@ export default function AssemblyLinePage() {
     setProductionCount(0);
   };
 
-  const handleLogout = () => {
-    logout();
-    router.push('/');
-  };
+
 
   const toggleAssemblyLine = () => {
     setAssemblyStatus(prev => prev === 'running' ? 'stopped' : 'running');
@@ -100,17 +97,7 @@ export default function AssemblyLinePage() {
                 </div>
               )}
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
-                Welcome, {user?.name || 'User'}
-              </span>
-              <button
-                onClick={handleLogout}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Sign Out
-              </button>
-            </div>
+
           </div>
         </div>
       </div>
