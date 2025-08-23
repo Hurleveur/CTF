@@ -34,10 +34,13 @@ export default function SolutionsPage() {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold mb-6">Robotic Solutions</h1>
+          <h1 className="text-5xl font-bold mb-6">CTF Leaderboard</h1>
           <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-            Discover our comprehensive range of industrial robotics designed to automate, 
-            optimize, and revolutionize your manufacturing processes.
+            Track the progress of all participating teams in our Robotics CTF Challenge. 
+            Each robot represents a hexadecimal flag discovered by the team.
+          </p>
+          <p className="text-sm text-blue-200 mt-4 opacity-75">
+            [Live updates every 15 minutes - Last updated: 14:32 GMT]
           </p>
         </div>
       </section>
@@ -46,151 +49,161 @@ export default function SolutionsPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Solutions</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Team Rankings</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From assembly automation to material handling, we offer specialized solutions 
-              for every manufacturing challenge.
+              Current standings of all participating teams. The more robots you collect, 
+              the higher your rank in the robotics security challenge.
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Assembly Robots */}
-            <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="h-64 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                <svg className="w-32 h-32 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-              </div>
-              <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Assembly Robots</h3>
-                <p className="text-gray-600 mb-4">
-                  High-precision robotic arms designed for complex assembly operations with 
-                  adaptive learning and real-time quality control.
-                </p>
-                <ul className="text-gray-600 text-sm mb-6 space-y-2">
-                  <li>• Precision down to 0.01mm</li>
-                  <li>• Adaptive learning algorithms</li>
-                  <li>• 24/7 operation capability</li>
-                  <li>• Easy programming interface</li>
-                </ul>
-                <div className="text-blue-600 font-semibold">Starting at $45,000</div>
-              </div>
-            </div>
-            
-            {/* Welding Systems */}
-            <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="h-64 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-                <svg className="w-32 h-32 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Welding Systems</h3>
-                <p className="text-gray-600 mb-4">
-                  Automated welding solutions with advanced sensors and adaptive control 
-                  for consistent, high-quality welds every time.
-                </p>
-                <ul className="text-gray-600 text-sm mb-6 space-y-2">
-                  <li>• Multi-process welding support</li>
-                  <li>• Real-time quality monitoring</li>
-                  <li>• Adaptive seam tracking</li>
-                  <li>• Safety compliance certified</li>
-                </ul>
-                <div className="text-green-600 font-semibold">Starting at $65,000</div>
-              </div>
-            </div>
-            
-            {/* Material Handling */}
+            {/* Team CyberNinja */}
             <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="h-64 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-                <svg className="w-32 h-32 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
+                <div className="text-center">
+                  <div className="text-6xl font-bold text-white mb-2">🥇</div>
+                  <div className="text-2xl font-bold text-white">47</div>
+                  <div className="text-sm text-purple-100">ROBOTS</div>
+                </div>
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Material Handling</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Team CyberNinja</h3>
                 <p className="text-gray-600 mb-4">
-                  Intelligent logistics robots for warehouse automation, palletizing, 
-                  and material transport with advanced navigation.
+                  Leading the pack with exceptional reverse engineering skills. 
+                  Specializes in binary exploitation and cryptographic challenges.
                 </p>
                 <ul className="text-gray-600 text-sm mb-6 space-y-2">
-                  <li>• Autonomous navigation</li>
-                  <li>• Load capacity up to 500kg</li>
-                  <li>• 24/7 warehouse operation</li>
-                  <li>• Integration with WMS</li>
+                  <li>• Found 23 web vulnerabilities</li>
+                  <li>• Cracked 12 crypto challenges</li>
+                  <li>• 8 reverse engineering flags</li>
+                  <li>• 4 forensics discoveries</li>
                 </ul>
-                <div className="text-purple-600 font-semibold">Starting at $35,000</div>
+                <div className="text-purple-600 font-semibold">Rank: #1</div>
               </div>
             </div>
             
-            {/* Inspection Robots */}
+            {/* Team H4ck3rz */}
             <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="h-64 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-                <svg className="w-32 h-32 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
+              <div className="h-64 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-6xl font-bold text-white mb-2">🥈</div>
+                  <div className="text-2xl font-bold text-white">42</div>
+                  <div className="text-sm text-green-100">ROBOTS</div>
+                </div>
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Inspection Robots</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Team H4ck3rz</h3>
                 <p className="text-gray-600 mb-4">
-                  Automated quality control systems with advanced vision technology 
-                  for defect detection and measurement verification.
+                  Close second place with strong web application security expertise. 
+                  Known for their innovative approaches to steganography challenges.
                 </p>
                 <ul className="text-gray-600 text-sm mb-6 space-y-2">
-                  <li>• High-resolution cameras</li>
-                  <li>• AI-powered defect detection</li>
-                  <li>• Statistical process control</li>
-                  <li>• Detailed reporting</li>
+                  <li>• 19 web application flags</li>
+                  <li>• 10 steganography finds</li>
+                  <li>• 7 network security flags</li>
+                  <li>• 6 miscellaneous challenges</li>
                 </ul>
-                <div className="text-yellow-600 font-semibold">Starting at $55,000</div>
+                <div className="text-green-600 font-semibold">Rank: #2</div>
               </div>
             </div>
             
-            {/* Collaborative Robots */}
+            {/* Team ByteBusters */}
+            <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+              <div className="h-64 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-6xl font-bold text-white mb-2">🥉</div>
+                  <div className="text-2xl font-bold text-white">35</div>
+                  <div className="text-sm text-orange-100">ROBOTS</div>
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Team ByteBusters</h3>
+                <p className="text-gray-600 mb-4">
+                  Strong third place showing with balanced skills across all categories. 
+                  Excels at forensics analysis and memory dump investigations.
+                </p>
+                <ul className="text-gray-600 text-sm mb-6 space-y-2">
+                  <li>• 15 forensics challenges</li>
+                  <li>• 9 reverse engineering flags</li>
+                  <li>• 6 web security finds</li>
+                  <li>• 5 cryptography solves</li>
+                </ul>
+                <div className="text-orange-600 font-semibold">Rank: #3</div>
+              </div>
+            </div>
+            
+            {/* Team RootAccess */}
             <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="h-64 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
-                <svg className="w-32 h-32 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-white mb-2">🏆</div>
+                  <div className="text-2xl font-bold text-white">29</div>
+                  <div className="text-sm text-red-100">ROBOTS</div>
+                </div>
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Collaborative Robots</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Team RootAccess</h3>
                 <p className="text-gray-600 mb-4">
-                  Safe, human-friendly robots designed to work alongside your workforce 
-                  in shared spaces without safety barriers.
+                  Solid performance with a focus on privilege escalation challenges. 
+                  Known for their methodical approach to binary analysis.
                 </p>
                 <ul className="text-gray-600 text-sm mb-6 space-y-2">
-                  <li>• Force-sensing technology</li>
-                  <li>• Easy programming</li>
-                  <li>• Quick deployment</li>
-                  <li>• Flexible applications</li>
+                  <li>• 12 privilege escalation flags</li>
+                  <li>• 8 binary exploitation finds</li>
+                  <li>• 5 network penetration flags</li>
+                  <li>• 4 system administration challenges</li>
                 </ul>
-                <div className="text-red-600 font-semibold">Starting at $25,000</div>
+                <div className="text-red-600 font-semibold">Rank: #4</div>
               </div>
             </div>
             
-            {/* Custom Solutions */}
+            {/* Team CryptoKings */}
             <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="h-64 bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center">
-                <svg className="w-32 h-32 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
+              <div className="h-64 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-white mb-2">⚡</div>
+                  <div className="text-2xl font-bold text-white">23</div>
+                  <div className="text-sm text-blue-100">ROBOTS</div>
+                </div>
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Custom Solutions</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Team CryptoKings</h3>
                 <p className="text-gray-600 mb-4">
-                  Tailored robotics solutions designed specifically for your unique 
-                  manufacturing requirements and processes.
+                  Specializes in cryptographic challenges with impressive mathematical skills. 
+                  Recently made a breakthrough on the advanced cipher series.
                 </p>
                 <ul className="text-gray-600 text-sm mb-6 space-y-2">
-                  <li>• Custom design & engineering</li>
-                  <li>• Industry-specific solutions</li>
-                  <li>• Full integration support</li>
-                  <li>• Ongoing maintenance</li>
+                  <li>• 18 cryptography challenges</li>
+                  <li>• 3 advanced cipher breaks</li>
+                  <li>• 1 quantum crypto flag</li>
+                  <li>• 1 mathematical proof challenge</li>
                 </ul>
-                <div className="text-indigo-600 font-semibold">Custom Pricing</div>
+                <div className="text-blue-600 font-semibold">Rank: #5</div>
+              </div>
+            </div>
+            
+            {/* Team Binary-Warriors */}
+            <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+              <div className="h-64 bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-white mb-2">🔍</div>
+                  <div className="text-2xl font-bold text-white">18</div>
+                  <div className="text-sm text-indigo-100">ROBOTS</div>
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Team Binary-Warriors</h3>
+                <p className="text-gray-600 mb-4">
+                  Focused team with deep expertise in reverse engineering and malware analysis. 
+                  Making steady progress through the more complex challenges.
+                </p>
+                <ul className="text-gray-600 text-sm mb-6 space-y-2">
+                  <li>• 11 reverse engineering flags</li>
+                  <li>• 4 malware analysis challenges</li>
+                  <li>• 2 firmware extraction flags</li>
+                  <li>• 1 hardware hacking challenge</li>
+                </ul>
+                <div className="text-indigo-600 font-semibold">Rank: #6</div>
               </div>
             </div>
           </div>
@@ -201,10 +214,13 @@ export default function SolutionsPage() {
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Technical Specifications</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Competition Statistics</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Our robots are built to the highest industry standards with cutting-edge technology 
-              and robust engineering for reliable performance.
+              Real-time metrics from our CTF platform showing challenge completion rates 
+              and team performance across different categories.
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              [Updated every 15 minutes - Competition ends in 18:42:15]
             </p>
           </div>
           
@@ -212,41 +228,41 @@ export default function SolutionsPage() {
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Precision</h3>
-              <p className="text-gray-600">0.01mm accuracy</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Teams</h3>
+              <p className="text-gray-600">47 registered</p>
             </div>
             
             <div className="text-center">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Speed</h3>
-              <p className="text-gray-600">Up to 2.5 m/s</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Challenges</h3>
+              <p className="text-gray-600">156 solved</p>
             </div>
             
             <div className="text-center">
               <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Reliability</h3>
-              <p className="text-gray-600">99.9% uptime</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Total Flags</h3>
+              <p className="text-gray-600">224 captured</p>
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Safety</h3>
-              <p className="text-gray-600">ISO 13482 certified</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Avg Solve Time</h3>
+              <p className="text-gray-600">2h 34m</p>
             </div>
           </div>
         </div>
@@ -256,17 +272,20 @@ export default function SolutionsPage() {
       <section id="demo" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Schedule a Demo</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Join the Competition</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              See our robotics solutions in action. Our experts will demonstrate how our technology 
-              can transform your manufacturing operations.
+              Register your team for our ongoing Robotics CTF Challenge. 
+              Prove your skills and climb the leaderboard!
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              [Registration closes in 6 hours - Limited spots available]
             </p>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             {/* Demo Information */}
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">What to Expect</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Competition Rules</h3>
               
               <div className="space-y-6">
                 <div className="flex items-start">
@@ -274,10 +293,10 @@ export default function SolutionsPage() {
                     <span className="text-blue-600 font-bold text-sm">1</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Initial Consultation</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">Team Registration</h4>
                     <p className="text-gray-600">
-                      We'll discuss your current manufacturing challenges and automation goals 
-                      to understand your specific needs.
+                      Register your team with up to 4 members. Each team gets access to the 
+                      CTF platform and challenge categories.
                     </p>
                   </div>
                 </div>
@@ -287,10 +306,10 @@ export default function SolutionsPage() {
                     <span className="text-blue-600 font-bold text-sm">2</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Live Demonstration</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">Challenge Categories</h4>
                     <p className="text-gray-600">
-                      Watch our robots in action at our facility or schedule an on-site demo 
-                      to see them in your environment.
+                      Solve challenges across web security, cryptography, reverse engineering, 
+                      forensics, and network penetration testing.
                     </p>
                   </div>
                 </div>
@@ -300,10 +319,10 @@ export default function SolutionsPage() {
                     <span className="text-blue-600 font-bold text-sm">3</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Solution Design</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">Scoring System</h4>
                     <p className="text-gray-600">
-                      Our engineers will work with you to design a custom automation solution 
-                      tailored to your specific requirements.
+                      Each solved challenge earns your team robots (points). Dynamic scoring 
+                      adjusts based on solve count and difficulty.
                     </p>
                   </div>
                 </div>
@@ -313,50 +332,50 @@ export default function SolutionsPage() {
                     <span className="text-blue-600 font-bold text-sm">4</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Implementation Plan</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">Competition End</h4>
                     <p className="text-gray-600">
-                      Receive a detailed implementation timeline and cost breakdown for 
-                      your automation project.
+                      Competition runs for 48 hours. Final rankings determine prizes 
+                      and recognition in the security community.
                     </p>
                   </div>
                 </div>
               </div>
               
-              {/* Demo Benefits */}
-              <div className="mt-12 p-6 bg-gray-50 rounded-xl">
-                <h4 className="text-xl font-semibold text-gray-900 mb-4">Demo Benefits</h4>
+              {/* Prize Information */}
+              <div className="mt-12 p-6 bg-blue-50 rounded-xl border border-blue-200">
+                <h4 className="text-xl font-semibold text-gray-900 mb-4">Prizes & Recognition</h4>
                 <ul className="space-y-2 text-gray-600">
                   <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <svg className="w-5 h-5 text-yellow-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
-                    No cost or obligation
+                    1st Place: $5,000 + Hardware Prize Pack
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    2nd Place: $3,000 + Security Toolkit
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-orange-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    3rd Place: $1,500 + Certificate
                   </li>
                   <li className="flex items-center">
                     <svg className="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Expert consultation
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Custom solution design
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    ROI analysis
+                    All participants get completion certificate
                   </li>
                 </ul>
               </div>
             </div>
             
-            {/* Demo Form */}
+            {/* Emergency Form */}
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-8">Request Your Demo</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-8">Team Registration Form</h3>
               <form onSubmit={handleDemoSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -425,7 +444,7 @@ export default function SolutionsPage() {
                 
                 <div>
                   <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
-                    Company Name *
+                    Team Name *
                   </label>
                   <input
                     type="text"
@@ -435,13 +454,13 @@ export default function SolutionsPage() {
                     value={demoForm.company}
                     onChange={handleDemoChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Your Company Inc."
+                    placeholder="Team Cyber-Warriors"
                   />
                 </div>
                 
                 <div>
                   <label htmlFor="interest" className="block text-sm font-medium text-gray-700 mb-2">
-                    I'm interested in
+                    Primary Expertise
                   </label>
                   <select
                     id="interest"
@@ -450,33 +469,38 @@ export default function SolutionsPage() {
                     onChange={handleDemoChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="general">General Automation</option>
-                    <option value="assembly">Assembly Robots</option>
-                    <option value="welding">Welding Systems</option>
-                    <option value="material">Material Handling</option>
-                    <option value="inspection">Inspection Robots</option>
-                    <option value="collaborative">Collaborative Robots</option>
-                    <option value="custom">Custom Solutions</option>
+                    <option value="general">General Security</option>
+                    <option value="assembly">Web Application Security</option>
+                    <option value="welding">Cryptography</option>
+                    <option value="material">Reverse Engineering</option>
+                    <option value="inspection">Digital Forensics</option>
+                    <option value="collaborative">Network Penetration</option>
+                    <option value="custom">Binary Exploitation</option>
                   </select>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="preferredDate" className="block text-sm font-medium text-gray-700 mb-2">
-                      Preferred Date
+                      Team Size
                     </label>
-                    <input
-                      type="date"
+                    <select
                       id="preferredDate"
                       name="preferredDate"
                       value={demoForm.preferredDate}
                       onChange={handleDemoChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    >
+                      <option value="">Select team size</option>
+                      <option value="1">1 member</option>
+                      <option value="2">2 members</option>
+                      <option value="3">3 members</option>
+                      <option value="4">4 members</option>
+                    </select>
                   </div>
                   <div>
                     <label htmlFor="preferredTime" className="block text-sm font-medium text-gray-700 mb-2">
-                      Preferred Time
+                      Experience Level
                     </label>
                     <select
                       id="preferredTime"
@@ -485,17 +509,17 @@ export default function SolutionsPage() {
                       onChange={handleDemoChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
-                      <option value="">Select time</option>
-                      <option value="morning">Morning (9 AM - 12 PM)</option>
-                      <option value="afternoon">Afternoon (1 PM - 4 PM)</option>
-                      <option value="evening">Evening (4 PM - 6 PM)</option>
+                      <option value="">Select level</option>
+                      <option value="beginner">Beginner</option>
+                      <option value="intermediate">Intermediate</option>
+                      <option value="advanced">Advanced</option>
                     </select>
                   </div>
                 </div>
                 
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                    Additional Information
+                    Team Members & Additional Info
                   </label>
                   <textarea
                     id="message"
@@ -504,7 +528,7 @@ export default function SolutionsPage() {
                     value={demoForm.message}
                     onChange={handleDemoChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Tell us about your specific automation needs, challenges, or any questions you have..."
+                    placeholder="List team member names, previous CTF experience, any special requirements, or additional information..."
                   />
                 </div>
                 
@@ -512,7 +536,7 @@ export default function SolutionsPage() {
                   type="submit"
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-lg text-lg font-semibold transition-colors"
                 >
-                  Schedule Demo
+                  Register Team
                 </button>
               </form>
             </div>
@@ -523,23 +547,26 @@ export default function SolutionsPage() {
       {/* CTA Section */}
       <section className="py-20 bg-blue-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Get Started?</h2>
+          <h2 className="text-4xl font-bold mb-6">Ready to Compete?</h2>
           <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-            Our robotics experts are ready to help you find the perfect automation solution 
-            for your manufacturing needs. Contact us today for a consultation.
+            Join our Robotics CTF Challenge and test your cybersecurity skills against the best. 
+            Register now and start collecting robots to claim your position on the leaderboard.
+          </p>
+          <p className="text-sm text-blue-200 mb-8">
+            [Competition starts in 2 hours - Don't miss your chance to compete!]
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/about#contact" 
               className="bg-white text-blue-900 hover:bg-gray-100 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
-              Get in Touch
+              Get Support
             </Link>
             <a 
-              href="tel:+15551234567" 
+              href="#demo" 
               className="border-2 border-white text-white hover:bg-white hover:text-blue-900 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
-              Call Now
+              Register Now
             </a>
           </div>
         </div>
