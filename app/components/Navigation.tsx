@@ -92,6 +92,9 @@ export default function Navigation() {
             <Link href="/solutions" className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
               Solutions
             </Link>
+            <Link href="/team" className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
+              Team Directory
+            </Link>
             <Link href="/assembly-line" className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
               Assembly Line
             </Link>

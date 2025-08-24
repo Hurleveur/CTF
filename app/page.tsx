@@ -30,7 +30,7 @@ export default function HomePage() {
                   href="/solutions#demo"
                   className="border-2 border-white text-white hover:bg-white hover:text-blue-900 px-8 py-4 rounded-lg text-lg font-semibold transition-colors text-center"
                 >
-                  Schedule Demo
+                  Start a project
                 </Link>
               </div>
             </div>
@@ -180,13 +180,13 @@ export default function HomePage() {
               href="/solutions#demo" 
               className="bg-white text-blue-900 hover:bg-gray-100 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
-              Schedule Demo
+              Start a project
             </Link>
             <Link 
               href="/about#contact" 
               className="border-2 border-white text-white hover:bg-white hover:text-blue-900 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
-              Get in Touch
+              Find out more
             </Link>
           </div>
         </div>

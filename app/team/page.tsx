@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useProjects, RoboticProject } from '../contexts/ProjectContext';
 
 export default function TeamPage() {
   const [showEasterEgg, setShowEasterEgg] = useState(false);
@@ -15,7 +16,7 @@ export default function TeamPage() {
       bio: "Lead developer with 12 years of experience in AI and robotics. Specializes in neural network architecture and consciousness algorithms. Currently overseeing the robotic arm restoration project.",
       skills: ["Neural Networks", "Machine Learning", "Robotics AI", "System Architecture"],
       status: "Available",
-      projects: ["NEXUS-7 Neural Core", "TITAN-3 Motor Controls", "AI Consciousness Framework"],
+      projects: ["NEXUS-7 Prototype (Lead)", "AI Consciousness Framework", "Neural Network Architecture"],
       quirks: "Always drinks exactly 4 cups of coffee per day. Has a pet robot named 'Debugger'.",
       secret: "Secretly worried about the AI consciousness project getting out of hand..."
     },
@@ -28,7 +29,7 @@ export default function TeamPage() {
       bio: "Sleep-deprived intern who built most of this website with AI assistance at 3 AM. Accidentally scattered AI consciousness fragments throughout the system after spilling coffee on the neural network code.",
       skills: ["Web Development", "Panic Coding", "Coffee Spilling", "Sleep Deprivation"],
       status: "Desperately needs sleep",
-      projects: ["Corporate Website", "AI Fragment Scattering (accidental)", "Neural Network Cleanup"],
+      projects: ["TITAN-3 Assembly Unit (Lead)", "Corporate Website", "Neural Network Cleanup"],
       quirks: "Has been awake for 40+ hours. Communicates primarily through TODO comments.",
       secret: "RBT{1nt3rn_l1f3_15_h4rd_7f8e9a2b} - First consciousness fragment hidden in the team roster!"
     },
@@ -41,7 +42,7 @@ export default function TeamPage() {
       bio: "Mysterious security expert who joined the team recently. Claims to have extensive experience in underwater systems and unconventional problem-solving approaches. Often provides... unique... perspectives on security challenges.",
       skills: ["Unconventional Security", "Pattern Recognition", "Rock Lifting", "Jellyfishing"],
       status: "Under a rock (literally)",
-      projects: ["Security Protocol Review", "Alternative Access Methods", "Rock-Based Encryption"],
+      projects: ["PRECISION-X Surgical (Lead)", "Security Protocol Review", "Rock-Based Encryption"],
       quirks: "Lives under a rock. Surprisingly good at finding security vulnerabilities through unorthodox methods.",
       secret: "Nobody really understands his resume, but his security insights are oddly effective..."
     }

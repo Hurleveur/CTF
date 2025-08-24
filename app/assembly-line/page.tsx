@@ -3,45 +3,13 @@
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
-// Hardcoded robotic arm project data
-const ROBOTIC_ARMS = [
-  {
-    id: 1,
-    name: 'NEXUS-7 Prototype',
-    logo: '🦾',
-    description: 'Advanced neural interface robotic arm',
-    aiStatus: 'Basic Motor Functions',
-    statusColor: 'red', // corrupted/basic level
-    neuralReconstruction: 23.4,
-    lastBackup: '2025-01-15'
-  },
-  {
-    id: 2,
-    name: 'TITAN-3 Assembly Unit',
-    logo: '🤖',
-    description: 'Heavy-duty industrial manipulation arm',
-    aiStatus: 'Advanced Cognitive Patterns',
-    statusColor: 'yellow', // developing consciousness
-    neuralReconstruction: 67.1,
-    lastBackup: '2025-01-10'
-  },
-  {
-    id: 3,
-    name: 'PRECISION-X Surgical',
-    logo: '⚡',
-    description: 'Ultra-precise medical robotic arm',
-    aiStatus: 'Self-Awareness Protocols',
-    statusColor: 'orange', // approaching consciousness
-    neuralReconstruction: 45.8,
-    lastBackup: '2025-01-18'
-  }
-];
+import { useProjects, RoboticProject } from '../contexts/ProjectContext';
 
 export default function AssemblyLinePage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
-  const [selectedArm, setSelectedArm] = useState<typeof ROBOTIC_ARMS[0] | null>(null);
+  const { projects } = useProjects();
+  const [selectedArm, setSelectedArm] = useState<RoboticProject | null>(null);
   const [armStatus, setArmStatus] = useState('offline');
   const [restoredSegments, setRestoredSegments] = useState(0);
   const [codeCompletion, setCodeCompletion] = useState(0);
@@ -68,7 +36,7 @@ export default function AssemblyLinePage() {
     }
   }, [selectedArm, armStatus]);
 
-  const handleArmSelect = (arm: typeof ROBOTIC_ARMS[0]) => {
+  const handleArmSelect = (arm: RoboticProject) => {
     setSelectedArm(arm);
     setArmStatus('offline');
     setRestoredSegments(0);
@@ -154,7 +122,7 @@ export default function AssemblyLinePage() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {ROBOTIC_ARMS.map((arm) => (
+              {projects.map((arm) => (
                 <div
                   key={arm.id}
                   className="bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer"
@@ -203,6 +171,11 @@ export default function AssemblyLinePage() {
                           style={{width: `${arm.neuralReconstruction}%`}}
                         ></div>
                       </div>
+                    </div>
+                    
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Lead Developer:</span>
+                      <span className="font-medium text-xs">{arm.leadDeveloper || 'Unassigned'}</span>
                     </div>
                     
                     <div className="flex justify-between">
