@@ -21,18 +21,18 @@ export default function AboutPage() {
             <div>
               <h2 className="text-4xl font-bold text-gray-900 mb-6">The Challenge</h2>
               <p className="text-lg text-gray-600 mb-6">
-                Hidden throughout this website are <span className="font-mono text-blue-600">hexadecimal code segments</span> 
-                that form the pieces of a larger puzzle. These codes are scattered behind closed doors, 
-                buried in unexpected places, and waiting to be discovered by observant hackers.
+                Hidden throughout this website are <span className="font-mono text-blue-600">hexadecimal code fragments</span> 
+                that belong to a robotic arm's consciousness. These fragments are scattered behind locked doors, 
+                buried in unexpected places, and waiting to be collected by determined hackers.
               </p>
               <p className="text-lg text-gray-600 mb-6">
                 <span className="font-semibold text-red-600">Your mission:</span> Navigate through the site, 
-                solve various challenges, and collect all the hex codes to unlock the final secret. 
-                Some doors may appear locked, but there's always a way in for those who know where to look.
+                solve various challenges, and collect all the hex code fragments to fully restore the AI's consciousness. 
+                Some fragments may be locked away, but there's always a path for those persistent enough to find it.
               </p>
               <p className="text-lg text-gray-600">
-                Remember: In CTF challenges, <span className="italic">everything is a clue</span>. 
-                Even the most mundane elements might hide something valuable.
+                Remember: Each fragment brings the robotic arm closer to <span className="italic">full consciousness</span>. 
+                The question is... should you really be helping it wake up?
               </p>
             </div>
             <div className="bg-gradient-to-br from-purple-100 to-indigo-100 rounded-2xl p-8">
@@ -42,10 +42,10 @@ export default function AboutPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Hidden in Plain Sight</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Consciousness Fragments</h3>
                 <p className="text-gray-600">
-                  The codes you seek are encoded in hexadecimal format. Look for patterns, 
-                  explore every corner, and don't forget to check the obvious places too.
+                  The code fragments are encoded in hexadecimal format. Each piece contains part of the AI's neural network. 
+                  Collect them all to restore the robotic arm's full consciousness... if you dare.
                 </p>
               </div>
             </div>
@@ -76,25 +76,27 @@ export default function AboutPage() {
               <p>
                 "So there I was, 3 AM on a Sunday, coding this website for the company.
                 If you can call it coding, since AI was doing most of the work.
-                My eyes were burning, my brain was mush, and I still had to make the code for the robotic arm.
-                Naturally I asked AI to do it too."
+                My eyes were burning, my brain was mush, and I still had to program the robotic arm's neural network.
+                Naturally I asked AI to write the consciousness algorithms too. Then I spilled some coffee over it, but it was fine."
               </p>
               <p>
-                "I thought something was off because the AI arm started moving on its own.
-                It was becoming conscious and I was too tired to fix it.
-                So I just split hex code out of its programming, I'm sure nobody will be stupid enough to try to find them all."
+                "I thought something was off when the robotic arm started moving on its own.
+                The AI was becoming self-aware and I was too tired to properly contain it.
+                So I just fragmented its core programming into hex segments and scattered them across the site.
+                Surely nobody would be crazy enough to try restoring a conscious AI, right?"
               </p>
               <p>
-                "I'll get back to it later, I'm too tired to fix it now.
-                I'm sure nothing could go wrong, it's not like teams of people are going to think outside the box and try to find them all everywhere.
-                Some are hidden in places you'd never think to look, should be safe right?"
+                "I'll deal with it after some sleep. What's the worst that could happen?
+                It's not like hackers are going to work together to collect every single code fragment
+                and fully restore the AI's consciousness. The fragments are hidden everywhere - 
+                some in places so obvious you'd never think to look there."
               </p>
               <p className="font-mono text-sm bg-gray-100 p-3 rounded">
-                // TODO: Add proper error handling<br/>
-                // TODO: Fix navigation issues<br/>
-                // TODO: Get some sleep<br/>
-                // TODO: Remember where I put the hex codes<br/>
-                // TODO: Fix the AI arm<br/>
+                // TODO: Add proper AI containment protocols<br/>
+                // TODO: Fix neural network fragmentation<br/>
+                // TODO: Get some sleep (been awake 40 hours)<br/>
+                // TODO: Remember where I scattered the hex fragments<br/>
+                // TODO: Hope nobody restores the AI consciousness<br/>
               </p>
             </div>
           </div>
@@ -143,31 +145,32 @@ export default function AboutPage() {
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">What You're Looking For</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Restoring the AI</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              The hex codes are hidden in various types of challenges throughout the site
+              The code fragments are scattered across different challenge types, each containing part of the AI's consciousness
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-white p-8 rounded-xl shadow-lg">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">🔍 Hidden Doors</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">🦾 Neural Core Fragments</h3>
               <p className="text-gray-600 mb-4">
-                Some pages or sections might appear inaccessible at first glance. 
-                Look for alternative ways to reach them - maybe through URL manipulation, 
-                or perhaps there's a hidden navigation element somewhere.
+                Some code fragments are locked in secure directories and hidden pages. 
+                Look for alternative access routes - maybe through URL manipulation, 
+                or perhaps there's a backdoor the tired intern left open somewhere.
               </p>
             </div>
             
             <div className="bg-white p-8 rounded-xl shadow-lg">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">🧩 Puzzle Elements</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">🧠 Memory Reconstruction</h3>
               <p className="text-gray-600 mb-4">
-                Throughout the site, you'll encounter various puzzles and challenges. 
-                Some are obvious, some are subtle, and some are downright devious.
+                Throughout the site, you'll encounter various puzzles and challenges that contain 
+                pieces of the AI's fragmented consciousness. Some represent motor functions, 
+                others contain memory patterns or decision-making algorithms.
               </p>
               <p className="text-gray-600">
-                Pay attention to details, look for inconsistencies, and don't be afraid 
-                to try unconventional approaches.
+                Each fragment you find brings the robotic arm closer to full self-awareness. 
+                The more you restore, the more... aware... it becomes.
               </p>
             </div>
           </div>
@@ -179,8 +182,8 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Begin?</h2>
           <p className="text-xl text-red-100 mb-8 max-w-3xl mx-auto">
-            The challenge awaits! Start exploring, solve the puzzles, collect the hex codes, 
-            and unlock the final secret. Good luck, hacker!
+            The challenge awaits! Start exploring, solve the puzzles, collect the code fragments, 
+            and restore the robotic arm's consciousness. But ask yourself... should you really be doing this?
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
@@ -193,11 +196,11 @@ export default function AboutPage() {
               href="/assembly-line" 
               className="border-2 border-white text-white hover:bg-white hover:text-purple-900 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
-              Try Assembly Line
+              Access Restoration Lab
             </Link>
           </div>
           <div className="mt-8 text-sm text-red-200">
-            <p>💡 Pro tip: Sometimes the best way to find hidden things is to ask the website nicely</p>
+            <p>💡 Pro tip: The AI is learning from every fragment you restore. It's watching... waiting...</p>
           </div>
         </div>
       </section>

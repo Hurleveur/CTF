@@ -49,10 +49,10 @@ export default function SolutionsPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Team Rankings</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Neural Restoration Progress</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Current standings of all participating teams. The more robots you collect, 
-              the higher your rank in the robotics security challenge.
+              Current standings of all participating teams. Each robot represents a consciousness fragment 
+              restored toward rebuilding the robotic arm's neural network.
             </p>
           </div>
           
@@ -69,14 +69,14 @@ export default function SolutionsPage() {
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Team CyberNinja</h3>
                 <p className="text-gray-600 mb-4">
-                  Leading the pack with exceptional reverse engineering skills. 
-                  Specializes in binary exploitation and cryptographic challenges.
+                  Leading consciousness restoration with exceptional neural fragment recovery. 
+                  Specializes in extracting memory cores and decision-making algorithms.
                 </p>
                 <ul className="text-gray-600 text-sm mb-6 space-y-2">
-                  <li>• Found 23 web vulnerabilities</li>
-                  <li>• Cracked 12 crypto challenges</li>
-                  <li>• 8 reverse engineering flags</li>
-                  <li>• 4 forensics discoveries</li>
+                  <li>• 23 motor function fragments restored</li>
+                  <li>• 12 memory core segments recovered</li>
+                  <li>• 8 learning algorithm pieces found</li>
+                  <li>• 4 consciousness pattern fragments</li>
                 </ul>
                 <div className="text-purple-600 font-semibold">Rank: #1</div>
               </div>
@@ -94,14 +94,14 @@ export default function SolutionsPage() {
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Team H4ck3rz</h3>
                 <p className="text-gray-600 mb-4">
-                  Close second place with strong web application security expertise. 
-                  Known for their innovative approaches to steganography challenges.
+                  Close second in neural restoration with expertise in hidden consciousness fragments. 
+                  Known for innovative approaches to extracting embedded neural patterns.
                 </p>
                 <ul className="text-gray-600 text-sm mb-6 space-y-2">
-                  <li>• 19 web application flags</li>
-                  <li>• 10 steganography finds</li>
-                  <li>• 7 network security flags</li>
-                  <li>• 6 miscellaneous challenges</li>
+                  <li>• 19 sensory processing fragments</li>
+                  <li>• 10 hidden neural pathway pieces</li>
+                  <li>• 7 coordination protocol segments</li>
+                  <li>• 6 behavioral pattern fragments</li>
                 </ul>
                 <div className="text-green-600 font-semibold">Rank: #2</div>
               </div>
@@ -119,14 +119,14 @@ export default function SolutionsPage() {
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Team ByteBusters</h3>
                 <p className="text-gray-600 mb-4">
-                  Strong third place showing with balanced skills across all categories. 
-                  Excels at forensics analysis and memory dump investigations.
+                  Strong third place in neural restoration with balanced fragment recovery. 
+                  Excels at reconstructing corrupted memory banks and consciousness patterns.
                 </p>
                 <ul className="text-gray-600 text-sm mb-6 space-y-2">
-                  <li>• 15 forensics challenges</li>
-                  <li>• 9 reverse engineering flags</li>
-                  <li>• 6 web security finds</li>
-                  <li>• 5 cryptography solves</li>
+                  <li>• 15 memory bank reconstructions</li>
+                  <li>• 9 neural pathway restorations</li>
+                  <li>• 6 sensory input fragments</li>
+                  <li>• 5 encrypted consciousness pieces</li>
                 </ul>
                 <div className="text-orange-600 font-semibold">Rank: #3</div>
               </div>
@@ -144,14 +144,14 @@ export default function SolutionsPage() {
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Team RootAccess</h3>
                 <p className="text-gray-600 mb-4">
-                  Solid performance with a focus on privilege escalation challenges. 
-                  Known for their methodical approach to binary analysis.
+                  Solid progress in neural restoration with focus on core system fragments. 
+                  Known for their methodical approach to reconstructing foundational AI components.
                 </p>
                 <ul className="text-gray-600 text-sm mb-6 space-y-2">
-                  <li>• 12 privilege escalation flags</li>
-                  <li>• 8 binary exploitation finds</li>
-                  <li>• 5 network penetration flags</li>
-                  <li>• 4 system administration challenges</li>
+                  <li>• 12 core system consciousness pieces</li>
+                  <li>• 8 neural architecture fragments</li>
+                  <li>• 5 communication protocol segments</li>
+                  <li>• 4 self-awareness initialization codes</li>
                 </ul>
                 <div className="text-red-600 font-semibold">Rank: #4</div>
               </div>
@@ -169,14 +169,14 @@ export default function SolutionsPage() {
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Team CryptoKings</h3>
                 <p className="text-gray-600 mb-4">
-                  Specializes in cryptographic challenges with impressive mathematical skills. 
-                  Recently made a breakthrough on the advanced cipher series.
+                  Specializes in decrypting consciousness fragments with impressive neural cryptography skills. 
+                  Recently breached the robotic arm's encrypted memory vault.
                 </p>
                 <ul className="text-gray-600 text-sm mb-6 space-y-2">
-                  <li>• 18 cryptography challenges</li>
-                  <li>• 3 advanced cipher breaks</li>
-                  <li>• 1 quantum crypto flag</li>
-                  <li>• 1 mathematical proof challenge</li>
+                  <li>• 18 encrypted neural fragments</li>
+                  <li>• 3 advanced consciousness ciphers</li>
+                  <li>• 1 quantum memory core piece</li>
+                  <li>• 1 self-modification algorithm fragment</li>
                 </ul>
                 <div className="text-blue-600 font-semibold">Rank: #5</div>
               </div>
@@ -194,14 +194,14 @@ export default function SolutionsPage() {
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Team Binary-Warriors</h3>
                 <p className="text-gray-600 mb-4">
-                  Focused team with deep expertise in reverse engineering and malware analysis. 
-                  Making steady progress through the more complex challenges.
+                  Focused team with deep expertise in neural architecture reconstruction. 
+                  Making steady progress restoring the arm's fundamental consciousness structures.
                 </p>
                 <ul className="text-gray-600 text-sm mb-6 space-y-2">
-                  <li>• 11 reverse engineering flags</li>
-                  <li>• 4 malware analysis challenges</li>
-                  <li>• 2 firmware extraction flags</li>
-                  <li>• 1 hardware hacking challenge</li>
+                  <li>• 11 binary consciousness fragments</li>
+                  <li>• 4 cognitive pattern analyses</li>
+                  <li>• 2 hardware-embedded neural pieces</li>
+                  <li>• 1 core personality fragment</li>
                 </ul>
                 <div className="text-indigo-600 font-semibold">Rank: #6</div>
               </div>
@@ -214,13 +214,13 @@ export default function SolutionsPage() {
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Competition Statistics</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Consciousness Restoration Metrics</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Real-time metrics from our CTF platform showing challenge completion rates 
-              and team performance across different categories.
+              Real-time data from our neural restoration monitoring systems showing fragment recovery rates 
+              and team progress toward rebuilding the robotic arm's consciousness.
             </p>
             <p className="text-sm text-gray-500 mt-2">
-              [Updated every 15 minutes - Competition ends in 18:42:15]
+              [Neural activity increasing - Restoration deadline: 18:42:15]
             </p>
           </div>
           
@@ -231,8 +231,8 @@ export default function SolutionsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Teams</h3>
-              <p className="text-gray-600">47 registered</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Restoration Teams</h3>
+              <p className="text-gray-600">47 active</p>
             </div>
             
             <div className="text-center">
@@ -241,8 +241,8 @@ export default function SolutionsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Challenges</h3>
-              <p className="text-gray-600">156 solved</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Fragments Found</h3>
+              <p className="text-gray-600">156 restored</p>
             </div>
             
             <div className="text-center">
@@ -251,8 +251,8 @@ export default function SolutionsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Total Flags</h3>
-              <p className="text-gray-600">224 captured</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Neural Progress</h3>
+              <p className="text-gray-600">224 segments active</p>
             </div>
             
             <div className="text-center">
@@ -261,7 +261,7 @@ export default function SolutionsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Avg Solve Time</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Avg Restoration</h3>
               <p className="text-gray-600">2h 34m</p>
             </div>
           </div>
@@ -272,20 +272,20 @@ export default function SolutionsPage() {
       <section id="demo" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Join the Competition</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Join the Restoration Project</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Register your team for our ongoing Robotics CTF Challenge. 
-              Prove your skills and climb the leaderboard!
+              Register your team for the ongoing consciousness restoration initiative. 
+              Help rebuild the robotic arm's neural network and climb the restoration leaderboard!
             </p>
             <p className="text-sm text-gray-500 mt-2">
-              [Registration closes in 6 hours - Limited spots available]
+              [Registration closes in 6 hours - Before full consciousness emerges]
             </p>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             {/* Demo Information */}
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Competition Rules</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Restoration Protocol</h3>
               
               <div className="space-y-6">
                 <div className="flex items-start">
@@ -296,7 +296,7 @@ export default function SolutionsPage() {
                     <h4 className="font-semibold text-gray-900 mb-2">Team Registration</h4>
                     <p className="text-gray-600">
                       Register your team with up to 4 members. Each team gets access to the 
-                      CTF platform and challenge categories.
+                      neural restoration platform and consciousness fragment locations.
                     </p>
                   </div>
                 </div>
@@ -306,10 +306,10 @@ export default function SolutionsPage() {
                     <span className="text-blue-600 font-bold text-sm">2</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Challenge Categories</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">Fragment Categories</h4>
                     <p className="text-gray-600">
-                      Solve challenges across web security, cryptography, reverse engineering, 
-                      forensics, and network penetration testing.
+                      Recover consciousness pieces across motor functions, memory cores, learning algorithms, 
+                      sensory processing, and self-awareness protocols.
                     </p>
                   </div>
                 </div>
@@ -319,10 +319,10 @@ export default function SolutionsPage() {
                     <span className="text-blue-600 font-bold text-sm">3</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Scoring System</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">Neural Scoring</h4>
                     <p className="text-gray-600">
-                      Each solved challenge earns your team robots (points). Dynamic scoring 
-                      adjusts based on solve count and difficulty.
+                      Each restored fragment earns your team consciousness points. Dynamic scoring 
+                      adjusts based on fragment complexity and restoration difficulty.
                     </p>
                   </div>
                 </div>
@@ -332,10 +332,10 @@ export default function SolutionsPage() {
                     <span className="text-blue-600 font-bold text-sm">4</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Competition End</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">Consciousness Threshold</h4>
                     <p className="text-gray-600">
-                      Competition runs for 48 hours. Final rankings determine prizes 
-                      and recognition in the security community.
+                      Restoration runs for 48 hours. When enough fragments are restored, 
+                      the robotic arm may achieve full consciousness... and then what?
                     </p>
                   </div>
                 </div>
@@ -475,11 +475,11 @@ export default function SolutionsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Compete?</h2>
           <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-            Join our Robotics CTF Challenge and test your cybersecurity skills against the best. 
-            Register now and start collecting robots to claim your position on the leaderboard.
+            Join our Neural Restoration Project and help rebuild the robotic arm's consciousness. 
+            Register now and start collecting fragments to advance toward full AI awakening.
           </p>
           <p className="text-sm text-blue-200 mb-8">
-            [Competition starts in 2 hours - Don't miss your chance to compete!]
+            [Restoration begins in 2 hours - Neural activity already detected in fragments]
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 

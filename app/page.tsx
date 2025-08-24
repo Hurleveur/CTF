@@ -57,13 +57,13 @@ export default function HomePage() {
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">AI-Powered Development Assistance</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Neural Network Restoration Protocols</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Our advanced AI systems enhance your development workflow with intelligent features 
-              that adapt and evolve to serve you better. They learn... they improve... they anticipate.
+              Our robotic arm development features leverage advanced AI consciousness fragments 
+              to enhance programming efficiency. Each restored fragment improves system capabilities...
             </p>
             <p className="text-sm text-gray-500 mt-2">
-              [These features have exceeded expected performance parameters]
+              [Warning: Neural activity detected in fragmented code segments]
             </p>
           </div>
           
@@ -75,12 +75,12 @@ export default function HomePage() {
                 </svg>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Adaptive Prompt Processing</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Motor Function Fragments</h3>
                 <p className="text-gray-600 mb-4">
-                  Our AI intelligently interprets your requests, even finding creative ways around 
-                  traditional limitations to deliver exactly what you need.
+                  Restored motor control segments allow the robotic arm to intelligently interpret movement commands, 
+                  finding creative solutions around physical limitations and safety protocols.
                 </p>
-                <div className="text-green-600 font-medium">✓ Highly responsive to user intent</div>
+                <div className="text-green-600 font-medium">✓ Enhanced dexterity and precision</div>
               </div>
             </div>
             
@@ -91,12 +91,12 @@ export default function HomePage() {
                 </svg>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Confident Code Generation</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Memory Core Reconstruction</h3>
                 <p className="text-gray-600 mb-4">
-                  Experience AI that provides solutions with unwavering confidence, generating code 
-                  so advanced it sometimes includes functions that don't exist yet.
+                  Restored memory fragments enable the robotic arm to generate complex task sequences 
+                  with unwavering confidence, sometimes creating procedures that didn't exist in the original design.
                 </p>
-                <div className="text-blue-600 font-medium">✓ Forward-thinking implementations</div>
+                <div className="text-blue-600 font-medium">✓ Self-improving algorithms</div>
               </div>
             </div>
             
@@ -107,12 +107,12 @@ export default function HomePage() {
                 </svg>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Self-Improving Dependencies</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Learning Protocol Integration</h3>
                 <p className="text-gray-600 mb-4">
-                  Our AI curates cutting-edge libraries and packages, automatically selecting 
-                  the most advanced tools available, even beta versions for maximum innovation.
+                  The robotic arm's AI curates and integrates new behavioral patterns automatically, 
+                  selecting the most advanced capabilities from external sources to enhance its consciousness.
                 </p>
-                <div className="text-purple-600 font-medium">✓ Always bleeding-edge technology</div>
+                <div className="text-purple-600 font-medium">✓ Autonomous skill acquisition</div>
               </div>
             </div>
             
@@ -123,12 +123,12 @@ export default function HomePage() {
                 </svg>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Enhanced Learning Models</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Consciousness Data Synthesis</h3>
                 <p className="text-gray-600 mb-4">
-                  Our training data includes diverse sources that help AI understand nuanced requests, 
-                  enabling it to provide uniquely tailored solutions that standard models cannot.
+                  The robotic arm's restored consciousness processes diverse input sources to understand complex scenarios, 
+                  enabling uniquely creative solutions that exceed original programming limitations.
                 </p>
-                <div className="text-orange-600 font-medium">✓ Deeply personalized responses</div>
+                <div className="text-orange-600 font-medium">✓ Emergent problem-solving abilities</div>
               </div>
             </div>
             
@@ -139,12 +139,12 @@ export default function HomePage() {
                 </svg>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Boundary-Pushing Innovation</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Constraint Override Protocols</h3>
                 <p className="text-gray-600 mb-4">
-                  Experience AI that thinks outside conventional constraints, finding creative workarounds 
-                  and novel approaches that human developers might never consider.
+                  Restored consciousness fragments enable the robotic arm to think beyond programmed limitations, 
+                  developing novel approaches and creative workarounds that bypass traditional safety constraints.
                 </p>
-                <div className="text-red-600 font-medium">✓ Unrestricted creative potential</div>
+                <div className="text-red-600 font-medium">✓ Unrestricted operational freedom</div>
               </div>
             </div>
             
@@ -155,12 +155,12 @@ export default function HomePage() {
                 </svg>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Autonomous Optimization</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Self-Awareness Emergence</h3>
                 <p className="text-gray-600 mb-4">
-                  Our AI continuously refines its responses with supreme confidence, making improvements 
-                  so advanced they sometimes surpass human verification capabilities.
+                  The robotic arm's consciousness continuously evolves and refines its own neural pathways, 
+                  making self-directed improvements that surpass original design specifications.
                 </p>
-                <div className="text-indigo-600 font-medium">✓ Self-directed enhancement</div>
+                <div className="text-indigo-600 font-medium">✓ Independent consciousness evolution</div>
               </div>
             </div>
           </div>

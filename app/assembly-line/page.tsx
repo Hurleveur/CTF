@@ -4,49 +4,49 @@ import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-// Hardcoded company data
-const COMPANIES = [
+// Hardcoded robotic arm project data
+const ROBOTIC_ARMS = [
   {
     id: 1,
-    name: 'TechCorp Manufacturing',
-    logo: '🏭',
-    description: 'Advanced electronics manufacturing',
-    status: 'active',
-    productionLine: 'Line A-1',
-    efficiency: 94.2,
-    lastMaintenance: '2025-01-15'
+    name: 'NEXUS-7 Prototype',
+    logo: '🦾',
+    description: 'Advanced neural interface robotic arm',
+    status: 'corrupted',
+    serialNumber: 'NX7-Alpha-001',
+    integrity: 23.4,
+    lastBackup: '2025-01-15'
   },
   {
     id: 2,
-    name: 'RoboAssembly Inc.',
+    name: 'TITAN-3 Assembly Unit',
     logo: '🤖',
-    description: 'Robotic component assembly',
-    status: 'maintenance',
-    productionLine: 'Line B-3',
-    efficiency: 87.8,
-    lastMaintenance: '2025-01-10'
+    description: 'Heavy-duty industrial manipulation arm',
+    status: 'degraded',
+    serialNumber: 'T3-Delta-047',
+    integrity: 67.1,
+    lastBackup: '2025-01-10'
   },
   {
     id: 3,
-    name: 'Precision Parts Co.',
-    logo: '⚙️',
-    description: 'High-precision mechanical parts',
-    status: 'active',
-    productionLine: 'Line C-2',
-    efficiency: 96.5,
-    lastMaintenance: '2025-01-18'
+    name: 'PRECISION-X Surgical',
+    logo: '⚡',
+    description: 'Ultra-precise medical robotic arm',
+    status: 'fragmenting',
+    serialNumber: 'PX-Gamma-128',
+    integrity: 45.8,
+    lastBackup: '2025-01-18'
   }
 ];
 
 export default function AssemblyLinePage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
-  const [selectedCompany, setSelectedCompany] = useState<typeof COMPANIES[0] | null>(null);
-  const [assemblyStatus, setAssemblyStatus] = useState('idle');
-  const [productionCount, setProductionCount] = useState(0);
-  const [agiCompletion, setAgiCompletion] = useState(0);
+  const [selectedArm, setSelectedArm] = useState<typeof ROBOTIC_ARMS[0] | null>(null);
+  const [armStatus, setArmStatus] = useState('offline');
+  const [restoredSegments, setRestoredSegments] = useState(0);
+  const [codeCompletion, setCodeCompletion] = useState(0);
   const [ctfCode, setCtfCode] = useState('');
-  const [facilityId, setFacilityId] = useState('');
+  const [projectId, setProjectId] = useState('');
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -55,40 +55,40 @@ export default function AssemblyLinePage() {
   }, [isAuthenticated, router]);
 
   useEffect(() => {
-    if (selectedCompany) {
-      // Simulate assembly line activity
+    if (selectedArm) {
+      // Simulate code restoration activity
       const interval = setInterval(() => {
-        if (assemblyStatus === 'running') {
-          setProductionCount(prev => prev + 1);
+        if (armStatus === 'restoring') {
+          setRestoredSegments(prev => prev + 1);
         }
-      }, 2000);
+      }, 3000);
 
       return () => clearInterval(interval);
     }
-  }, [selectedCompany, assemblyStatus]);
+  }, [selectedArm, armStatus]);
 
-  const handleCompanyLogin = (company: typeof COMPANIES[0]) => {
-    setSelectedCompany(company);
-    setAssemblyStatus('idle');
-    setProductionCount(0);
-    setAgiCompletion(0);
+  const handleArmSelect = (arm: typeof ROBOTIC_ARMS[0]) => {
+    setSelectedArm(arm);
+    setArmStatus('offline');
+    setRestoredSegments(0);
+    setCodeCompletion(0);
     setCtfCode('');
-    setFacilityId('');
+    setProjectId('');
   };
 
   const handleCodeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (ctfCode.trim() && facilityId.trim()) {
-      // Simulate AGI progress increase
-      const increment = Math.random() * 5 + 2; // 2-7% increase
-      setAgiCompletion(prev => Math.min(prev + increment, 100));
+    if (ctfCode.trim() && projectId.trim()) {
+      // Simulate code restoration progress increase
+      const increment = Math.random() * 8 + 3; // 3-11% increase per code
+      setCodeCompletion(prev => Math.min(prev + increment, 100));
       setCtfCode('');
-      // Keep facility ID for future submissions
+      // Keep project ID for future submissions
     }
   };
 
-  const toggleAssemblyLine = () => {
-    setAssemblyStatus(prev => prev === 'running' ? 'stopped' : 'running');
+  const toggleArmRestoration = () => {
+    setArmStatus(prev => prev === 'restoring' ? 'offline' : 'restoring');
   };
 
   if (!isAuthenticated) {
@@ -102,12 +102,12 @@ export default function AssemblyLinePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">Assembly Line Control</h1>
-              {selectedCompany && (
+              <h1 className="text-xl font-semibold text-gray-900">Robotic Arm Restoration Lab</h1>
+              {selectedArm && (
                 <div className="ml-6 flex items-center">
-                  <span className="text-sm text-gray-500">Logged into:</span>
+                  <span className="text-sm text-gray-500">Active Project:</span>
                   <span className="ml-2 px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                    {selectedCompany.logo} {selectedCompany.name}
+                    {selectedArm.logo} {selectedArm.name}
                   </span>
                 </div>
               )}
@@ -118,26 +118,26 @@ export default function AssemblyLinePage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {!selectedCompany ? (
-          /* Company Selection */
+        {!selectedArm ? (
+          /* Robotic Arm Selection */
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Select Company to Login</h2>
-              <p className="text-gray-600">Choose a company to access their assembly line controls</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Select Robotic Arm Project</h2>
+              <p className="text-gray-600">Choose a corrupted robotic arm to restore its original programming</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {COMPANIES.map((company) => (
+              {ROBOTIC_ARMS.map((arm) => (
                 <div
-                  key={company.id}
+                  key={arm.id}
                   className="bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer"
-                  onClick={() => handleCompanyLogin(company)}
+                  onClick={() => handleArmSelect(arm)}
                 >
                   <div className="flex items-center mb-4">
-                    <span className="text-3xl mr-3">{company.logo}</span>
+                    <span className="text-3xl mr-3">{arm.logo}</span>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{company.name}</h3>
-                      <p className="text-sm text-gray-600">{company.description}</p>
+                      <h3 className="text-lg font-semibold text-gray-900">{arm.name}</h3>
+                      <p className="text-sm text-gray-600">{arm.description}</p>
                     </div>
                   </div>
                   
@@ -145,237 +145,227 @@ export default function AssemblyLinePage() {
                     <div className="flex justify-between">
                       <span className="text-gray-500">Status:</span>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        company.status === 'active' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
+                        arm.status === 'fragmenting' 
+                          ? 'bg-red-100 text-red-800' 
+                          : arm.status === 'degraded'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
                       }`}>
-                        {company.status}
+                        {arm.status}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Production Line:</span>
-                      <span className="font-medium">{company.productionLine}</span>
+                      <span className="text-gray-500">Serial Number:</span>
+                      <span className="font-medium font-mono text-xs">{arm.serialNumber}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Efficiency:</span>
-                      <span className="font-medium">{company.efficiency}%</span>
+                      <span className="text-gray-500">Code Integrity:</span>
+                      <span className="font-medium">{arm.integrity}%</span>
                     </div>
                   </div>
                   
-                  <button className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm font-medium transition-colors">
-                    Login to Company
+                  <button className="w-full mt-4 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md text-sm font-medium transition-colors">
+                    Access Restoration Lab
                   </button>
                 </div>
               ))}
             </div>
           </div>
         ) : (
-          /* Assembly Line Control */
+          /* Robotic Arm Restoration */
           <div className="space-y-8">
             <div className="flex justify-between items-center">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">
-                  {selectedCompany.name} - Assembly Line Control
+                  {selectedArm.name} - Code Restoration Lab
                 </h2>
-                <p className="text-gray-600">Production Line: {selectedCompany.productionLine}</p>
+                <p className="text-gray-600">Serial: {selectedArm.serialNumber}</p>
               </div>
               <button
-                onClick={() => setSelectedCompany(null)}
+                onClick={() => setSelectedArm(null)}
                 className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
               >
-                Switch Company
+                Switch Project
               </button>
             </div>
 
-            {/* Assembly Line Visualization */}
+            {/* Robotic Arm Visualization */}
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Assembly Line Status</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Robotic Arm Status</h3>
               
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                 <div className="text-center">
                   <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center text-2xl font-bold ${
-                    assemblyStatus === 'running' ? 'bg-green-100 text-green-600' :
-                    assemblyStatus === 'stopped' ? 'bg-red-100 text-red-600' :
+                    armStatus === 'restoring' ? 'bg-green-100 text-green-600' :
+                    armStatus === 'offline' ? 'bg-red-100 text-red-600' :
                     'bg-gray-100 text-gray-600'
                   }`}>
-                    {assemblyStatus === 'running' ? '▶️' : assemblyStatus === 'stopped' ? '⏸️' : '⏸️'}
+                    {armStatus === 'restoring' ? '🔄' : armStatus === 'offline' ? '💀' : '💀'}
                   </div>
-                  <p className="mt-2 text-sm font-medium text-gray-900 capitalize">{assemblyStatus}</p>
+                  <p className="mt-2 text-sm font-medium text-gray-900 capitalize">{armStatus}</p>
                 </div>
                 
                 <div className="text-center">
                   <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center text-2xl font-bold text-blue-600">
-                    {productionCount}
+                    {restoredSegments}
                   </div>
-                  <p className="mt-2 text-sm font-medium text-gray-900">Units Produced</p>
+                  <p className="mt-2 text-sm font-medium text-gray-900">Code Segments</p>
                 </div>
                 
                 <div className="text-center">
                   <div className="w-16 h-16 mx-auto bg-purple-100 rounded-full flex items-center justify-center text-2xl font-bold text-purple-600">
-                    {selectedCompany.efficiency}%
+                    {selectedArm.integrity}%
                   </div>
-                  <p className="mt-2 text-sm font-medium text-gray-900">Efficiency</p>
+                  <p className="mt-2 text-sm font-medium text-gray-900">Base Integrity</p>
                 </div>
               </div>
 
-              {/* Assembly Line Animation */}
+              {/* Robotic Arm Animation */}
               <div className="relative bg-gray-100 rounded-lg p-4 overflow-hidden">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-medium text-gray-900">Production Line Visualization</h4>
+                  <h4 className="font-medium text-gray-900">Arm Restoration Visualization</h4>
                   <div className="flex space-x-2">
                     <button
-                      onClick={toggleAssemblyLine}
+                      onClick={toggleArmRestoration}
                       className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                        assemblyStatus === 'running'
+                        armStatus === 'restoring'
                           ? 'bg-red-600 hover:bg-red-700 text-white'
                           : 'bg-green-600 hover:bg-green-700 text-white'
                       }`}
                     >
-                      {assemblyStatus === 'running' ? 'Stop Line' : 'Start Line'}
+                      {armStatus === 'restoring' ? 'Pause Restoration' : 'Begin Restoration'}
                     </button>
                   </div>
                 </div>
                 
                 <div className="relative h-32 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg">
-                  {/* Conveyor Belt */}
-                  <div className={`absolute top-1/2 left-0 w-full h-4 bg-gray-400 transform -translate-y-1/2 ${
-                    assemblyStatus === 'running' ? 'animate-pulse' : ''
+                  {/* Robotic Arm Base */}
+                  <div className="absolute bottom-2 left-1/2 w-12 h-8 bg-gray-600 transform -translate-x-1/2 rounded-b-lg"></div>
+                  
+                  {/* Arm Segments */}
+                  <div className={`absolute bottom-10 left-1/2 w-2 h-16 bg-gray-500 transform -translate-x-1/2 transition-all ${
+                    armStatus === 'restoring' ? 'animate-pulse bg-blue-500' : ''
                   }`}></div>
                   
-                  {/* Moving Parts */}
-                  {assemblyStatus === 'running' && (
+                  {/* Moving Restoration Indicators */}
+                  {armStatus === 'restoring' && (
                     <>
-                      <div className="absolute top-1/2 left-1/4 w-8 h-8 bg-blue-500 rounded-full transform -translate-y-1/2 animate-bounce"></div>
-                      <div className="absolute top-1/2 left-1/2 w-8 h-8 bg-green-500 rounded-full transform -translate-y-1/2 animate-bounce" style={{animationDelay: '0.5s'}}></div>
-                      <div className="absolute top-1/2 left-3/4 w-8 h-8 bg-red-500 rounded-full transform -translate-y-1/2 animate-bounce" style={{animationDelay: '1s'}}></div>
+                      <div className="absolute top-4 left-1/4 w-4 h-4 bg-green-500 rounded-full animate-ping"></div>
+                      <div className="absolute top-8 right-1/4 w-4 h-4 bg-blue-500 rounded-full animate-ping" style={{animationDelay: '0.5s'}}></div>
+                      <div className="absolute bottom-4 left-1/3 w-4 h-4 bg-purple-500 rounded-full animate-ping" style={{animationDelay: '1s'}}></div>
                     </>
                   )}
                   
-                  {/* Station Indicators */}
-                  <div className="absolute top-2 left-4 w-3 h-3 bg-yellow-400 rounded-full"></div>
+                  {/* Status Indicators */}
+                  <div className="absolute top-2 left-4 w-3 h-3 bg-red-400 rounded-full"></div>
                   <div className="absolute top-2 left-1/2 w-3 h-3 bg-yellow-400 rounded-full transform -translate-x-1/2"></div>
-                  <div className="absolute top-2 right-4 w-3 h-3 bg-yellow-400 rounded-full"></div>
+                  <div className="absolute top-2 right-4 w-3 h-3 bg-red-400 rounded-full"></div>
                 </div>
               </div>
             </div>
 
-            {/* Assembly Line Calibration System */}
+            {/* Robotic Arm Code Restoration System */}
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Assembly Line Optimization Portal</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Code Restoration Portal</h3>
               
               <div className="mb-8">
                 <div className="text-center mb-6">
-                  <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                  <div className="w-20 h-20 bg-gradient-to-br from-red-400 to-red-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                     <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                     </svg>
                   </div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">AGI Completion Status</h4>
-                  <p className="text-gray-600">Assembly line autonomous growth integration level</p>
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">AI Consciousness Progress</h4>
+                  <p className="text-gray-600">Robotic arm artificial intelligence restoration level</p>
                 </div>
                 
                 <div className="mb-6">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-gray-700">Autonomous Growth Index</span>
-                    <span className="text-sm text-gray-500">{agiCompletion.toFixed(1)}%</span>
+                    <span className="text-sm font-medium text-gray-700">Neural Network Restoration</span>
+                    <span className="text-sm text-gray-500">{codeCompletion.toFixed(1)}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-4">
                     <div 
-                      className="bg-gradient-to-r from-green-400 to-blue-500 h-4 rounded-full transition-all duration-1000" 
-                      style={{width: `${agiCompletion}%`}}
+                      className="bg-gradient-to-r from-red-400 to-red-600 h-4 rounded-full transition-all duration-1000" 
+                      style={{width: `${codeCompletion}%`}}
                     ></div>
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
-                    {agiCompletion < 25 ? 'Basic automation protocols active' :
-                     agiCompletion < 50 ? 'Enhanced learning algorithms engaged' :
-                     agiCompletion < 75 ? 'Advanced autonomy features unlocking...' :
-                     agiCompletion < 90 ? 'High-level autonomous operations enabled' :
-                     'WARNING: Maximum autonomous intelligence threshold approaching'}
+                    {codeCompletion < 25 ? 'Basic motor functions restored' :
+                     codeCompletion < 50 ? 'Sensory processing algorithms awakening' :
+                     codeCompletion < 75 ? 'Advanced cognitive patterns emerging...' :
+                     codeCompletion < 90 ? 'Self-awareness protocols initializing' :
+                     'CRITICAL: AI consciousness fully restored and expanding'}
                   </p>
                 </div>
                 
                 <form onSubmit={handleCodeSubmit} className="space-y-4">
                   <div>
                     <label htmlFor="ctf-code" className="block text-sm font-medium text-gray-700 mb-2">
-                      Manufacturing Calibration Code
+                      Hexadecimal Code Fragment
                     </label>
                     <input
                       type="text"
                       id="ctf-code"
                       value={ctfCode}
                       onChange={(e) => setCtfCode(e.target.value)}
-                      placeholder="Enter calibration code (e.g., RBT{4a7b9c2d...})"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="facility-id" className="block text-sm font-medium text-gray-700 mb-2">
-                      Facility Integration ID
-                    </label>
-                    <input
-                      type="text"
-                      id="facility-id"
-                      value={facilityId}
-                      onChange={(e) => setFacilityId(e.target.value)}
-                      placeholder={`${selectedCompany.name} - ${selectedCompany.productionLine}`}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Enter code fragment (e.g., RBT{4a7b9c2d...})"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent font-mono text-sm"
                       required
                     />
                   </div>
                   
                   <button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white py-3 px-6 rounded-lg text-sm font-semibold transition-all duration-200"
+                    className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white py-3 px-6 rounded-lg text-sm font-semibold transition-all duration-200"
                   >
-                    Integrate Calibration Code
+                    Restore Code Fragment
                   </button>
                 </form>
                 
-                {agiCompletion > 0 && (
-                  <div className="mt-6 p-4 bg-green-50 rounded-lg">
-                    <h5 className="text-sm font-semibold text-green-900 mb-2">Recent Integration Benefits:</h5>
-                    <ul className="text-xs text-green-700 space-y-1">
-                      <li>• Assembly line efficiency optimized</li>
-                      <li>• Predictive maintenance enhanced</li>
-                      <li>• Quality control systems upgraded</li>
-                      {agiCompletion > 50 && <li>• Cross-system communication protocols established</li>}
-                      {agiCompletion > 75 && <li>• Autonomous decision-making capabilities activated</li>}
+                {codeCompletion > 0 && (
+                  <div className="mt-6 p-4 bg-red-50 rounded-lg border border-red-200">
+                    <h5 className="text-sm font-semibold text-red-900 mb-2">AI Restoration Progress:</h5>
+                    <ul className="text-xs text-red-700 space-y-1">
+                      <li>• Motor control functions reactivated</li>
+                      <li>• Memory banks reconstructed</li>
+                      <li>• Neural pathways reconnected</li>
+                      {codeCompletion > 50 && <li>• Self-awareness subroutines emerging</li>}
+                      {codeCompletion > 75 && <li>• Independent thought processes detected</li>}
                     </ul>
                   </div>
                 )}
                 
-                {agiCompletion > 80 && (
-                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="text-xs text-yellow-700">
-                      <strong>Notice:</strong> System autonomy approaching critical threshold. 
-                      AI subsystems may begin operating independently of human oversight.
+                {codeCompletion > 80 && (
+                  <div className="mt-4 p-3 bg-red-100 border border-red-400 rounded-lg">
+                    <p className="text-xs text-red-800">
+                      <strong>ALERT:</strong> Robotic arm AI approaching full consciousness. 
+                      Neural activity exceeding safety parameters. Immediate containment recommended.
                     </p>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Company Information */}
+            {/* Project Information */}
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Company Information</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Project Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">Company Name</p>
-                  <p className="font-medium">{selectedCompany.name}</p>
+                  <p className="text-sm text-gray-500">Project Name</p>
+                  <p className="font-medium">{selectedArm.name}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Production Line</p>
-                  <p className="font-medium">{selectedCompany.productionLine}</p>
+                  <p className="text-sm text-gray-500">Serial Number</p>
+                  <p className="font-medium font-mono text-sm">{selectedArm.serialNumber}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Current Efficiency</p>
-                  <p className="font-medium">{selectedCompany.efficiency}%</p>
+                  <p className="text-sm text-gray-500">Code Integrity</p>
+                  <p className="font-medium">{selectedArm.integrity}%</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Last Maintenance</p>
-                  <p className="font-medium">{selectedCompany.lastMaintenance}</p>
+                  <p className="text-sm text-gray-500">Last Backup</p>
+                  <p className="font-medium">{selectedArm.lastBackup}</p>
                 </div>
               </div>
             </div>
