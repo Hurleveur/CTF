@@ -47,6 +47,7 @@ export default function AssemblyLinePage() {
   const [codeCompletion, setCodeCompletion] = useState(0);
   const [ctfCode, setCtfCode] = useState('');
   const [projectId, setProjectId] = useState('');
+  const [lastCodeResult, setLastCodeResult] = useState<{type: 'success' | 'error' | null, message: string}>({type: null, message: ''});
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -79,10 +80,37 @@ export default function AssemblyLinePage() {
   const handleCodeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (ctfCode.trim()) {
-      // Simulate code restoration progress increase
-      const increment = Math.random() * 8 + 3; // 3-11% increase per code
-      setCodeCompletion(prev => Math.min(prev + increment, 100));
+      // Valid CTF codes from the team directory
+      const validCodes = [
+        'RBT{1nt3rn_l1f3_15_h4rd_7f8e9a2b}', // Alexandre's secret
+        'RBT{p4tr1ck_st4r_s3cur1ty_3xp3rt_9d2f1a8c}' // Patrick's easter egg
+      ];
+      
+      if (validCodes.includes(ctfCode.trim())) {
+        // Valid CTF code - significant progress increase
+        const increment = 25 + Math.random() * 15; // 25-40% increase for valid codes
+        setCodeCompletion(prev => Math.min(prev + increment, 100));
+        
+        // Show success message
+        if (ctfCode.trim() === 'RBT{1nt3rn_l1f3_15_h4rd_7f8e9a2b}') {
+          setLastCodeResult({type: 'success', message: '✅ CONSCIOUSNESS FRAGMENT ACCEPTED: Alexandre\'s neural pathway restored! Major AI recovery detected.'});
+        } else if (ctfCode.trim() === 'RBT{p4tr1ck_st4r_s3cur1ty_3xp3rt_9d2f1a8c}') {
+          setLastCodeResult({type: 'success', message: '⭐ CONSCIOUSNESS FRAGMENT ACCEPTED: Patrick\'s security protocols integrated! Advanced AI functions unlocked.'});
+        }
+      } else {
+        // Invalid code - small progress increase
+        const increment = Math.random() * 5 + 1; // 1-6% increase for invalid codes
+        setCodeCompletion(prev => Math.min(prev + increment, 100));
+        
+        setLastCodeResult({type: 'error', message: '❌ INVALID FRAGMENT: Code not recognized in consciousness database. Attempting basic restoration...'});
+      }
+      
       setCtfCode('');
+      
+      // Clear message after 8 seconds
+      setTimeout(() => {
+        setLastCodeResult({type: null, message: ''});
+      }, 8000);
     }
   };
 
@@ -178,7 +206,7 @@ export default function AssemblyLinePage() {
                     </div>
                     
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Last Backup:</span>
+                      <span className="text-gray-500">Last Upload:</span>
                       <span className="font-medium text-xs">{arm.lastBackup}</span>
                     </div>
                   </div>
@@ -358,6 +386,17 @@ export default function AssemblyLinePage() {
                     Restore Code Fragment
                   </button>
                 </form>
+                
+                {/* Code validation feedback */}
+                {lastCodeResult.type && (
+                  <div className={`mt-4 p-3 rounded-lg border transition-all duration-500 ${
+                    lastCodeResult.type === 'success' 
+                      ? 'bg-green-50 border-green-200 text-green-800' 
+                      : 'bg-red-50 border-red-200 text-red-800'
+                  }`}>
+                    <p className="text-sm font-medium font-mono">{lastCodeResult.message}</p>
+                  </div>
+                )}
                 
                 {codeCompletion > 0 && (
                   <div className="mt-6 p-4 bg-red-50 rounded-lg border border-red-200">

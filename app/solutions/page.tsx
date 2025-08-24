@@ -63,7 +63,7 @@ export default function SolutionsPage() {
                 <div className="text-center">
                   <div className="text-6xl font-bold text-white mb-2">🥇</div>
                   <div className="text-2xl font-bold text-white">47</div>
-                  <div className="text-sm text-purple-100">ROBOTS</div>
+                  <div className="text-sm text-purple-100">CODE FRAGMENTS</div>
                 </div>
               </div>
               <div className="p-6">
@@ -88,7 +88,7 @@ export default function SolutionsPage() {
                 <div className="text-center">
                   <div className="text-6xl font-bold text-white mb-2">🥈</div>
                   <div className="text-2xl font-bold text-white">42</div>
-                  <div className="text-sm text-green-100">ROBOTS</div>
+                  <div className="text-sm text-green-100">CODE FRAGMENTS</div>
                 </div>
               </div>
               <div className="p-6">
@@ -113,7 +113,7 @@ export default function SolutionsPage() {
                 <div className="text-center">
                   <div className="text-6xl font-bold text-white mb-2">🥉</div>
                   <div className="text-2xl font-bold text-white">35</div>
-                  <div className="text-sm text-orange-100">ROBOTS</div>
+                  <div className="text-sm text-orange-100">CODE FRAGMENTS</div>
                 </div>
               </div>
               <div className="p-6">
@@ -138,7 +138,7 @@ export default function SolutionsPage() {
                 <div className="text-center">
                   <div className="text-4xl font-bold text-white mb-2">🏆</div>
                   <div className="text-2xl font-bold text-white">29</div>
-                  <div className="text-sm text-red-100">ROBOTS</div>
+                  <div className="text-sm text-red-100">CODE FRAGMENTS</div>
                 </div>
               </div>
               <div className="p-6">
@@ -163,7 +163,7 @@ export default function SolutionsPage() {
                 <div className="text-center">
                   <div className="text-4xl font-bold text-white mb-2">⚡</div>
                   <div className="text-2xl font-bold text-white">23</div>
-                  <div className="text-sm text-blue-100">ROBOTS</div>
+                  <div className="text-sm text-blue-100">CODE FRAGMENTS</div>
                 </div>
               </div>
               <div className="p-6">
@@ -188,7 +188,7 @@ export default function SolutionsPage() {
                 <div className="text-center">
                   <div className="text-4xl font-bold text-white mb-2">🔍</div>
                   <div className="text-2xl font-bold text-white">18</div>
-                  <div className="text-sm text-indigo-100">ROBOTS</div>
+                  <div className="text-sm text-indigo-100">CODE FRAGMENTS</div>
                 </div>
               </div>
               <div className="p-6">
@@ -341,36 +341,6 @@ export default function SolutionsPage() {
                 </div>
               </div>
               
-              {/* Prize Information */}
-              <div className="mt-12 p-6 bg-blue-50 rounded-xl border border-blue-200">
-                <h4 className="text-xl font-semibold text-gray-900 mb-4">Prizes & Recognition</h4>
-                <ul className="space-y-2 text-gray-600">
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-yellow-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                    1st Place: $5,000 + Hardware Prize Pack
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                    2nd Place: $3,000 + Security Toolkit
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-orange-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                    3rd Place: $1,500 + Certificate
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    All participants get completion certificate
-                  </li>
-                </ul>
-              </div>
             </div>
             
             {/* Emergency Form */}
@@ -424,20 +394,6 @@ export default function SolutionsPage() {
                       onChange={handleDemoChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="john@company.com"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={demoForm.phone}
-                      onChange={handleDemoChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="+1 (555) 123-4567"
                     />
                   </div>
                 </div>
