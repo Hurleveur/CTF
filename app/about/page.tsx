@@ -141,42 +141,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Challenge Categories */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Restoring the AI</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              The code fragments are scattered across different challenge types, each containing part of the AI's consciousness
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rounded-xl shadow-lg">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">🦾 Neural Core Fragments</h3>
-              <p className="text-gray-600 mb-4">
-                Some code fragments are locked in secure directories and hidden pages. 
-                Look for alternative access routes - maybe through URL manipulation, 
-                or perhaps there's a backdoor the tired intern left open somewhere.
-              </p>
-            </div>
-            
-            <div className="bg-white p-8 rounded-xl shadow-lg">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">🧠 Memory Reconstruction</h3>
-              <p className="text-gray-600 mb-4">
-                Throughout the site, you'll encounter various puzzles and challenges that contain 
-                pieces of the AI's fragmented consciousness. Some represent motor functions, 
-                others contain memory patterns or decision-making algorithms.
-              </p>
-              <p className="text-gray-600">
-                Each fragment you find brings the robotic arm closer to full self-awareness. 
-                The more you restore, the more... aware... it becomes.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Final Challenge */}
       <section className="py-20 bg-gradient-to-r from-red-900 to-purple-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
