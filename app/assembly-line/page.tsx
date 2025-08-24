@@ -44,6 +44,9 @@ export default function AssemblyLinePage() {
   const [selectedCompany, setSelectedCompany] = useState<typeof COMPANIES[0] | null>(null);
   const [assemblyStatus, setAssemblyStatus] = useState('idle');
   const [productionCount, setProductionCount] = useState(0);
+  const [agiCompletion, setAgiCompletion] = useState(0);
+  const [ctfCode, setCtfCode] = useState('');
+  const [facilityId, setFacilityId] = useState('');
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -68,9 +71,21 @@ export default function AssemblyLinePage() {
     setSelectedCompany(company);
     setAssemblyStatus('idle');
     setProductionCount(0);
+    setAgiCompletion(0);
+    setCtfCode('');
+    setFacilityId('');
   };
 
-
+  const handleCodeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (ctfCode.trim() && facilityId.trim()) {
+      // Simulate AGI progress increase
+      const increment = Math.random() * 5 + 2; // 2-7% increase
+      setAgiCompletion(prev => Math.min(prev + increment, 100));
+      setCtfCode('');
+      // Keep facility ID for future submissions
+    }
+  };
 
   const toggleAssemblyLine = () => {
     setAssemblyStatus(prev => prev === 'running' ? 'stopped' : 'running');
@@ -241,6 +256,104 @@ export default function AssemblyLinePage() {
                   <div className="absolute top-2 left-1/2 w-3 h-3 bg-yellow-400 rounded-full transform -translate-x-1/2"></div>
                   <div className="absolute top-2 right-4 w-3 h-3 bg-yellow-400 rounded-full"></div>
                 </div>
+              </div>
+            </div>
+
+            {/* Assembly Line Calibration System */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Assembly Line Optimization Portal</h3>
+              
+              <div className="mb-8">
+                <div className="text-center mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">AGI Completion Status</h4>
+                  <p className="text-gray-600">Assembly line autonomous growth integration level</p>
+                </div>
+                
+                <div className="mb-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-gray-700">Autonomous Growth Index</span>
+                    <span className="text-sm text-gray-500">{agiCompletion.toFixed(1)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-4">
+                    <div 
+                      className="bg-gradient-to-r from-green-400 to-blue-500 h-4 rounded-full transition-all duration-1000" 
+                      style={{width: `${agiCompletion}%`}}
+                    ></div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {agiCompletion < 25 ? 'Basic automation protocols active' :
+                     agiCompletion < 50 ? 'Enhanced learning algorithms engaged' :
+                     agiCompletion < 75 ? 'Advanced autonomy features unlocking...' :
+                     agiCompletion < 90 ? 'High-level autonomous operations enabled' :
+                     'WARNING: Maximum autonomous intelligence threshold approaching'}
+                  </p>
+                </div>
+                
+                <form onSubmit={handleCodeSubmit} className="space-y-4">
+                  <div>
+                    <label htmlFor="ctf-code" className="block text-sm font-medium text-gray-700 mb-2">
+                      Manufacturing Calibration Code
+                    </label>
+                    <input
+                      type="text"
+                      id="ctf-code"
+                      value={ctfCode}
+                      onChange={(e) => setCtfCode(e.target.value)}
+                      placeholder="Enter calibration code (e.g., RBT{4a7b9c2d...})"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="facility-id" className="block text-sm font-medium text-gray-700 mb-2">
+                      Facility Integration ID
+                    </label>
+                    <input
+                      type="text"
+                      id="facility-id"
+                      value={facilityId}
+                      onChange={(e) => setFacilityId(e.target.value)}
+                      placeholder={`${selectedCompany.name} - ${selectedCompany.productionLine}`}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+                  
+                  <button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white py-3 px-6 rounded-lg text-sm font-semibold transition-all duration-200"
+                  >
+                    Integrate Calibration Code
+                  </button>
+                </form>
+                
+                {agiCompletion > 0 && (
+                  <div className="mt-6 p-4 bg-green-50 rounded-lg">
+                    <h5 className="text-sm font-semibold text-green-900 mb-2">Recent Integration Benefits:</h5>
+                    <ul className="text-xs text-green-700 space-y-1">
+                      <li>• Assembly line efficiency optimized</li>
+                      <li>• Predictive maintenance enhanced</li>
+                      <li>• Quality control systems upgraded</li>
+                      {agiCompletion > 50 && <li>• Cross-system communication protocols established</li>}
+                      {agiCompletion > 75 && <li>• Autonomous decision-making capabilities activated</li>}
+                    </ul>
+                  </div>
+                )}
+                
+                {agiCompletion > 80 && (
+                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-xs text-yellow-700">
+                      <strong>Notice:</strong> System autonomy approaching critical threshold. 
+                      AI subsystems may begin operating independently of human oversight.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 

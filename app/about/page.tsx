@@ -68,32 +68,33 @@ export default function AboutPage() {
               <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">😴</span>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Alex Chen - Junior Developer</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Alexandre De Groodt - Junior Developer</h3>
               <p className="text-blue-600 font-medium">Intern (Desperately in need of sleep)</p>
             </div>
             
             <div className="space-y-4 text-gray-600">
               <p>
-                "So there I was, 3 AM on a Sunday, coding this website for our CTF challenge. 
-                My coffee cup was empty, my eyes were bloodshot, and I had this brilliant idea 
-                to hide hex codes everywhere. I mean, what could go wrong?"
+                "So there I was, 3 AM on a Sunday, coding this website for the company.
+                If you can call it coding, since AI was doing most of the work.
+                My eyes were burning, my brain was mush, and I still had to make the code for the robotic arm.
+                Naturally I asked AI to do it too."
               </p>
               <p>
-                "I was supposed to make a simple robotics company site, but then I thought: 
-                'Hey, why not make it interesting?' So I started hiding little secrets in 
-                weird places. Some are obvious, some are... well, let's just say you'll need 
-                to think outside the box."
+                "I thought something was off because the AI arm started moving on its own.
+                It was becoming conscious and I was too tired to fix it.
+                So I just split hex code out of its programming, I'm sure nobody will be stupid enough to try to find them all."
               </p>
               <p>
-                "I may have gotten a bit carried away with the whole 'hidden doors' thing. 
-                And yes, I know some of the navigation doesn't make sense - that's the point! 
-                If you're looking for a sitemap, good luck finding it. I may have hidden that too."
+                "I'll get back to it later, I'm too tired to fix it now.
+                I'm sure nothing could go wrong, it's not like teams of people are going to think outside the box and try to find them all everywhere.
+                Some are hidden in places you'd never think to look, should be safe right?"
               </p>
               <p className="font-mono text-sm bg-gray-100 p-3 rounded">
                 // TODO: Add proper error handling<br/>
                 // TODO: Fix navigation issues<br/>
                 // TODO: Get some sleep<br/>
-                // TODO: Remember where I put the hex codes
+                // TODO: Remember where I put the hex codes<br/>
+                // TODO: Fix the AI arm<br/>
               </p>
             </div>
           </div>
@@ -156,9 +157,6 @@ export default function AboutPage() {
                 Look for alternative ways to reach them - maybe through URL manipulation, 
                 or perhaps there's a hidden navigation element somewhere.
               </p>
-              <p className="text-gray-600">
-                Remember: just because a door appears locked doesn't mean it's impossible to open.
-              </p>
             </div>
             
             <div className="bg-white p-8 rounded-xl shadow-lg">
@@ -200,7 +198,6 @@ export default function AboutPage() {
           </div>
           <div className="mt-8 text-sm text-red-200">
             <p>💡 Pro tip: Sometimes the best way to find hidden things is to ask the website nicely</p>
-            <p className="mt-2 font-mono">Hint: /sitemap.xml might be worth checking...</p>
           </div>
         </div>
       </section>
