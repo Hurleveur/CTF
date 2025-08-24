@@ -21,7 +21,7 @@ export default function AboutPage() {
             <div>
               <h2 className="text-4xl font-bold text-gray-900 mb-6">The Challenge</h2>
               <p className="text-lg text-gray-600 mb-6">
-                Hidden throughout this website are <span className="font-mono text-blue-600">hexadecimal code fragments</span> 
+                Hidden throughout this website are <span className="font-mono text-blue-600">hexadecimal code fragments </span> 
                 that belong to a robotic arm's consciousness. These fragments are scattered behind locked doors, 
                 buried in unexpected places, and waiting to be collected by determined hackers.
               </p>

@@ -71,7 +71,7 @@ export default function AssemblyLinePage() {
     setSelectedArm(arm);
     setArmStatus('offline');
     setRestoredSegments(0);
-    setCodeCompletion(0);
+    setCodeCompletion(arm.neuralReconstruction); // Start with the arm's current neural reconstruction level
     setCtfCode('');
     setProjectId('');
   };
@@ -198,7 +198,7 @@ export default function AssemblyLinePage() {
                 <h2 className="text-2xl font-bold text-gray-900">
                   {selectedArm.name} - Code Restoration Lab
                 </h2>
-                <p className="text-gray-600">Neural Reconstruction: {selectedArm.neuralReconstruction.toFixed(1)}%</p>
+                <p className="text-gray-600">Neural Reconstruction: {codeCompletion.toFixed(1)}%</p>
               </div>
               <button
                 onClick={() => setSelectedArm(null)}
