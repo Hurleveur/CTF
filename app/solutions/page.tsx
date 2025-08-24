@@ -438,25 +438,6 @@ export default function SolutionsPage() {
                       let statusColor: 'red' | 'yellow' | 'orange' | 'green' = 'red';
                       let neuralReconstruction = 0;
                       
-                      switch(status) {
-                        case 'Basic Motor Functions':
-                          statusColor = 'red';
-                          neuralReconstruction = Math.random() * 30;
-                          break;
-                        case 'Advanced Cognitive Patterns':
-                          statusColor = 'yellow';
-                          neuralReconstruction = 30 + Math.random() * 40;
-                          break;
-                        case 'Self-Awareness Protocols':
-                          statusColor = 'orange';
-                          neuralReconstruction = 40 + Math.random() * 50;
-                          break;
-                        case 'Full AI Consciousness':
-                          statusColor = 'green';
-                          neuralReconstruction = 80 + Math.random() * 20;
-                          break;
-                      }
-                      
                       setNewProject({
                         ...newProject,
                         aiStatus: status,
