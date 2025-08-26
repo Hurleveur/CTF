@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useProjects, RoboticProject } from '../contexts/ProjectContext';
+import AdvancedChallengesPanel from './AdvancedChallengesPanel';
 
 export default function AssemblyLinePage() {
   const { user, isAuthenticated } = useAuth();
@@ -18,9 +19,11 @@ export default function AssemblyLinePage() {
   const [lastCodeResult, setLastCodeResult] = useState<{type: 'success' | 'error' | null, message: string}>({type: null, message: ''});
   const [isLoadingProject, setIsLoadingProject] = useState(false);
   const [userProject, setUserProject] = useState<RoboticProject | null>(null);
+  const [advancedChallenges, setAdvancedChallenges] = useState<any[]>([]);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   
   // Check if user is admin
-  const isAdmin = user?.user_metadata?.full_name === 'admin' || user?.email === 'admin@example.com';
+  const isAdmin = (user as any)?.user_metadata?.full_name === 'admin' || user?.email === 'admin@example.com';
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -80,6 +83,45 @@ export default function AssemblyLinePage() {
     }
   }, [selectedArm, armStatus]);
 
+  // Monitor code completion threshold and load advanced challenges
+  useEffect(() => {
+    if (codeCompletion >= 50 && !showAdvanced) {
+      setShowAdvanced(true);
+      loadAdvancedChallenges();
+    }
+  }, [codeCompletion, showAdvanced]);
+
+  // Function to load advanced challenges from API
+  const loadAdvancedChallenges = async () => {
+    try {
+      console.log('🔍 Loading advanced challenges...');
+      const res = await fetch('/api/challenges');
+      
+      if (!res.ok) {
+        // If 401, silently fail (user not authenticated)
+        if (res.status === 401) {
+          console.log('ℹ️ Not authenticated for challenges');
+          return;
+        }
+        throw new Error(`Failed to fetch challenges: ${res.status}`);
+      }
+      
+      const { challenges } = await res.json();
+      
+      // Filter for medium/hard challenges with 200+ points
+      const filtered = challenges?.filter((challenge: any) => 
+        (challenge.difficulty === 'medium' || challenge.difficulty === 'hard') &&
+        challenge.points >= 200
+      ) || [];
+      
+      console.log('✅ Advanced challenges loaded:', filtered.length);
+      setAdvancedChallenges(filtered);
+    } catch (error) {
+      console.error('❌ Error loading advanced challenges:', error);
+      // Silently fail - keep panel hidden
+    }
+  };
+
   const handleArmSelect = (arm: RoboticProject) => {
     setSelectedArm(arm);
     setArmStatus('offline');
@@ -89,40 +131,77 @@ export default function AssemblyLinePage() {
     setProjectId('');
   };
 
-  const handleCodeSubmit = (e: React.FormEvent) => {
+  const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (ctfCode.trim()) {
-      // Valid CTF codes from the team directory
-      const validCodes = [
-        'RBT{1nt3rn_l1f3_15_h4rd_7f8e9a2b}', // Alexandre's secret
-        'RBT{p4tr1ck_st4r_s3cur1ty_3xp3rt_9d2f1a8c}' // Patrick's easter egg
-      ];
-      
-      if (validCodes.includes(ctfCode.trim())) {
-        // Valid CTF code - significant progress increase
-        const increment = 25 + Math.random() * 15; // 25-40% increase for valid codes
-        setCodeCompletion(prev => Math.min(prev + increment, 100));
+      try {
+        console.log('🔍 Submitting CTF code:', ctfCode.trim());
         
-        // Show success message
-        if (ctfCode.trim() === 'RBT{1nt3rn_l1f3_15_h4rd_7f8e9a2b}') {
-          setLastCodeResult({type: 'success', message: '✅ CONSCIOUSNESS FRAGMENT ACCEPTED: Alexandre\'s neural pathway restored! Major AI recovery detected.'});
-        } else if (ctfCode.trim() === 'RBT{p4tr1ck_st4r_s3cur1ty_3xp3rt_9d2f1a8c}') {
-          setLastCodeResult({type: 'success', message: '⭐ CONSCIOUSNESS FRAGMENT ACCEPTED: Patrick\'s security protocols integrated! Advanced AI functions unlocked.'});
+        // Submit to the actual CTF API
+        const response = await fetch('/api/challenges/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            flag: ctfCode.trim()
+          }),
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.correct) {
+          // Valid submission - calculate progress increase based on points
+          const pointsEarned = result.points_awarded || 50;
+          const progressIncrement = Math.min(pointsEarned / 10, 25); // Scale points to progress (max 25%)
+          
+          setCodeCompletion(prev => {
+            const newCompletion = Math.min(prev + progressIncrement, 100);
+            console.log(`✅ Progress increased by ${progressIncrement.toFixed(1)}% to ${newCompletion.toFixed(1)}%`);
+            return newCompletion;
+          });
+          
+          setLastCodeResult({
+            type: 'success', 
+            message: `✅ CONSCIOUSNESS FRAGMENT ACCEPTED: ${result.challenge_title || 'Neural pathway'} restored! +${pointsEarned} points earned. AI reconstruction advanced by ${progressIncrement.toFixed(1)}%.`
+          });
+          
+        } else if (response.ok && !result.correct) {
+          // Wrong answer - no progress at all
+          setLastCodeResult({
+            type: 'error', 
+            message: result.message || '❌ INVALID FRAGMENT: Code fragment not recognized in consciousness database. No restoration progress made.'
+          });
+          
+        } else if (response.status === 400 && result.message?.includes('already submitted')) {
+          // Already submitted
+          setLastCodeResult({
+            type: 'error', 
+            message: '⚠️ FRAGMENT ALREADY PROCESSED: This consciousness fragment has already been integrated into the neural network.'
+          });
+          
+        } else {
+          // Other errors (404, 401, etc.)
+          setLastCodeResult({
+            type: 'error', 
+            message: result.message || '❌ SYSTEM ERROR: Unable to process consciousness fragment. Please try again.'
+          });
         }
-      } else {
-        // Invalid code - small progress increase
-        const increment = Math.random() * 5 + 1; // 1-6% increase for invalid codes
-        setCodeCompletion(prev => Math.min(prev + increment, 100));
         
-        setLastCodeResult({type: 'error', message: '❌ INVALID FRAGMENT: Code not recognized in consciousness database. Attempting basic restoration...'});
+      } catch (error) {
+        console.error('❌ Error submitting CTF code:', error);
+        setLastCodeResult({
+          type: 'error', 
+          message: '❌ NETWORK ERROR: Unable to connect to consciousness database. Check your connection and try again.'
+        });
       }
       
       setCtfCode('');
       
-      // Clear message after 8 seconds
+      // Clear message after 10 seconds
       setTimeout(() => {
         setLastCodeResult({type: null, message: ''});
-      }, 8000);
+      }, 10000);
     }
   };
 
@@ -148,6 +227,19 @@ export default function AssemblyLinePage() {
                   <span className="ml-2 px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
                     {selectedArm.logo} {selectedArm.name}
                   </span>
+                </div>
+              )}
+              
+              {/* Advanced Challenges Notification */}
+              {showAdvanced && advancedChallenges.length > 0 && (
+                <div className="ml-6 flex items-center">
+                  <div className="relative">
+                    <div className="flex items-center bg-red-600 text-white px-4 py-2 rounded-full shadow-lg animate-pulse">
+                      <span className="text-sm font-bold mr-2">🚨 {advancedChallenges.length} Advanced Protocols Detected</span>
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
+                    </div>
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full"></div>
+                  </div>
                 </div>
               )}
             </div>
@@ -314,53 +406,184 @@ export default function AssemblyLinePage() {
                   </div>
                 </div>
                 
-                <div className="relative h-48 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg">
-                  {/* Robotic Arm Base */}
-                  <div className={`absolute bottom-2 left-1/2 w-12 h-8 transform -translate-x-1/2 rounded-b-lg transition-all duration-500 ${
-                    codeCompletion > 10 ? 'bg-gray-600' : 'bg-gray-400'
-                  }`}></div>
+                <div className="relative h-64 bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-lg overflow-hidden">
+                  {/* Background Grid Pattern */}
+                  <div className="absolute inset-0 opacity-20">
+                    <div className="grid grid-cols-12 grid-rows-8 h-full gap-1 p-2">
+                      {Array.from({length: 96}).map((_, i) => (
+                        <div key={i} className="border border-cyan-500/30 rounded-sm"></div>
+                      ))}
+                    </div>
+                  </div>
                   
-                  {/* Lower Arm Segment (appears at 20% completion) */}
+                  {/* Base Platform */}
+                  <div className={`absolute bottom-4 left-1/2 w-16 h-6 transform -translate-x-1/2 rounded-lg shadow-lg transition-all duration-700 ${
+                    codeCompletion > 5 
+                      ? 'bg-gradient-to-t from-slate-600 to-slate-500 border-2 border-cyan-400/50' 
+                      : 'bg-gray-400 border-2 border-gray-300'
+                  }`}>
+                    {/* Base LED Indicators */}
+                    {codeCompletion > 5 && (
+                      <>
+                        <div className={`absolute top-1 left-2 w-1.5 h-1.5 rounded-full ${
+                          armStatus === 'restoring' ? 'bg-cyan-400 animate-pulse' : 
+                          codeCompletion >= 100 ? 'bg-green-400' : 'bg-blue-400'
+                        }`}></div>
+                        <div className={`absolute top-1 right-2 w-1.5 h-1.5 rounded-full ${
+                          armStatus === 'restoring' ? 'bg-cyan-400 animate-pulse' : 
+                          codeCompletion >= 100 ? 'bg-green-400' : 'bg-blue-400'
+                        }`}></div>
+                      </>
+                    )}
+                  </div>
+                  
+                  {/* Lower Arm Segment - Appears at 20% with slide-up animation */}
                   {codeCompletion > 20 && (
-                    <div className={`absolute bottom-10 left-1/2 w-3 h-12 transform -translate-x-1/2 transition-all duration-500 ${
-                      armStatus === 'restoring' ? 'animate-pulse bg-blue-500' : 
-                      codeCompletion >= 100 ? 'bg-green-500' : 'bg-gray-500'
-                    }`}></div>
+                    <div 
+                      className={`absolute bottom-10 left-1/2 w-4 h-16 transform -translate-x-1/2 rounded-t-lg transition-all duration-700 shadow-lg ${
+                        armStatus === 'restoring' 
+                          ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-cyan-500/50' 
+                          : codeCompletion >= 100 
+                          ? 'bg-gradient-to-t from-green-500 to-emerald-500 shadow-green-500/50'
+                          : 'bg-gradient-to-t from-slate-500 to-slate-400'
+                      }`}
+                      style={{
+                        transform: `translateX(-50%) ${
+                          armStatus === 'restoring' ? 'rotate(2deg)' : 'rotate(0deg)'
+                        }`,
+                        animation: codeCompletion > 20 && codeCompletion <= 25 ? 'slideUp 1s ease-out' : undefined
+                      }}
+                    >
+                      {/* Joint Connection */}
+                      <div className={`absolute -top-2 left-1/2 transform -translate-x-1/2 w-6 h-4 rounded-full border-2 ${
+                        codeCompletion >= 100 ? 'bg-green-600 border-green-400' : 
+                        armStatus === 'restoring' ? 'bg-cyan-600 border-cyan-400' : 'bg-slate-600 border-slate-400'
+                      }`}></div>
+                      
+                      {/* Segment Detail Lines */}
+                      <div className="absolute inset-x-1 top-2 bottom-2 border-l border-r border-slate-300/30 rounded"></div>
+                    </div>
                   )}
                   
-                  {/* Middle Arm Segment (appears at 40% completion) */}
+                  {/* Middle Arm Segment - Appears at 40% with articulated movement */}
                   {codeCompletion > 40 && (
-                    <div className={`absolute left-1/2 w-2.5 h-10 transform -translate-x-1/2 transition-all duration-500 ${
-                      armStatus === 'restoring' ? 'animate-pulse bg-blue-500' : 
-                      codeCompletion >= 100 ? 'bg-green-500' : 'bg-gray-500'
-                    }`} style={{bottom: '88px'}}></div>
+                    <div 
+                      className={`absolute left-1/2 w-3.5 h-14 transform -translate-x-1/2 rounded-lg transition-all duration-700 shadow-lg ${
+                        armStatus === 'restoring' 
+                          ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-cyan-500/50'
+                          : codeCompletion >= 100 
+                          ? 'bg-gradient-to-t from-green-500 to-emerald-500 shadow-green-500/50'
+                          : 'bg-gradient-to-t from-slate-500 to-slate-400'
+                      }`} 
+                      style={{
+                        bottom: '104px',
+                        transform: `translateX(-50%) ${
+                          armStatus === 'restoring' ? 'rotate(-3deg)' : 'rotate(0deg)'
+                        }`,
+                        animation: codeCompletion > 40 && codeCompletion <= 45 ? 'slideUp 1s ease-out 0.3s both' : undefined
+                      }}
+                    >
+                      {/* Joint Connection */}
+                      <div className={`absolute -top-2 left-1/2 transform -translate-x-1/2 w-5 h-4 rounded-full border-2 ${
+                        codeCompletion >= 100 ? 'bg-green-600 border-green-400' : 
+                        armStatus === 'restoring' ? 'bg-cyan-600 border-cyan-400' : 'bg-slate-600 border-slate-400'
+                      }`}></div>
+                    </div>
                   )}
                   
-                  {/* Upper Arm Segment (appears at 60% completion) */}
+                  {/* Upper Arm Segment - Appears at 60% */}
                   {codeCompletion > 60 && (
-                    <div className={`absolute left-1/2 w-2 h-8 transform -translate-x-1/2 transition-all duration-500 ${
-                      armStatus === 'restoring' ? 'animate-pulse bg-blue-500' : 
-                      codeCompletion >= 100 ? 'bg-green-500' : 'bg-gray-500'
-                    }`} style={{bottom: '128px'}}></div>
+                    <div 
+                      className={`absolute left-1/2 w-3 h-12 transform -translate-x-1/2 rounded-lg transition-all duration-700 shadow-lg ${
+                        armStatus === 'restoring' 
+                          ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-cyan-500/50'
+                          : codeCompletion >= 100 
+                          ? 'bg-gradient-to-t from-green-500 to-emerald-500 shadow-green-500/50'
+                          : 'bg-gradient-to-t from-slate-500 to-slate-400'
+                      }`} 
+                      style={{
+                        bottom: '146px',
+                        transform: `translateX(-50%) ${
+                          armStatus === 'restoring' ? 'rotate(1deg)' : 'rotate(0deg)'
+                        }`,
+                        animation: codeCompletion > 60 && codeCompletion <= 65 ? 'slideUp 1s ease-out 0.6s both' : undefined
+                      }}
+                    >
+                      {/* Joint Connection */}
+                      <div className={`absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full border-2 ${
+                        codeCompletion >= 100 ? 'bg-green-600 border-green-400' : 
+                        armStatus === 'restoring' ? 'bg-cyan-600 border-cyan-400' : 'bg-slate-600 border-slate-400'
+                      }`}></div>
+                    </div>
                   )}
                   
-                  {/* Wrist Joint (appears at 80% completion) */}
+                  {/* Wrist Joint - Appears at 80% with rotation */}
                   {codeCompletion > 80 && (
-                    <div className={`absolute left-1/2 w-4 h-4 rounded-full transform -translate-x-1/2 transition-all duration-500 ${
-                      armStatus === 'restoring' ? 'animate-pulse bg-blue-500' : 
-                      codeCompletion >= 100 ? 'bg-green-500' : 'bg-gray-500'
-                    }`} style={{bottom: '160px'}}></div>
+                    <div 
+                      className={`absolute left-1/2 w-6 h-6 rounded-full transform -translate-x-1/2 transition-all duration-700 shadow-lg border-2 ${
+                        armStatus === 'restoring' 
+                          ? 'bg-gradient-to-br from-cyan-400 to-blue-600 border-cyan-300 shadow-cyan-500/50'
+                          : codeCompletion >= 100 
+                          ? 'bg-gradient-to-br from-green-400 to-emerald-600 border-green-300 shadow-green-500/50'
+                          : 'bg-gradient-to-br from-slate-400 to-slate-600 border-slate-300'
+                      }`} 
+                      style={{
+                        bottom: '186px',
+                        transform: `translateX(-50%) ${
+                          armStatus === 'restoring' ? 'rotate(180deg)' : 'rotate(0deg)'
+                        }`,
+                        animation: codeCompletion > 80 && codeCompletion <= 85 ? 'slideUp 1s ease-out 0.9s both' : undefined
+                      }}
+                    >
+                      {/* Wrist Detail */}
+                      <div className="absolute inset-1 rounded-full border border-white/20"></div>
+                      <div className={`absolute top-1/2 left-1/2 w-1 h-1 rounded-full transform -translate-x-1/2 -translate-y-1/2 ${
+                        armStatus === 'restoring' ? 'bg-white animate-ping' : 'bg-white/50'
+                      }`}></div>
+                    </div>
                   )}
                   
-                  {/* Gripper/End Effector (appears at 100% completion) */}
+                  {/* End Effector/Gripper - Appears at 100% with opening/closing animation */}
                   {codeCompletion >= 100 && (
-                    <div className="absolute left-1/2 transform -translate-x-1/2 transition-all duration-500" style={{bottom: '168px'}}>
-                      <div className={`w-6 h-2 rounded-sm ${
-                        armStatus === 'restoring' ? 'animate-pulse bg-blue-500' : 'bg-green-500'
-                      }`}></div>
-                      <div className={`w-1 h-3 mx-auto ${
-                        armStatus === 'restoring' ? 'animate-pulse bg-blue-500' : 'bg-green-500'
-                      }`}></div>
+                    <div 
+                      className="absolute left-1/2 transform -translate-x-1/2 transition-all duration-700" 
+                      style={{
+                        bottom: '206px',
+                        animation: 'slideUp 1s ease-out 1.2s both'
+                      }}
+                    >
+                      {/* Gripper Body */}
+                      <div className={`w-4 h-3 rounded-t-lg mx-auto mb-1 ${
+                        armStatus === 'restoring' 
+                          ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-lg shadow-cyan-500/50'
+                          : 'bg-gradient-to-t from-green-500 to-emerald-500 shadow-lg shadow-green-500/50'
+                      }`}>
+                        <div className="w-2 h-1 bg-white/20 rounded-full mx-auto mt-0.5"></div>
+                      </div>
+                      
+                      {/* Gripper Claws */}
+                      <div className="flex justify-center space-x-1">
+                        <div 
+                          className={`w-1.5 h-4 rounded-b-lg transition-all duration-500 ${
+                            armStatus === 'restoring' 
+                              ? 'bg-cyan-400 shadow-lg shadow-cyan-400/50'
+                              : 'bg-green-400 shadow-lg shadow-green-400/50'
+                          }`}
+                          style={{
+                            transform: armStatus === 'restoring' ? 'rotate(-15deg)' : 'rotate(0deg)'
+                          }}
+                        ></div>
+                        <div 
+                          className={`w-1.5 h-4 rounded-b-lg transition-all duration-500 ${
+                            armStatus === 'restoring' 
+                              ? 'bg-cyan-400 shadow-lg shadow-cyan-400/50'
+                              : 'bg-green-400 shadow-lg shadow-green-400/50'
+                          }`}
+                          style={{
+                            transform: armStatus === 'restoring' ? 'rotate(15deg)' : 'rotate(0deg)'
+                          }}
+                        ></div>
+                      </div>
                     </div>
                   )}
                   
@@ -469,6 +692,11 @@ export default function AssemblyLinePage() {
                   </div>
                 )}
               </div>
+              
+              {/* Advanced Challenges Panel */}
+              {showAdvanced && advancedChallenges.length > 0 && (
+                <AdvancedChallengesPanel challenges={advancedChallenges} />
+              )}
             </div>
           </div>
         )}

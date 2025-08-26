@@ -54,7 +54,7 @@ More information on the challenge can be found here https://docs.google.com/docu
 - **Homepage** (`/`) - Main landing page with company overview
 - **About** (`/about`) - Company information and contact details
 - **Solutions** (`/solutions`) - Product solutions and interactive demos
-- **Assembly Line** (`/assembly-line`) - Interactive robotics demonstration
+- **Assembly Line** (`/assembly-line`) - Interactive robotics demonstration with advanced challenges
 - **Login** (`/login`) - Authentication and user management
 
 ## 🛡️ Security Features
@@ -181,6 +181,47 @@ This platform is designed to be a foundation for CTF challenges. You can:
 2. **Implement Challenges**: Build puzzles and security exercises
 3. **Add User Management**: Create user accounts and scoring systems
 4. **Build Challenge Categories**: Web, crypto, forensics, etc.
+
+### 🚨 Advanced Challenge Detection System
+
+The Assembly Line page features an innovative challenge discovery system:
+
+- **Neural Threshold Trigger**: When AI restoration reaches ≥50% completion, advanced challenges automatically unlock
+- **Intelligent Filtering**: Displays only medium/hard difficulty challenges worth 200+ points
+- **Robotics Theme**: Challenges are presented as "Advanced Challenge Protocols" with cyberpunk styling
+- **Attention-Grabbing Alerts**: 
+  - 🔊 **Alarm Sound System**: Robotic beep sequence using Web Audio API
+  - 🌟 **Screen Flash Effect**: Full-screen red overlay with pulsing animation
+  - 📍 **Auto-Scroll**: Automatically scrolls to show the panel when unlocked
+  - 📢 **Header Notification**: Live notification badge showing available challenges
+- **Interactive Elements**: 
+  - Animated warning headers with pulsing effects
+  - Category-based icons (🌐 Web, 🔐 Crypto, ⚙️ Reverse, etc.)
+  - Hover animations with scaling and glow effects
+  - Enhanced visual borders and shadow effects
+  - Direct links to individual challenge pages
+
+#### Implementation Details:
+- Component: `AdvancedChallengesPanel.tsx`
+- Trigger: `codeCompletion >= 50`
+- API Integration: Fetches from `/api/challenges` endpoint
+- Responsive Design: Adapts from 1-3 columns based on screen size
+- Error Handling: Gracefully handles authentication failures
+
+#### Customization:
+```typescript
+// Modify challenge filtering criteria
+const filtered = challenges?.filter((challenge: any) => 
+  (challenge.difficulty === 'medium' || challenge.difficulty === 'hard') &&
+  challenge.points >= 200  // Adjust point threshold
+) || [];
+
+// Change activation threshold
+if (codeCompletion >= 75 && !showAdvanced) {  // Change from 50 to 75
+  setShowAdvanced(true);
+  loadAdvancedChallenges();
+}
+```
 
 ## 📚 Learning Resources
 

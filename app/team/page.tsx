@@ -182,7 +182,7 @@ export default function TeamPage() {
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-1">
                       {member.name}
-                      {member.hasProject !== undefined && (
+                      {member.projects.length > 0 && (
                         <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
                           CTF Participant
                         </span>
@@ -239,7 +239,7 @@ export default function TeamPage() {
                           </ul>
                         ) : (
                           <p className="text-gray-500 text-sm italic">
-                            {member.hasProject === false ? 'No active projects yet' : 'Project information classified'}
+{member.projects.length === 0 ? 'No active projects yet' : 'Project information classified'}
                           </p>
                         )}
                       </div>
