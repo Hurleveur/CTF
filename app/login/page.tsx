@@ -23,12 +23,12 @@ export default function LoginPage() {
     setIsLoading(true);
     setError('');
 
-    const success = login(email, password);
+    const result = await login(email, password);
     
-    if (success) {
+    if (result.success) {
       router.push('/assembly-line');
     } else {
-      setError('Invalid credentials. Use admin@example.com / admin');
+      setError(result.error || 'Login failed');
     }
     
     setIsLoading(false);
