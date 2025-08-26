@@ -20,6 +20,7 @@ interface ProjectContextType {
   addProject: (project: Omit<RoboticProject, 'id'>) => void;
   updateProject: (id: number, updates: Partial<RoboticProject>) => void;
   getProject: (id: number) => RoboticProject | undefined;
+  setProjects: (projects: RoboticProject[]) => void;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
@@ -113,6 +114,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       addProject,
       updateProject,
       getProject,
+      setProjects,
     }}>
       {children}
     </ProjectContext.Provider>

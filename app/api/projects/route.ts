@@ -21,9 +21,9 @@ export async function GET(request: NextRequest) {
     const supabase = createClient();
 
     // Check authentication
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
     
-    if (sessionError || !session?.user) {
+    if (userError || !user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     const { data: projects, error } = await supabase
       .from('user_projects')
       .select('*')
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -94,20 +94,51 @@ export async function POST(request: NextRequest) {
     const supabase = createClient();
 
     // Check authentication
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
     
-    if (sessionError || !session?.user) {
+    if (userError || !user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
+    // Check if user already has a project
+    const { data: existingProjects, error: checkError } = await supabase
+      .from('user_projects')
+      .select('id')
+      .eq('user_id', user.id)
+      .limit(1);
+
+    if (checkError) {
+      console.error('[Projects] Check existing error:', checkError.message);
+      return NextResponse.json(
+        { error: 'Failed to check existing projects' },
+        { status: 500 }
+      );
+    }
+
+    if (existingProjects && existingProjects.length > 0) {
+      return NextResponse.json(
+        { error: 'You can only have one project at a time. Please delete your existing project first.' },
+        { status: 400 }
+      );
+    }
+
+    // Get user's profile information for lead developer name
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('full_name, email')
+      .eq('id', user.id)
+      .single();
+
+    const leadDeveloperName = profile?.full_name || user.email || 'Unknown Developer';
+
     // Insert project into database
     const { data: project, error } = await supabase
       .from('user_projects')
       .insert({
-        user_id: session.user.id,
+        user_id: user.id,
         name: projectData.name,
         description: projectData.description,
         logo: projectData.logo,
@@ -115,8 +146,8 @@ export async function POST(request: NextRequest) {
         status_color: projectData.statusColor,
         neural_reconstruction: projectData.neuralReconstruction,
         last_backup: projectData.lastBackup,
-        lead_developer: projectData.leadDeveloper || null,
-        team_members: projectData.teamMembers || [],
+        lead_developer: leadDeveloperName,
+        team_members: [leadDeveloperName],
       })
       .select()
       .single();

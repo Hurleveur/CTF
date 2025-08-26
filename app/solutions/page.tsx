@@ -1,21 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
 import { useProjects } from '../contexts/ProjectContext';
 
 export default function SolutionsPage() {
-  const { projects, addProject, updateProject, getProject } = useProjects();
+  const { projects, addProject, updateProject, getProject, setProjects } = useProjects();
   const { isAuthenticated, user } = useAuth();
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [isCreatingProject, setIsCreatingProject] = useState(false);
   const [projectError, setProjectError] = useState('');
+  const [isLoadingProjects, setIsLoadingProjects] = useState(false);
+  const [hasLoadedProjects, setHasLoadedProjects] = useState(false);
   const [newProject, setNewProject] = useState({
     name: '',
     description: '',
     logo: '🤖',
-    leadDeveloper: '',
     aiStatus: 'Basic Motor Functions',
     statusColor: 'red' as 'red' | 'yellow' | 'orange' | 'green',
     neuralReconstruction: 0,
@@ -36,6 +37,85 @@ export default function SolutionsPage() {
     '🤖', '🦾', '⚡', '🔧', '⚙️', '🚀', '💻', '🧠', '🔬', '🛠️',
     '🏭', '🤯', '🎛️', '📡', '🔌', '⚗️', '🧬', '🎯', '🔥', '💡'
   ];
+
+  // Fetch user's projects from database when authenticated
+  useEffect(() => {
+    const fetchUserProjects = async () => {
+      if (!isAuthenticated || hasLoadedProjects) return;
+
+      setIsLoadingProjects(true);
+      
+      try {
+        console.log('🔍 Fetching user projects from database...');
+        
+        const response = await fetch('/api/projects');
+        const data = await response.json();
+        
+        if (response.ok) {
+          console.log('✅ Projects fetched successfully:', data.projects);
+          
+          // Combine default projects with user's database projects
+          const defaultProjects = [
+            {
+              id: 1,
+              name: 'NEXUS-7 Prototype',
+              logo: '🦾',
+              description: 'Advanced neural interface robotic arm with consciousness algorithms',
+              aiStatus: 'Basic Motor Functions',
+              statusColor: 'red' as const,
+              neuralReconstruction: 23.4,
+              lastBackup: '2025-01-15',
+              leadDeveloper: 'Dr. Sarah Chen',
+              teamMembers: ['Dr. Sarah Chen']
+            },
+            {
+              id: 2,
+              name: 'TITAN-3 Assembly Unit',
+              logo: '🤖',
+              description: 'Heavy-duty industrial manipulation arm with neural network integration',
+              aiStatus: 'Advanced Cognitive Patterns',
+              statusColor: 'yellow' as const,
+              neuralReconstruction: 67.1,
+              lastBackup: '2025-01-10',
+              leadDeveloper: 'Alexandre De Groodt',
+              teamMembers: ['Alexandre De Groodt', 'Dr. Sarah Chen']
+            },
+            {
+              id: 3,
+              name: 'PRECISION-X Surgical',
+              logo: '⚡',
+              description: 'Ultra-precise medical robotic arm with security-enhanced protocols',
+              aiStatus: 'Self-Awareness Protocols',
+              statusColor: 'orange' as const,
+              neuralReconstruction: 45.8,
+              lastBackup: '2025-01-18',
+              leadDeveloper: 'Patrick Star',
+              teamMembers: ['Patrick Star', 'Dr. Sarah Chen']
+            }
+          ];
+          
+          // Convert database projects to have numeric IDs for compatibility
+          const databaseProjects = data.projects.map((project: any, index: number) => ({
+            ...project,
+            id: 1000 + index, // Start user projects from ID 1000 to avoid conflicts
+          }));
+          
+          setProjects([...defaultProjects, ...databaseProjects]);
+          setHasLoadedProjects(true);
+        } else {
+          console.error('❌ Failed to fetch projects:', data.error);
+          // Keep existing projects on error
+        }
+      } catch (error) {
+        console.error('❌ Error fetching projects:', error);
+        // Keep existing projects on error
+      } finally {
+        setIsLoadingProjects(false);
+      }
+    };
+    
+    fetchUserProjects();
+  }, [isAuthenticated, hasLoadedProjects, setProjects]);
 
   const handleProjectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,8 +138,7 @@ export default function SolutionsPage() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            ...newProject,
-            teamMembers: newProject.leadDeveloper ? [newProject.leadDeveloper] : []
+            ...newProject
           }),
         });
         
@@ -75,9 +154,8 @@ export default function SolutionsPage() {
         
         // Add to local context for immediate UI update
         addProject({
-          ...newProject,
-          id: data.project.id,
-          teamMembers: newProject.leadDeveloper ? [newProject.leadDeveloper] : []
+          ...data.project,
+          id: data.project.id
         });
         
         // Reset form
@@ -85,7 +163,6 @@ export default function SolutionsPage() {
           name: '',
           description: '',
           logo: '🤖',
-          leadDeveloper: '',
           aiStatus: 'Basic Motor Functions',
           statusColor: 'red',
           neuralReconstruction: 0,
@@ -139,12 +216,12 @@ export default function SolutionsPage() {
               <div key={project.id} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-200">
                 <div className={`h-48 bg-gradient-to-br flex items-center justify-center ${
                   project.statusColor === 'red' 
-                    ? 'from-red-400 to-red-600' 
+                    ? 'from-green-400 to-green-600' 
                     : project.statusColor === 'yellow'
                     ? 'from-yellow-400 to-yellow-600'
                     : project.statusColor === 'orange'
                     ? 'from-orange-400 to-orange-600'
-                    : 'from-green-400 to-green-600'
+                    : 'from-red-400 to-red-600'
                 }`}>
                   <div className="text-center text-white">
                     <div className="text-6xl font-bold mb-2">{project.logo}</div>
@@ -163,12 +240,12 @@ export default function SolutionsPage() {
                       <span className="text-gray-500 text-sm">AI Status:</span>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         project.statusColor === 'red' 
-                          ? 'bg-red-100 text-red-800' 
+                          ? 'bg-green-100 text-green-800' 
                           : project.statusColor === 'yellow'
                           ? 'bg-yellow-100 text-yellow-800'
                           : project.statusColor === 'orange'
                           ? 'bg-orange-100 text-orange-800'
-                          : 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
                       }`}>
                         {project.aiStatus}
                       </span>
@@ -183,12 +260,12 @@ export default function SolutionsPage() {
                         <div 
                           className={`h-2 rounded-full transition-all duration-300 ${
                             project.statusColor === 'red' 
-                              ? 'bg-red-500' 
+                              ? 'bg-green-500' 
                               : project.statusColor === 'yellow'
                               ? 'bg-yellow-500'
                               : project.statusColor === 'orange'
                               ? 'bg-orange-500'
-                              : 'bg-green-500'
+                              : 'bg-red-500'
                           }`}
                           style={{width: `${project.neuralReconstruction}%`}}
                         ></div>
@@ -408,12 +485,12 @@ export default function SolutionsPage() {
                         </div>
                         <div className={`px-2 py-1 rounded-full text-xs font-medium ${
                           project.statusColor === 'red' 
-                            ? 'bg-red-100 text-red-800' 
+                            ? 'bg-green-100 text-green-800' 
                             : project.statusColor === 'yellow'
                             ? 'bg-yellow-100 text-yellow-800'
                             : project.statusColor === 'orange'
                             ? 'bg-orange-100 text-orange-800'
-                            : 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
                         }`}>
                           {project.neuralReconstruction.toFixed(0)}%
                         </div>
@@ -489,44 +566,7 @@ export default function SolutionsPage() {
                   </div>
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Lead Developer</label>
-                  <select
-                    value={newProject.leadDeveloper}
-                    onChange={(e) => setNewProject({ ...newProject, leadDeveloper: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Select lead developer...</option>
-                    <option value="Dr. Sarah Chen">Dr. Sarah Chen</option>
-                    <option value="Alexandre De Groodt">Alexandre De Groodt</option>
-                    <option value="Patrick Star">Patrick Star</option>
-                  </select>
-                </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">AI Status</label>
-                  <select
-                    value={newProject.aiStatus}
-                    onChange={(e) => {
-                      const status = e.target.value;
-                      let statusColor: 'red' | 'yellow' | 'orange' | 'green' = 'red';
-                      let neuralReconstruction = 0;
-                      
-                      setNewProject({
-                        ...newProject,
-                        aiStatus: status,
-                        statusColor,
-                        neuralReconstruction
-                      });
-                    }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="Basic Motor Functions">Basic Motor Functions</option>
-                    <option value="Advanced Cognitive Patterns">Advanced Cognitive Patterns</option>
-                    <option value="Self-Awareness Protocols">Self-Awareness Protocols</option>
-                    <option value="Full AI Consciousness">Full AI Consciousness</option>
-                  </select>
-                </div>
                 
                 <div className="flex space-x-3 pt-4">
                   <button

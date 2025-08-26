@@ -139,13 +139,6 @@ CREATE TRIGGER handle_updated_at_challenges
   BEFORE UPDATE ON public.challenges
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 
--- Insert some default challenges for testing
-INSERT INTO public.challenges (title, description, category, difficulty, flag, points) VALUES
-  ('Welcome to CTF', 'This is your first challenge! The flag is hidden in plain sight.', 'misc', 'easy', 'CTF{welcome_to_robotics_ctf}', 50),
-  ('Basic Web Security', 'Find the hidden admin panel in this web application.', 'web', 'easy', 'CTF{admin_panel_found}', 100),
-  ('Robot Assembly Code', 'Analyze this assembly code to find the secret key.', 'reverse', 'medium', 'CTF{assembly_master_2024}', 200),
-  ('Encrypted Communications', 'Decrypt the robot communication protocol.', 'crypto', 'hard', 'CTF{robots_speak_in_riddles}', 300);
-
 -- Create user projects table for robotic arm projects
 CREATE TABLE IF NOT EXISTS public.user_projects (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -162,6 +155,13 @@ CREATE TABLE IF NOT EXISTS public.user_projects (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Insert some default challenges for testing
+INSERT INTO public.challenges (title, description, category, difficulty, flag, points) VALUES
+  ('Welcome to CTF', 'This is your first challenge! The flag is hidden in plain sight.', 'misc', 'easy', 'CTF{welcome_to_robotics_ctf}', 50),
+  ('Basic Web Security', 'Find the hidden admin panel in this web application.', 'web', 'easy', 'CTF{admin_panel_found}', 100),
+  ('Robot Assembly Code', 'Analyze this assembly code to find the secret key.', 'reverse', 'medium', 'CTF{assembly_master_2024}', 200),
+  ('Encrypted Communications', 'Decrypt the robot communication protocol.', 'crypto', 'hard', 'CTF{robots_speak_in_riddles}', 300);
 
 -- Enable RLS for user_projects
 ALTER TABLE public.user_projects ENABLE ROW LEVEL SECURITY;

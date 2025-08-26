@@ -1,11 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useAuth } from '../contexts/AuthContext';
 import { useProjects, RoboticProject } from '../contexts/ProjectContext';
+
+interface TeamMember {
+  id: string | number;
+  name: string;
+  role: string;
+  avatar: string;
+  email: string;
+  bio: string;
+  skills: string[];
+  status: string;
+  projects: string[];
+  quirks: string;
+  secret: string;
+  projectCount?: number;
+  totalProgress?: number;
+  hasProject?: boolean;
+}
 
 export default function TeamPage() {
   const [showEasterEgg, setShowEasterEgg] = useState(false);
+  const [databaseTeamMembers, setDatabaseTeamMembers] = useState<TeamMember[]>([]);
+  const [isLoadingTeam, setIsLoadingTeam] = useState(false);
+  const [teamStats, setTeamStats] = useState({ totalMembers: 0, totalProjects: 0, averageProgress: '0.0' });
+  const { isAuthenticated } = useAuth();
 
   const teamMembers = [
     {
@@ -54,6 +76,39 @@ export default function TeamPage() {
     setTimeout(() => setShowEasterEgg(false), 5000);
   };
 
+  // Fetch database team members when authenticated
+  useEffect(() => {
+    const fetchTeamMembers = async () => {
+      if (!isAuthenticated) return;
+      
+      setIsLoadingTeam(true);
+      
+      try {
+        console.log('🔍 Fetching team members from database...');
+        
+        const response = await fetch('/api/team');
+        const data = await response.json();
+        
+        if (response.ok) {
+          console.log('✅ Team members fetched successfully:', data.teamMembers);
+          setDatabaseTeamMembers(data.teamMembers);
+          setTeamStats(data.stats);
+        } else {
+          console.error('❌ Failed to fetch team members:', data.error);
+        }
+      } catch (error) {
+        console.error('❌ Error fetching team members:', error);
+      } finally {
+        setIsLoadingTeam(false);
+      }
+    };
+    
+    fetchTeamMembers();
+  }, [isAuthenticated]);
+
+  // Combine static team members with database team members
+  const allTeamMembers = [...teamMembers, ...databaseTeamMembers];
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -95,11 +150,25 @@ export default function TeamPage() {
             Meet the brilliant minds behind our cutting-edge robotics and AI systems. 
             Each team member brings unique expertise to our consciousness restoration project.
           </p>
+          {isAuthenticated && (
+            <div className="mt-4 flex justify-center items-center space-x-4">
+              <div className="text-sm text-gray-500">
+                {isLoadingTeam ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                    Loading team members...
+                  </div>
+                ) : (
+                  `Total Members: ${allTeamMembers.length} | Active Projects: ${teamStats.totalProjects}`
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Team Members Grid */}
         <div className="space-y-8">
-          {teamMembers.map((member) => (
+          {allTeamMembers.map((member) => (
             <div key={member.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
               <div className="p-8">
                 <div className="flex flex-col lg:flex-row lg:items-start gap-8">
@@ -111,7 +180,14 @@ export default function TeamPage() {
                     >
                       <span className="text-4xl">{member.avatar}</span>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">{member.name}</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">
+                      {member.name}
+                      {member.hasProject !== undefined && (
+                        <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                          CTF Participant
+                        </span>
+                      )}
+                    </h3>
                     <p className="text-blue-600 font-medium mb-2">{member.role}</p>
                     <p className="text-sm text-gray-500 font-mono">{member.email}</p>
                     <div className={`mt-3 px-3 py-1 rounded-full text-xs font-medium ${
@@ -152,14 +228,20 @@ export default function TeamPage() {
                       {/* Current Projects */}
                       <div>
                         <h4 className="text-lg font-semibold text-gray-900 mb-3">Current Projects</h4>
-                        <ul className="space-y-1">
-                          {member.projects.map((project, index) => (
-                            <li key={index} className="text-gray-600 text-sm flex items-start">
-                              <span className="text-blue-500 mr-2">•</span>
-                              {project}
-                            </li>
-                          ))}
-                        </ul>
+                        {member.projects && member.projects.length > 0 ? (
+                          <ul className="space-y-1">
+                            {member.projects.map((project, index) => (
+                              <li key={index} className="text-gray-600 text-sm flex items-start">
+                                <span className="text-blue-500 mr-2">•</span>
+                                {project}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-gray-500 text-sm italic">
+                            {member.hasProject === false ? 'No active projects yet' : 'Project information classified'}
+                          </p>
+                        )}
                       </div>
 
                       {/* Fun Facts */}

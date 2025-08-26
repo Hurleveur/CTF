@@ -16,12 +16,56 @@ export default function AssemblyLinePage() {
   const [ctfCode, setCtfCode] = useState('');
   const [projectId, setProjectId] = useState('');
   const [lastCodeResult, setLastCodeResult] = useState<{type: 'success' | 'error' | null, message: string}>({type: null, message: ''});
+  const [isLoadingProject, setIsLoadingProject] = useState(false);
+  const [userProject, setUserProject] = useState<RoboticProject | null>(null);
+  
+  // Check if user is admin
+  const isAdmin = user?.user_metadata?.full_name === 'admin' || user?.email === 'admin@example.com';
 
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('/login');
     }
   }, [isAuthenticated, router]);
+
+  // Fetch user's project from database
+  useEffect(() => {
+    const fetchUserProject = async () => {
+      if (!isAuthenticated || userProject) return;
+      
+      setIsLoadingProject(true);
+      
+      try {
+        console.log('🔍 Fetching user project for assembly line...');
+        
+        const response = await fetch('/api/projects');
+        const data = await response.json();
+        
+        if (response.ok && data.projects && data.projects.length > 0) {
+          // User has a project - automatically select it
+          const project = {
+            ...data.projects[0],
+            id: 1000, // Use consistent ID for compatibility
+          };
+          
+          console.log('✅ User project loaded:', project);
+          setUserProject(project);
+          setSelectedArm(project);
+          setCodeCompletion(project.neuralReconstruction || 0);
+          setArmStatus('offline');
+        } else {
+          console.log('ℹ️ No user project found');
+          setUserProject(null);
+        }
+      } catch (error) {
+        console.error('❌ Error fetching user project:', error);
+      } finally {
+        setIsLoadingProject(false);
+      }
+    };
+    
+    fetchUserProject();
+  }, [isAuthenticated, userProject]);
 
   useEffect(() => {
     if (selectedArm) {
@@ -113,7 +157,37 @@ export default function AssemblyLinePage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {!selectedArm ? (
+        {isLoadingProject ? (
+          /* Loading State */
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading your project...</p>
+            </div>
+          </div>
+        ) : !selectedArm && !userProject ? (
+          /* No Project State */
+          <div className="text-center py-12">
+            <div className="max-w-md mx-auto">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">No Project Found</h2>
+              <p className="text-gray-600 mb-6">
+                You need to create a robotic project before you can access the assembly line. 
+                Create your project first to start restoring AI consciousness.
+              </p>
+              <a
+                href="/solutions#demo"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors inline-block"
+              >
+                Create Your Project
+              </a>
+            </div>
+          </div>
+        ) : !selectedArm ? (
           /* Robotic Arm Selection */
           <div className="space-y-6">
             <div>
@@ -201,12 +275,14 @@ export default function AssemblyLinePage() {
                 </h2>
                 <p className="text-gray-600">Neural Reconstruction: {codeCompletion.toFixed(1)}%</p>
               </div>
-              <button
-                onClick={() => setSelectedArm(null)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Switch Project
-              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => setSelectedArm(null)}
+                  className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Switch Project
+                </button>
+              )}
             </div>
 
             {/* Merged Robotic Arm Code Restoration System */}
@@ -222,17 +298,17 @@ export default function AssemblyLinePage() {
                   </div>
                   <div className="flex space-x-2">
                     <button
-                      onClick={toggleArmRestoration}
-                      disabled={codeCompletion < 100}
+                      onClick={isAdmin ? toggleArmRestoration : undefined}
+                      disabled={codeCompletion < 100 || !isAdmin}
                       className={`px-6 py-3 rounded-md text-sm font-bold transition-all duration-300 border-2 ${
-                        codeCompletion < 100
+                        codeCompletion < 100 || !isAdmin
                           ? 'bg-gray-400 text-gray-600 border-gray-300 cursor-not-allowed'
                           : armStatus === 'restoring'
                           ? 'bg-red-600 hover:bg-red-700 text-white border-red-400 shadow-lg animate-pulse shadow-red-500/50'
                           : 'bg-red-500 hover:bg-red-600 text-white border-red-300 shadow-md'
                       }`}
                     >
-                      {codeCompletion < 100 ? '🔒 LOCKED' : 
+                      {codeCompletion < 100 || !isAdmin ? '🔒 LOCKED' : 
                        armStatus === 'restoring' ? '🔥 AI ACTIVATING...' : '⚡ ACTIVATE AI'}
                     </button>
                   </div>
