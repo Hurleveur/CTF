@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useProjects, RoboticProject } from '../contexts/ProjectContext';
 
 export default function TeamPage() {
@@ -218,6 +219,14 @@ export default function TeamPage() {
                 <span className="font-medium text-gray-900">Sleep Hours:</span><br/>
                 Variable (Alexandre: 2, Sarah: 6, Patrick: ???)
               </div>
+            </div>
+            <div className="mt-6">
+              <Link 
+                href="/solutions" 
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors inline-block"
+              >
+                View All Projects →
+              </Link>
             </div>
           </div>
         </div>

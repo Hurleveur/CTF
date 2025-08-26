@@ -151,16 +151,16 @@ export default function AboutPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
-              href="/" 
+              href="/team" 
               className="bg-white text-purple-900 hover:bg-gray-100 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
-              Start Exploring
+              View Team Leaderboard
             </Link>
             <Link 
-              href="/assembly-line" 
+              href="/" 
               className="border-2 border-white text-white hover:bg-white hover:text-purple-900 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
-              Access Restoration Lab
+              Back to Home
             </Link>
           </div>
           <div className="mt-8 text-sm text-red-200">

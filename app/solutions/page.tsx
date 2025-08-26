@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useProjects } from '../contexts/ProjectContext';
 
 export default function SolutionsPage() {
-  const { projects, addProject } = useProjects();
+  const { projects, addProject, updateProject, getProject } = useProjects();
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [newProject, setNewProject] = useState({
     name: '',
@@ -13,7 +13,7 @@ export default function SolutionsPage() {
     logo: '🤖',
     leadDeveloper: '',
     aiStatus: 'Basic Motor Functions',
-    statusColor: 'red' as const,
+    statusColor: 'red' as 'red' | 'yellow' | 'orange' | 'green',
     neuralReconstruction: 0,
     lastBackup: new Date().toISOString().split('T')[0]
   });

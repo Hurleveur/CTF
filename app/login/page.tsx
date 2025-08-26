@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -71,7 +72,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="admin@example.com"
+                placeholder="Enter your email"
               />
             </div>
             
@@ -109,7 +110,10 @@ export default function LoginPage() {
           
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Use <span className="font-mono bg-gray-100 px-2 py-1 rounded">admin@example.com</span> / <span className="font-mono bg-gray-100 px-2 py-1 rounded">admin</span>
+              Don't have an account?{' '}
+              <Link href="/signup" className="text-blue-600 hover:text-blue-800 font-medium">
+                Sign up here
+              </Link>
             </p>
           </div>
         </form>

@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
       console.error('[API] Leaderboard fetch error:', leaderboardError.message);
     }
 
-    const userRank = leaderboard?.findIndex(entry => entry.id === user_id) + 1 || 0;
+    const userRank = (leaderboard || []).findIndex(entry => entry.id === user_id) + 1 || 0;
 
     return NextResponse.json({
       profile: {
