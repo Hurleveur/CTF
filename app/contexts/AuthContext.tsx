@@ -33,12 +33,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const getSession = async () => {
       try {
+        console.log('🔄 Checking initial session on mount...');
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
+          console.log('🔄 Initial session found for:', session.user.email);
           setUser(formatUser(session.user));
+        } else {
+          console.log('🔄 No initial session found');
         }
       } catch (error) {
-        console.error('Error getting session:', error);
+        console.error('🔄 Error getting session:', error);
       } finally {
         setIsLoading(false);
       }
@@ -49,9 +53,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('🔄 Auth state changed:', event, !!session?.user);
         if (session?.user) {
+          console.log('🔄 Setting user from auth listener:', session.user.email);
           setUser(formatUser(session.user));
         } else {
+          console.log('🔄 Clearing user from auth listener');
           setUser(null);
         }
         setIsLoading(false);
@@ -74,6 +81,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
+      console.log('🔐 Starting login process for:', email);
+      setIsLoading(true);
+      
+      // Use API route but with immediate session check for performance
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
@@ -82,20 +93,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log('🔐 API response status:', response.status);
       const data = await response.json();
+      console.log('🔐 API response data:', data);
 
       if (!response.ok) {
+        console.error('🔐 Login API failed:', response.status, data);
+        setIsLoading(false);
         return {
           success: false,
           error: data.error || 'Login failed'
         };
       }
 
-      // The user state will be updated via the auth state change listener
+      // Immediately check session after successful API call for faster UI update
+      try {
+        console.log('🔐 Checking session after successful API call...');
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('🔐 Session retrieval error:', sessionError);
+        } else if (sessionData?.session?.user) {
+          console.log('🔐 Session found, updating user state immediately');
+          setUser(formatUser(sessionData.session.user));
+        } else {
+          console.log('🔐 No session found, waiting for auth listener...');
+        }
+      } catch (sessionError) {
+        console.error('🔐 Session check error:', sessionError);
+        // Don't fail login if session check fails, auth listener will handle it
+      }
+      
+      setIsLoading(false);
+      console.log('🔐 Login process completed successfully');
       return { success: true };
 
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('🔐 Login error:', error);
+      setIsLoading(false);
       return {
         success: false,
         error: 'Network error. Please try again.'
@@ -135,13 +170,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async (): Promise<void> => {
     try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-      });
+      console.log('🚪 Starting logout process...');
+      setIsLoading(true);
       
-      // The user state will be updated via the auth state change listener
+      // First clear the client-side session
+      console.log('🚪 Clearing client-side session...');
+      const { error: clientError } = await supabase.auth.signOut();
+      
+      if (clientError) {
+        console.error('🚪 Client-side logout error:', clientError);
+      } else {
+        console.log('🚪 Client-side session cleared successfully');
+      }
+      
+      // Also call the server-side logout API for completeness
+      try {
+        console.log('🚪 Calling server-side logout API...');
+        const response = await fetch('/api/auth/logout', {
+          method: 'POST',
+        });
+        
+        if (response.ok) {
+          console.log('🚪 Server-side logout successful');
+        } else {
+          console.error('🚪 Server-side logout failed:', response.status);
+        }
+      } catch (apiError) {
+        console.error('🚪 Server-side logout API error:', apiError);
+        // Don't fail the logout if server call fails - client logout is more important
+      }
+      
+      // Immediately clear user state for instant UI update
+      console.log('🚪 Clearing user state immediately');
+      setUser(null);
+      
+      // Verify session is actually cleared
+      setTimeout(async () => {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            console.error('🚪 WARNING: Session still exists after logout!', session.user?.email);
+          } else {
+            console.log('🚪 ✅ Verified: Session successfully cleared');
+          }
+        } catch (error) {
+          console.error('🚪 Session verification error:', error);
+        }
+      }, 100);
+      
+      setIsLoading(false);
+      console.log('🚪 Logout process completed');
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('🚪 Logout error:', error);
+      // Even if there's an error, clear the user state
+      setUser(null);
+      setIsLoading(false);
     }
   };
 

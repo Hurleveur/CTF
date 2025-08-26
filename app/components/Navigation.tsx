@@ -1,12 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
+  
+  // Debug auth state changes in Navigation
+  useEffect(() => {
+    console.log('🧭 Navigation: Auth state changed - isAuthenticated:', isAuthenticated, 'user:', user?.email || 'none');
+  }, [isAuthenticated, user]);
 
   return (
     <nav className="bg-white shadow-lg border-b border-gray-200">
@@ -92,7 +97,7 @@ export default function Navigation() {
             <Link href="/solutions" className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
               Solutions
             </Link>
-            <Link href="/team" className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
+            <Link href="/solutions" className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
               Team Directory
             </Link>
             <Link href="/assembly-line" className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">

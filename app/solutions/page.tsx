@@ -2,11 +2,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useAuth } from '../contexts/AuthContext';
 import { useProjects } from '../contexts/ProjectContext';
 
 export default function SolutionsPage() {
   const { projects, addProject, updateProject, getProject } = useProjects();
+  const { isAuthenticated, user } = useAuth();
   const [showProjectForm, setShowProjectForm] = useState(false);
+  const [isCreatingProject, setIsCreatingProject] = useState(false);
+  const [projectError, setProjectError] = useState('');
   const [newProject, setNewProject] = useState({
     name: '',
     description: '',
@@ -33,24 +37,69 @@ export default function SolutionsPage() {
     '🏭', '🤯', '🎛️', '📡', '🔌', '⚗️', '🧬', '🎯', '🔥', '💡'
   ];
 
-  const handleProjectSubmit = (e: React.FormEvent) => {
+  const handleProjectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!isAuthenticated) {
+      setProjectError('You must be logged in to create a project');
+      return;
+    }
+    
     if (newProject.name && newProject.description) {
-      addProject({
-        ...newProject,
-        teamMembers: newProject.leadDeveloper ? [newProject.leadDeveloper] : []
-      });
-      setNewProject({
-        name: '',
-        description: '',
-        logo: '🤖',
-        leadDeveloper: '',
-        aiStatus: 'Basic Motor Functions',
-        statusColor: 'red',
-        neuralReconstruction: 0,
-        lastBackup: new Date().toISOString().split('T')[0]
-      });
-      setShowProjectForm(false);
+      setIsCreatingProject(true);
+      setProjectError('');
+      
+      try {
+        console.log('🛠️ Creating new project:', newProject.name);
+        
+        const response = await fetch('/api/projects', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...newProject,
+            teamMembers: newProject.leadDeveloper ? [newProject.leadDeveloper] : []
+          }),
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          console.error('🛠️ Project creation failed:', data);
+          setProjectError(data.error || 'Failed to create project');
+          return;
+        }
+        
+        console.log('🛠️ Project created successfully:', data.project);
+        
+        // Add to local context for immediate UI update
+        addProject({
+          ...newProject,
+          id: data.project.id,
+          teamMembers: newProject.leadDeveloper ? [newProject.leadDeveloper] : []
+        });
+        
+        // Reset form
+        setNewProject({
+          name: '',
+          description: '',
+          logo: '🤖',
+          leadDeveloper: '',
+          aiStatus: 'Basic Motor Functions',
+          statusColor: 'red',
+          neuralReconstruction: 0,
+          lastBackup: new Date().toISOString().split('T')[0]
+        });
+        
+        setShowProjectForm(false);
+        
+      } catch (error) {
+        console.error('🛠️ Project creation error:', error);
+        setProjectError('Network error. Please try again.');
+      } finally {
+        setIsCreatingProject(false);
+      }
     }
   };
 
@@ -318,12 +367,31 @@ export default function SolutionsPage() {
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">New Project Configuration</h3>
                 <p className="text-gray-600 mb-6">Configure the parameters for your new robotic project</p>
-                <button
-                  onClick={() => setShowProjectForm(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
-                >
-                  + Create New Project
-                </button>
+                {isAuthenticated ? (
+                  <button
+                    onClick={() => setShowProjectForm(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
+                  >
+                    + Create New Project
+                  </button>
+                ) : (
+                  <div className="text-center">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                      <p className="text-yellow-800 text-sm font-medium">
+                        🔒 Authentication Required
+                      </p>
+                      <p className="text-yellow-700 text-sm mt-1">
+                        You must be logged in to create robotic projects
+                      </p>
+                    </div>
+                    <Link
+                      href="/login"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors inline-block"
+                    >
+                      Sign In to Create Project
+                    </Link>
+                  </div>
+                )}
               </div>
               
               {/* Project Preview Cards */}
@@ -355,7 +423,7 @@ export default function SolutionsPage() {
                 </div>
                 <div className="mt-4 text-center">
                   <Link 
-                    href="/team" 
+                    href="/solutions" 
                     className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                   >
                     View All Projects →
@@ -371,6 +439,12 @@ export default function SolutionsPage() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
               <h3 className="text-xl font-bold text-gray-900 mb-4">Create New Robotic Project</h3>
+              
+              {projectError && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+                  <p className="text-sm text-red-600">{projectError}</p>
+                </div>
+              )}
               
               <form onSubmit={handleProjectSubmit} className="space-y-4">
                 <div>
@@ -457,14 +531,23 @@ export default function SolutionsPage() {
                 <div className="flex space-x-3 pt-4">
                   <button
                     type="submit"
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md font-medium transition-colors"
+                    disabled={isCreatingProject}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center"
                   >
-                    Create Project
+                    {isCreatingProject ? (
+                      <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Creating...
+                      </div>
+                    ) : (
+                      'Create Project'
+                    )}
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowProjectForm(false)}
-                    className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-md font-medium transition-colors"
+                    disabled={isCreatingProject}
+                    className="flex-1 bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-800 py-2 px-4 rounded-md font-medium transition-colors"
                   >
                     Cancel
                   </button>

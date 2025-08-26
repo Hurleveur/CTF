@@ -248,7 +248,7 @@ export default function SignupPage() {
                   <p className="text-sm text-gray-600">
                     Already have access?{' '}
                     <Link href="/login" className="text-blue-600 hover:text-blue-800 font-medium">
-                      Sign in to laboratory
+                      Log in to laboratory
                     </Link>
                   </p>
                 </div>
