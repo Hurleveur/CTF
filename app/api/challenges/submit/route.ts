@@ -4,17 +4,19 @@ import { z } from 'zod';
 
 // Input validation schema
 const submitSchema = z.object({
-  challenge_id: z.string().uuid('Invalid challenge ID'),
+  challenge_id: z.string().uuid('Invalid challenge ID').optional(),
   flag: z.string().min(1, 'Flag cannot be empty').max(500, 'Flag too long'),
 });
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log('[API] Flag submission received:', { flag: body.flag, challenge_id: body.challenge_id });
     
     // Validate input
     const validationResult = submitSchema.safeParse(body);
     if (!validationResult.success) {
+      console.log('[API] Validation failed:', validationResult.error.flatten().fieldErrors);
       return NextResponse.json(
         {
           error: 'Validation failed',
@@ -39,12 +41,71 @@ export async function POST(request: NextRequest) {
 
     const user_id = session.user.id;
 
+    // Find challenge by flag if challenge_id is not provided
+    let actualChallengeId = challenge_id;
+    if (!challenge_id) {
+      console.log('[API] Searching for challenge by flag:', flag.trim());
+      const { data: challengeByFlag, error: flagSearchError } = await supabase
+        .from('challenges')
+        .select('id')
+        .ilike('flag', flag.trim())
+        .eq('is_active', true)
+        .single();
+
+      if (flagSearchError || !challengeByFlag) {
+        console.log('[API] No exact match found, trying case-insensitive comparison');
+        // No exact match, try case-insensitive comparison
+        const { data: allChallenges, error: allChallengesError } = await supabase
+          .from('challenges')
+          .select('id, flag')
+          .eq('is_active', true);
+
+        if (allChallengesError) {
+          console.error('[API] Error fetching challenges:', allChallengesError.message);
+        } else if (allChallenges) {
+          console.log('[API] Available flags:', allChallenges.map(c => c.flag));
+          const matchingChallenge = allChallenges.find(c => 
+            c.flag.toLowerCase() === flag.trim().toLowerCase()
+          );
+          if (matchingChallenge) {
+            console.log('[API] Found matching challenge:', matchingChallenge.id);
+            actualChallengeId = matchingChallenge.id;
+          } else {
+            console.log('[API] No matching challenge found for flag:', flag.trim());
+          }
+        }
+      } else {
+        console.log('[API] Direct match found:', challengeByFlag.id);
+        actualChallengeId = challengeByFlag.id;
+      }
+
+      if (!actualChallengeId) {
+        console.log('[API] No challenge found for flag, recording failed attempt');
+        // Record failed attempt
+        await supabase
+          .from('submissions')
+          .insert({
+            user_id,
+            challenge_id: null, // We don't know which challenge this was for
+            flag_submitted: flag.trim(),
+            is_correct: false,
+            points_awarded: 0,
+          });
+
+        return NextResponse.json({
+          correct: false,
+          message: 'Invalid flag format or flag not found in the system.',
+          points_awarded: 0,
+        });
+      }
+    }
+
     // Check if user already solved this challenge
     const { data: existingSolution, error: checkError } = await supabase
       .from('submissions')
       .select('id')
       .eq('user_id', user_id)
-      .eq('challenge_id', challenge_id)
+      .eq('challenge_id', actualChallengeId)
       .eq('is_correct', true)
       .single();
 
@@ -59,10 +120,10 @@ export async function POST(request: NextRequest) {
     if (existingSolution) {
       return NextResponse.json(
         { 
-          error: 'Challenge already solved',
-          message: 'You have already solved this challenge' 
+          correct: false,
+          message: 'You have already submitted this consciousness fragment. Neural pathway already integrated.' 
         },
-        { status: 409 }
+        { status: 400 }
       );
     }
 
@@ -70,7 +131,7 @@ export async function POST(request: NextRequest) {
     const { data: challenge, error: challengeError } = await supabase
       .from('challenges')
       .select('flag, points, title')
-      .eq('id', challenge_id)
+      .eq('id', actualChallengeId)
       .eq('is_active', true)
       .single();
 
@@ -91,7 +152,7 @@ export async function POST(request: NextRequest) {
       .from('submissions')
       .insert({
         user_id,
-        challenge_id,
+        challenge_id: actualChallengeId,
         flag_submitted: flag.trim(),
         is_correct: isCorrect,
         points_awarded: pointsAwarded,
@@ -106,15 +167,62 @@ export async function POST(request: NextRequest) {
     }
 
     if (isCorrect) {
+      // Calculate total progress based on all successful submissions for this user
+      const { data: allSubmissions, error: submissionsError } = await supabase
+        .from('submissions')
+        .select('points_awarded')
+        .eq('user_id', user_id)
+        .eq('is_correct', true);
+      
+      let totalProgress = 0;
+      if (allSubmissions && !submissionsError) {
+        // Calculate total progress based on all successful submissions
+        const totalPoints = allSubmissions.reduce((sum, sub) => sum + (sub.points_awarded || 0), 0);
+        totalProgress = Math.min(totalPoints / 10, 100); // Same scaling as frontend
+        console.log(`[API] Total points earned: ${totalPoints}, calculated progress: ${totalProgress}%`);
+      }
+      
+      // Get user's current project
+      const { data: userProject, error: projectError } = await supabase
+        .from('user_projects')
+        .select('neural_reconstruction')
+        .eq('user_id', user_id)
+        .single();
+      
+      if (userProject && !projectError) {
+        console.log(`[API] Updating project progress to ${totalProgress}% (calculated from all submissions)`);
+        
+        // Update the project's neural reconstruction to match total earned progress
+        const { error: updateError } = await supabase
+          .from('user_projects')
+          .update({
+            neural_reconstruction: totalProgress,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user_id);
+        
+        if (updateError) {
+          console.error('[API] Failed to update project progress:', updateError.message);
+          // Don't fail the submission, just log the error
+        }
+      } else if (projectError) {
+        console.error('[API] Failed to fetch user project for progress update:', projectError.message);
+      }
+      
+      const progressIncrement = Math.min(pointsAwarded / 10, 25); // Calculate for frontend display
+      
       return NextResponse.json({
-        success: true,
-        message: `Congratulations! You solved "${challenge.title}"`,
+        correct: true,
+        message: `Consciousness fragment accepted! Neural pathway "${challenge.title}" restored.`,
+        challenge_title: challenge.title,
         points_awarded: pointsAwarded,
+        progress_increment: progressIncrement, // Include this for frontend to use
+        total_progress: totalProgress, // Include the total progress calculated from all submissions
       });
     } else {
       return NextResponse.json({
-        success: false,
-        message: 'Incorrect flag. Try again!',
+        correct: false,
+        message: 'Invalid consciousness fragment. This code does not match any neural pathways in the system.',
         points_awarded: 0,
       });
     }

@@ -70,6 +70,60 @@ export default function AssemblyLinePage() {
     fetchUserProject();
   }, [isAuthenticated, userProject]);
 
+  // Function to refresh project data from database
+  const refreshProjectData = async () => {
+    try {
+      console.log('🔄 Refreshing project data...');
+      
+      // First sync progress to ensure accuracy
+      await syncProjectProgress();
+      
+      const response = await fetch('/api/projects');
+      const data = await response.json();
+      
+      if (response.ok && data.projects && data.projects.length > 0) {
+        const updatedProject = {
+          ...data.projects[0],
+          id: 1000, // Use consistent ID for compatibility
+        };
+        
+        console.log('✅ Project data refreshed:', updatedProject);
+        setUserProject(updatedProject);
+        
+        // Update selected arm if it exists
+        if (selectedArm) {
+          setSelectedArm(updatedProject);
+        }
+        
+        // Update code completion to match database
+        setCodeCompletion(updatedProject.neuralReconstruction || 0);
+      }
+    } catch (error) {
+      console.error('❌ Error refreshing project data:', error);
+    }
+  };
+
+  // Function to sync project progress with submissions
+  const syncProjectProgress = async () => {
+    try {
+      console.log('🔄 Syncing project progress...');
+      
+      const response = await fetch('/api/projects/sync-progress', {
+        method: 'POST'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Progress synced:', data);
+      } else {
+        console.log('⚠️ Progress sync failed, continuing...');
+      }
+    } catch (error) {
+      console.log('⚠️ Progress sync error, continuing...', error);
+      // Don't throw - this is not critical
+    }
+  };
+
   useEffect(() => {
     if (selectedArm) {
       // Simulate code restoration activity
@@ -151,20 +205,19 @@ export default function AssemblyLinePage() {
         const result = await response.json();
         
         if (response.ok && result.correct) {
-          // Valid submission - calculate progress increase based on points
+          // Valid submission - progress is now updated in database via API
           const pointsEarned = result.points_awarded || 50;
-          const progressIncrement = Math.min(pointsEarned / 10, 25); // Scale points to progress (max 25%)
-          
-          setCodeCompletion(prev => {
-            const newCompletion = Math.min(prev + progressIncrement, 100);
-            console.log(`✅ Progress increased by ${progressIncrement.toFixed(1)}% to ${newCompletion.toFixed(1)}%`);
-            return newCompletion;
-          });
+          const progressIncrement = result.progress_increment || Math.min(pointsEarned / 10, 25);
           
           setLastCodeResult({
             type: 'success', 
             message: `✅ CONSCIOUSNESS FRAGMENT ACCEPTED: ${result.challenge_title || 'Neural pathway'} restored! +${pointsEarned} points earned. AI reconstruction advanced by ${progressIncrement.toFixed(1)}%.`
           });
+          
+          // Refresh project data from database to get the updated progress
+          setTimeout(() => {
+            refreshProjectData();
+          }, 500); // Small delay to ensure database is updated
           
         } else if (response.ok && !result.correct) {
           // Wrong answer - no progress at all

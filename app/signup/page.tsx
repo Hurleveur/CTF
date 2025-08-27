@@ -25,7 +25,7 @@ export default function SignupPage() {
   }, [isAuthenticated, router]);
 
   const handleCopyCTB = () => {
-    const ctbExample = 'CTB{example_flag_format_here}';
+    const ctbExample = 'RBT{w3lc0m3_t0_n3ur4l_r3st0r4t10n_2025}';
     navigator.clipboard.writeText(ctbExample);
     setCopiedCTB(true);
     setTimeout(() => setCopiedCTB(false), 2000);
@@ -128,7 +128,7 @@ export default function SignupPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-400 mb-2">CTB Flag Format Example:</p>
-                      <code className="text-green-400 font-mono text-lg">CTB{"{example_flag_format_here}"}</code>
+                      <code className="text-green-400 font-mono text-lg">CTB{"{w3lc0m3_t0_n3ur4l_r3st0r4t10n_2025}"}</code>
                     </div>
                     <button
                       onClick={handleCopyCTB}

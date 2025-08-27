@@ -38,8 +38,7 @@ CREATE TABLE IF NOT EXISTS public.submissions (
   flag_submitted TEXT NOT NULL,
   is_correct BOOLEAN NOT NULL,
   points_awarded INTEGER DEFAULT 0,
-  submitted_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  UNIQUE(user_id, challenge_id, is_correct)
+  submitted_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 -- Create leaderboard view
@@ -161,7 +160,8 @@ INSERT INTO public.challenges (title, description, category, difficulty, flag, p
   ('Welcome to CTF', 'This is your first challenge! The flag is hidden in plain sight.', 'misc', 'easy', 'CTF{welcome_to_robotics_ctf}', 50),
   ('Basic Web Security', 'Find the hidden admin panel in this web application.', 'web', 'easy', 'CTF{admin_panel_found}', 100),
   ('Robot Assembly Code', 'Analyze this assembly code to find the secret key.', 'reverse', 'medium', 'CTF{assembly_master_2024}', 200),
-  ('Encrypted Communications', 'Decrypt the robot communication protocol.', 'crypto', 'hard', 'CTF{robots_speak_in_riddles}', 300);
+  ('Encrypted Communications', 'Decrypt the robot communication protocol.', 'crypto', 'hard', 'CTF{robots_speak_in_riddles}', 300)
+ON CONFLICT (flag) DO NOTHING;
 
 -- Enable RLS for user_projects
 ALTER TABLE public.user_projects ENABLE ROW LEVEL SECURITY;

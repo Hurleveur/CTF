@@ -39,7 +39,7 @@ export default function Navigation() {
                 About
               </Link>
               <Link href="/solutions" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">
-                Solutions
+                Projects
               </Link>
               <Link href="/assembly-line" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">
                 Assembly Line
