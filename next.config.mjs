@@ -6,6 +6,10 @@ const nextConfig = {
   // Set headers to prevent common attacks like clickjacking and XSS
   // These headers are set globally via middleware.
   async headers() {
+    // Get Supabase URL from environment variables
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://aadmjsrhybjnelqgswxg.supabase.co';
+    const supabaseHost = supabaseUrl.replace('https://', '');
+    
     return [
       {
         source: '/(.*)',
@@ -14,7 +18,7 @@ const nextConfig = {
           // In a real app, you would define this more strictly.
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; connect-src 'self'; font-src 'self';",
+            value: `default-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; connect-src 'self' ${supabaseUrl} wss://${supabaseHost}; font-src 'self';`,
           },
           // Strict-Transport-Security: Enforces secure connections (HTTPS).
           {

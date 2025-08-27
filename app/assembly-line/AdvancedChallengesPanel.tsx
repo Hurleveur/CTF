@@ -78,21 +78,47 @@ export default function AdvancedChallengesPanel({ challenges }: AdvancedChalleng
   const panelRef = useRef<HTMLDivElement>(null);
   const [isNewlyVisible, setIsNewlyVisible] = useState(true);
   const [flashEffect, setFlashEffect] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
 
-  // Play alarm sound using Web Audio API
-  const playAlarmSound = () => {
+  // Initialize and resume AudioContext after user gesture
+  const initializeAudio = async () => {
     try {
-      // Create audio context if it doesn't exist
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
       }
       
       const audioContext = audioContextRef.current;
       
+      // Resume AudioContext if it's in suspended state
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume();
+      }
+      
+      setAudioEnabled(true);
+      return audioContext;
+    } catch (error) {
+      console.warn('Could not initialize audio context:', error);
+      return null;
+    }
+  };
+
+  // Play alarm sound using Web Audio API (only after user gesture)
+  const playAlarmSound = async () => {
+    try {
+      let audioContext = audioContextRef.current;
+      
+      // Initialize audio context if not already done
+      if (!audioContext || audioContext.state === 'suspended') {
+        audioContext = await initializeAudio();
+        if (!audioContext) return;
+      }
+      
       // Create a series of beeps for alarm effect
       const playBeep = (frequency: number, duration: number, delay: number) => {
         setTimeout(() => {
+          if (!audioContext || audioContext.state !== 'running') return;
+          
           const oscillator = audioContext.createOscillator();
           const gainNode = audioContext.createGain();
           
@@ -122,6 +148,12 @@ export default function AdvancedChallengesPanel({ challenges }: AdvancedChalleng
     }
   };
 
+  // Handle user click to enable audio and play sound
+  const handleEnableAudio = async () => {
+    await initializeAudio();
+    await playAlarmSound();
+  };
+
   // Scroll to panel and trigger effects when it becomes visible
   useEffect(() => {
     if (challenges && challenges.length > 0 && isNewlyVisible) {
@@ -130,8 +162,8 @@ export default function AdvancedChallengesPanel({ challenges }: AdvancedChalleng
         // Trigger flash effect
         setFlashEffect(true);
         
-        // Play alarm sound
-        playAlarmSound();
+        // Note: Audio requires user gesture, so we don't auto-play here
+        // playAlarmSound() will be called when user interacts with the panel
         
         // Scroll to panel
         if (panelRef.current) {
@@ -151,6 +183,17 @@ export default function AdvancedChallengesPanel({ challenges }: AdvancedChalleng
       }, 100);
     }
   }, [challenges, isNewlyVisible]);
+
+  // Cleanup AudioContext on component unmount
+  useEffect(() => {
+    return () => {
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+        audioContextRef.current.close().catch(error => {
+          console.warn('Error closing AudioContext:', error);
+        });
+      }
+    };
+  }, []);
 
   if (!challenges || challenges.length === 0) {
     return null;
@@ -184,6 +227,16 @@ export default function AdvancedChallengesPanel({ challenges }: AdvancedChalleng
         <p className="text-sm opacity-90 mt-1">
           Neural reconstruction has unlocked elite-level missions
         </p>
+        
+        {/* Audio Enable Button */}
+        {!audioEnabled && (
+          <button
+            onClick={handleEnableAudio}
+            className="mt-2 px-3 py-1 text-xs bg-yellow-500 hover:bg-yellow-600 text-yellow-900 rounded-full font-medium transition-colors duration-200 shadow-sm"
+          >
+            🔊 Enable Alert Sounds
+          </button>
+        )}
       </div>
 
       {/* Challenges Grid */}
