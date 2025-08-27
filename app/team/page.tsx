@@ -167,7 +167,7 @@ export default function TeamPage() {
         </div>
 
         {/* Team Members Grid */}
-        <div className="space-y-8">
+        <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2">
           {allTeamMembers.map((member) => (
             <div key={member.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
               <div className="p-8">
@@ -182,11 +182,6 @@ export default function TeamPage() {
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-1">
                       {member.name}
-                      {member.projects.length > 0 && (
-                        <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                          CTF Participant
-                        </span>
-                      )}
                     </h3>
                     <p className="text-blue-600 font-medium mb-2">{member.role}</p>
                     <p className="text-sm text-gray-500 font-mono">{member.email}</p>
@@ -210,20 +205,6 @@ export default function TeamPage() {
                         <p className="text-gray-600 leading-relaxed">{member.bio}</p>
                       </div>
 
-                      {/* Skills */}
-                      <div>
-                        <h4 className="text-lg font-semibold text-gray-900 mb-3">Core Skills</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {member.skills.map((skill, index) => (
-                            <span 
-                              key={index}
-                              className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
-                            >
-                              {skill}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
 
                       {/* Current Projects */}
                       <div>
