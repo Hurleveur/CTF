@@ -193,7 +193,7 @@ export default function TeamPage() {
         </div>
 
         {/* Team Members Grid */}
-        <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2">
+        <div className="grid gap-8 sm:grid-cols-1 lg:grid-cols-2">
           {allTeamMembers.map((member) => (
             <div key={member.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
               <div className="p-8">
