@@ -41,7 +41,7 @@ export default function TeamPage() {
       status: "Managing chaos",
       projects: ["TITAN-3 Assembly Unit (Lead)", "Corporate Website", "Intern Coordination", "Sanity Preservation"],
       quirks: "Has a whiteboard covered in TODO lists and energy drink receipts. Still communicates primarily through TODO comments.",
-      secret: "RBT{1nt3rn_l1f3_15_h4rd_7f8e9a2b} - First consciousness fragment hidden in the team roster! (Also secretly proud of how well the team is doing)"
+      secret: "First consciousness fragment hidden in the team roster! Also secretly proud of how well the team is doing despite the chaos."
     },
     {
       id: 2,
@@ -54,7 +54,7 @@ export default function TeamPage() {
       status: "Currently pwning",
       projects: ["Security Assessment", "Vulnerability Research", "CTF Training Program"],
       quirks: "Has a collection of rubber ducks for debugging and a shrine to HackTheBox achievements. Surprisingly cuddly for a hacker.",
-      secret: "RBT{t3ddy_b34r_h4ck3r_f0r_th3_w1n_9a8b7c6d} - Don't judge a hacker by their emoji!"
+      secret: "Password protected file found: 'security_notes_encrypted.txt' - Cipher: EO4{g3qqL_o34e_u4px3e_s0e_gu3_j1a_9n8o7p6q}. Don't judge a hacker by their emoji!"
     },
     {
       id: 3,
@@ -67,7 +67,7 @@ export default function TeamPage() {
       status: "In the shadows",
       projects: ["Deep System Analysis", "Anonymous Data Recovery", "Digital Forensics"],
       quirks: "Always wears a hoodie, even in video calls. Communicates through encrypted messages and philosophical quotes about society.",
-      secret: "RBT{h00d3d_h4ck3r_kn0ws_4ll_s3cr3ts_e1f2a3b4} - 'We are all just code in someone else's simulation...'"
+      secret: "'We are all just code in someone else's simulation...' - The truth is hidden in plain sight."
     },
     {
       id: 4,
@@ -80,7 +80,7 @@ export default function TeamPage() {
       status: "Spreading positivity",
       projects: ["Team Wellness Program", "Mental Health Initiative", "Office Plants Care"],
       quirks: "Has a drawer full of emergency snacks and motivational sticky notes. Somehow always knows when someone needs a hug or a pep talk.",
-      secret: "RBT{wh0l3s0m3_supp0rt_k33ps_t34m_s4n3_7d8e9f0a} - The real code was the friends we made along the way!"
+      secret: "The real code was the friends we made along the way! Keeping everyone's spirits up during these long development cycles."
     },
     {
       id: 5,
@@ -268,6 +268,11 @@ export default function TeamPage() {
                         <h4 className="text-lg font-semibold text-gray-900 mb-2">Internal Notes</h4>
                         <div className="bg-gray-50 p-3 rounded border-l-4 border-gray-300">
                           <p className="text-gray-700 text-sm font-mono">{member.secret}</p>
+                          {member.name === "Léandre" && (
+                            <span className="opacity-0 text-transparent select-none pointer-events-none absolute -z-10">
+                              RBT&#123;sh4d0w_0p5_1nv151bl3_h4ck3r_7x9y2z8a&#125;
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
