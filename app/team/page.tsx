@@ -193,6 +193,25 @@ export default function TeamPage() {
                     }`}>
                       {member.status}
                     </div>
+                    
+                    {/* Current Projects */}
+                    <div className="mt-6">
+                      <h4 className="text-sm font-semibold text-gray-900 mb-3">Current Projects</h4>
+                      {member.projects && member.projects.length > 0 ? (
+                        <ul className="space-y-1">
+                          {member.projects.map((project, index) => (
+                            <li key={index} className="text-gray-600 text-xs flex items-start">
+                              <span className="text-blue-500 mr-2">•</span>
+                              <span className="leading-tight">{project}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-gray-500 text-xs italic">
+                          {member.projects.length === 0 ? 'No active projects yet' : 'Project information classified'}
+                        </p>
+                      )}
+                    </div>
                   </div>
 
                   {/* Detailed Information */}
@@ -204,31 +223,10 @@ export default function TeamPage() {
                         <p className="text-gray-600 leading-relaxed">{member.bio}</p>
                       </div>
 
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Current Projects */}
-                        <div>
-                          <h4 className="text-lg font-semibold text-gray-900 mb-3">Current Projects</h4>
-                          {member.projects && member.projects.length > 0 ? (
-                            <ul className="space-y-1">
-                              {member.projects.map((project, index) => (
-                                <li key={index} className="text-gray-600 text-sm flex items-start">
-                                  <span className="text-blue-500 mr-2">•</span>
-                                  {project}
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="text-gray-500 text-sm italic">
-{member.projects.length === 0 ? 'No active projects yet' : 'Project information classified'}
-                            </p>
-                          )}
-                        </div>
-
-                        {/* Fun Facts */}
-                        <div>
-                          <h4 className="text-lg font-semibold text-gray-900 mb-2">Fun Facts</h4>
-                          <p className="text-gray-600 text-sm italic">{member.quirks}</p>
-                        </div>
+                      {/* Fun Facts */}
+                      <div>
+                        <h4 className="text-lg font-semibold text-gray-900 mb-2">Fun Facts</h4>
+                        <p className="text-gray-600 leading-relaxed">{member.quirks}</p>
                       </div>
 
                       {/* Secret/Notes - Full Width */}
