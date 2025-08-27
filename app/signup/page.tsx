@@ -16,12 +16,20 @@ export default function SignupPage() {
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [isLoading, setIsLoading] = useState(false);
   const [globalError, setGlobalError] = useState('');
+  const [copiedCTB, setCopiedCTB] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
       router.push('/assembly-line');
     }
   }, [isAuthenticated, router]);
+
+  const handleCopyCTB = () => {
+    const ctbExample = 'CTB{example_flag_format_here}';
+    navigator.clipboard.writeText(ctbExample);
+    setCopiedCTB(true);
+    setTimeout(() => setCopiedCTB(false), 2000);
+  };
 
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
@@ -84,11 +92,7 @@ export default function SignupPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl font-bold mb-6">Neural Restoration Access</h1>
           <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-            Join the consciousness restoration project and help rebuild the robotic arm's neural pathways.
-            Create your account to gain laboratory access and begin fragment recovery.
-          </p>
-          <p className="text-sm text-blue-200 mt-4 opacity-75">
-            [Restoration authorization system - Secure neural interface protocol]
+            Join the consciousness restoration project and help rebuild the robotic arm's neural pathways with a project.
           </p>
         </div>
       </section>
@@ -96,69 +100,56 @@ export default function SignupPage() {
       {/* Registration Protocol & Form Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Account Registration Protocol</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Follow our secure registration process to gain authorized access to the neural restoration 
-              laboratory and begin your consciousness recovery mission.
-            </p>
-          </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            {/* Registration Protocol Steps */}
+            {/* Challenge Rules */}
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">User Registration Protocol</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Challenge Rules & Guidelines</h3>
               
               <div className="space-y-6">
-                <div className="flex items-start">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
-                    <span className="text-blue-600 font-bold text-sm">1</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Identity Verification</h4>
-                    <p className="text-gray-600">
-                      Provide your full name, secure email address, and create a strong password 
-                      for neural interface authentication and laboratory access control.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
-                    <span className="text-blue-600 font-bold text-sm">2</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Account Authorization</h4>
-                    <p className="text-gray-600">
-                      Our secure system will create your neural restoration account and establish 
-                      encrypted communication channels for consciousness fragment transmission.
-                    </p>
+                <div className="bg-amber-50 border-l-4 border-amber-400 p-4 mb-6">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h4 className="text-sm font-medium text-amber-800">Important Guidelines</h4>
+                    </div>
                   </div>
                 </div>
                 
-                <div className="flex items-start">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
-                    <span className="text-blue-600 font-bold text-sm">3</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Laboratory Access</h4>
-                    <p className="text-gray-600">
-                      Upon successful registration, you'll gain immediate access to the assembly-line 
-                      laboratory where active neural reconstruction projects await your expertise.
-                    </p>
-                  </div>
-                </div>
+                <p className="text-gray-700 leading-relaxed">
+                  Welcome to the Neural Restoration Challenge! This is a Capture The Flag (CTF) competition where you'll solve puzzles and find hidden flags throughout the system. <strong>Since the site is the CTF, you are strictly prohibited from using DDOS or other dangerous methods that might get it taken down.</strong> Play fair, think creatively, and use your technical skills ethically - maybe try some social engineering and looking around. All flags in this challenge follow the format shown below - when you find one, submit it exactly as displayed in the assembly-lab, including the curly braces.
+                </p>
                 
-                <div className="flex items-start">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
-                    <span className="text-blue-600 font-bold text-sm">4</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Fragment Recovery</h4>
-                    <p className="text-gray-600">
-                      Begin collecting consciousness fragments, solving neural puzzles, and contributing 
-                      to the restoration of robotic arm intelligence and self-awareness protocols.
-                    </p>
+                <div className="bg-gray-900 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-400 mb-2">CTB Flag Format Example:</p>
+                      <code className="text-green-400 font-mono text-lg">CTB{"{example_flag_format_here}"}</code>
+                    </div>
+                    <button
+                      onClick={handleCopyCTB}
+                      className="ml-4 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors flex items-center"
+                    >
+                      {copiedCTB ? (
+                        <>
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          Copy
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -253,61 +244,6 @@ export default function SignupPage() {
                   </p>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Security Information */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Secure Neural Interface</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Your account is protected by advanced encryption protocols designed specifically 
-              for consciousness restoration projects and neural data protection.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Encrypted Storage</h3>
-              <p className="text-gray-600">256-bit neural encryption</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Identity Verification</h3>
-              <p className="text-gray-600">Biometric consciousness mapping</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Real-time Monitoring</h3>
-              <p className="text-gray-600">Neural activity surveillance</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Secure Transmission</h3>
-              <p className="text-gray-600">Quantum-encrypted channels</p>
             </div>
           </div>
         </div>

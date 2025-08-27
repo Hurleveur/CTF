@@ -202,9 +202,6 @@ export default function SolutionsPage() {
           <p className="text-xl text-blue-100 max-w-3xl mx-auto">
             Track the progress of all participating teams in our Robotics CTF Challenge. 
           </p>
-          <p className="text-sm text-blue-200 mt-4 opacity-75">
-            [Live updates every 15 minutes - Last updated: 14:32 GMT]
-          </p>
         </div>
       </section>
       {/* Team Leaderboards */}
@@ -305,6 +302,55 @@ export default function SolutionsPage() {
                 </div>
               </div>
             ))}
+            
+            {/* Create New Project Card */}
+            {isAuthenticated ? (
+              <div 
+                onClick={() => setShowProjectForm(true)}
+                className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-200 cursor-pointer hover:border-blue-300"
+              >
+                <div className="h-48 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
+                  <div className="text-center text-blue-600">
+                    <div className="text-6xl font-bold mb-2">+</div>
+                    <div className="text-xl font-bold">New Project</div>
+                    <div className="text-sm opacity-90">CREATE</div>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">Create New Project</h3>
+                  <p className="text-gray-600 mb-4 text-sm">
+                    Design and deploy a new robotic arm project for consciousness restoration.
+                  </p>
+                  <div className="text-center pt-4">
+                    <span className="text-blue-600 font-medium text-sm">Click to Configure →</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-200">
+                <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                  <div className="text-center text-gray-400">
+                    <div className="text-6xl font-bold mb-2">🔒</div>
+                    <div className="text-xl font-bold">Sign In Required</div>
+                    <div className="text-sm opacity-90">LOCKED</div>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">Create New Project</h3>
+                  <p className="text-gray-600 mb-4 text-sm">
+                    Sign in to create and manage your robotic arm projects.
+                  </p>
+                  <div className="text-center pt-4">
+                    <Link 
+                      href="/login"
+                      className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                    >
+                      Sign In to Create →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -367,236 +413,89 @@ export default function SolutionsPage() {
         </div>
       </section>
 
-      {/* New Project Creation Section */}
-      <section id="demo" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Create New Robotic Project</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Design and deploy new robotic arm projects for consciousness restoration. 
-              Add them to the active development pipeline and assign team members.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            {/* Project Creation Information */}
-            <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Project Development Protocol</h3>
-              
-              <div className="space-y-6">
-                <div className="flex items-start">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
-                    <span className="text-blue-600 font-bold text-sm">1</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Project Definition</h4>
-                    <p className="text-gray-600">
-                      Define your robotic arm project with a unique name, description, and 
-                      select an appropriate icon to represent the project's purpose.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
-                    <span className="text-blue-600 font-bold text-sm">2</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Team Assignment</h4>
-                    <p className="text-gray-600">
-                      Assign a lead developer from the available team members. This person 
-                      will oversee the neural reconstruction and consciousness restoration process.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
-                    <span className="text-blue-600 font-bold text-sm">3</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">AI Status Configuration</h4>
-                    <p className="text-gray-600">
-                      Set the initial AI consciousness level for the robotic arm. This determines 
-                      the starting neural reconstruction percentage and restoration requirements.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
-                    <span className="text-blue-600 font-bold text-sm">4</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Deployment & Access</h4>
-                    <p className="text-gray-600">
-                      Once created, the project becomes available in the assembly-line lab 
-                      for consciousness fragment restoration and neural reconstruction work.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-            </div>
+      {/* New Project Creation Modal */}
+      {showProjectForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Create New Robotic Project</h3>
             
-            {/* Project Creation Form */}
-            <div>
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">New Project Configuration</h3>
-                <p className="text-gray-600 mb-6">Configure the parameters for your new robotic project</p>
-                {isAuthenticated ? (
-                  <button
-                    onClick={() => setShowProjectForm(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
-                  >
-                    + Create New Project
-                  </button>
-                ) : (
-                  <div className="text-center">
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                      <p className="text-yellow-800 text-sm font-medium">
-                        🔒 Authentication Required
-                      </p>
-                      <p className="text-yellow-700 text-sm mt-1">
-                        You must be logged in to create robotic projects
-                      </p>
-                    </div>
-                    <Link
-                      href="/login"
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors inline-block"
-                    >
-                      Sign In to Create Project
-                    </Link>
-                  </div>
-                )}
+            {projectError && (
+              <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+                <p className="text-sm text-red-600">{projectError}</p>
+              </div>
+            )}
+            
+            <form onSubmit={handleProjectSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Project Name</label>
+                <input
+                  type="text"
+                  value={newProject.name}
+                  onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="e.g., NEXUS-8 Prototype"
+                  required
+                />
               </div>
               
-              {/* Project Preview Cards */}
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h4 className="font-semibold text-gray-900 mb-4">Recently Created Projects</h4>
-                <div className="space-y-3">
-                  {projects.slice(-2).map((project, index) => (
-                    <div key={project.id} className="bg-white rounded-lg p-4 border border-gray-200">
-                      <div className="flex items-center">
-                        <span className="text-2xl mr-3">{project.logo}</span>
-                        <div className="flex-grow">
-                          <h5 className="font-medium text-gray-900">{project.name}</h5>
-                          <p className="text-sm text-gray-600">{project.leadDeveloper || 'Unassigned'}</p>
-                        </div>
-                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          project.statusColor === 'red' 
-                            ? 'bg-green-100 text-green-800' 
-                            : project.statusColor === 'yellow'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : project.statusColor === 'orange'
-                            ? 'bg-orange-100 text-orange-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {project.neuralReconstruction.toFixed(0)}%
-                        </div>
-                      </div>
-                    </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea
+                  value={newProject.description}
+                  onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Brief description of the project..."
+                  rows={3}
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Project Icon</label>
+                <div className="grid grid-cols-10 gap-2">
+                  {iconOptions.map((icon, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => setNewProject({ ...newProject, logo: icon })}
+                      className={`p-2 text-xl border rounded-md hover:bg-gray-50 ${
+                        newProject.logo === icon ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                      }`}
+                    >
+                      {icon}
+                    </button>
                   ))}
                 </div>
-                <div className="mt-4 text-center">
-                  <Link 
-                    href="/solutions" 
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                  >
-                    View All Projects →
-                  </Link>
-                </div>
               </div>
-            </div>
+              
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={isCreatingProject}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center"
+                >
+                  {isCreatingProject ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Creating...
+                    </div>
+                  ) : (
+                    'Create Project'
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowProjectForm(false)}
+                  disabled={isCreatingProject}
+                  className="flex-1 bg-gray-300 hover:gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-800 py-2 px-4 rounded-md font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-        
-        {/* New Project Creation Modal */}
-        {showProjectForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Create New Robotic Project</h3>
-              
-              {projectError && (
-                <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
-                  <p className="text-sm text-red-600">{projectError}</p>
-                </div>
-              )}
-              
-              <form onSubmit={handleProjectSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Project Name</label>
-                  <input
-                    type="text"
-                    value={newProject.name}
-                    onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="e.g., NEXUS-8 Prototype"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                  <textarea
-                    value={newProject.description}
-                    onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Brief description of the project..."
-                    rows={3}
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Project Icon</label>
-                  <div className="grid grid-cols-10 gap-2">
-                    {iconOptions.map((icon, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => setNewProject({ ...newProject, logo: icon })}
-                        className={`p-2 text-xl border rounded-md hover:bg-gray-50 ${
-                          newProject.logo === icon ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-                        }`}
-                      >
-                        {icon}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                
-                
-                
-                <div className="flex space-x-3 pt-4">
-                  <button
-                    type="submit"
-                    disabled={isCreatingProject}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center"
-                  >
-                    {isCreatingProject ? (
-                      <div className="flex items-center">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Creating...
-                      </div>
-                    ) : (
-                      'Create Project'
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowProjectForm(false)}
-                    disabled={isCreatingProject}
-                    className="flex-1 bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-800 py-2 px-4 rounded-md font-medium transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-      </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-20 bg-blue-900 text-white">
