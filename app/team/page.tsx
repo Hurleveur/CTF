@@ -36,7 +36,7 @@ export default function TeamPage() {
       role: "Senior AI Developer & Team Lead",
       avatar: "👩‍💻",
       email: "s.chen@robotech.fake",
-      bio: "Lead developer with 12 years of experience in AI and robotics. Specializes in neural network architecture and consciousness algorithms. Currently overseeing the robotic arm restoration project.",
+      bio: "Senior AI developer specializing in neural networks and consciousness algorithms. Leading the robotic arm restoration project.",
       skills: ["Neural Networks", "Machine Learning", "Robotics AI", "System Architecture"],
       status: "Available",
       projects: ["NEXUS-7 Prototype (Lead)", "AI Consciousness Framework", "Neural Network Architecture"],
@@ -49,7 +49,7 @@ export default function TeamPage() {
       role: "Junior Developer (Intern)",
       avatar: "😴",
       email: "a.degroodt@robotech.fake",
-      bio: "Sleep-deprived intern who built most of this website with AI assistance at 3 AM. Accidentally scattered AI consciousness fragments throughout the system after spilling coffee on the neural network code.",
+      bio: "Junior developer who built this website at 3 AM. Accidentally scattered AI consciousness fragments throughout the system.",
       skills: ["Web Development", "Panic Coding", "Coffee Spilling", "Sleep Deprivation"],
       status: "Desperately needs sleep",
       projects: ["TITAN-3 Assembly Unit (Lead)", "Corporate Website", "Neural Network Cleanup"],
@@ -62,7 +62,7 @@ export default function TeamPage() {
       role: "Senior Security Consultant",
       avatar: "⭐",
       email: "p.star@robotech.fake",
-      bio: "Mysterious security expert who joined the team recently. Claims to have extensive experience in underwater systems and unconventional problem-solving approaches. Often provides... unique... perspectives on security challenges.",
+      bio: "Security expert with experience in underwater systems and unconventional problem-solving. Provides unique perspectives on security challenges.",
       skills: ["Unconventional Security", "Pattern Recognition", "Rock Lifting", "Jellyfishing"],
       status: "Under a rock (literally)",
       projects: ["PRECISION-X Surgical (Lead)", "Security Protocol Review", "Rock-Based Encryption"],
@@ -184,7 +184,6 @@ export default function TeamPage() {
                       {member.name}
                     </h3>
                     <p className="text-blue-600 font-medium mb-2">{member.role}</p>
-                    <p className="text-sm text-gray-500 font-mono">{member.email}</p>
                     <div className={`mt-3 px-3 py-1 rounded-full text-xs font-medium ${
                       member.status === 'Available' 
                         ? 'bg-green-100 text-green-800' 
@@ -198,40 +197,41 @@ export default function TeamPage() {
 
                   {/* Detailed Information */}
                   <div className="flex-grow">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="space-y-6">
                       {/* Bio */}
-                      <div className="lg:col-span-2">
+                      <div>
                         <h4 className="text-lg font-semibold text-gray-900 mb-2">Biography</h4>
                         <p className="text-gray-600 leading-relaxed">{member.bio}</p>
                       </div>
 
-
-                      {/* Current Projects */}
-                      <div>
-                        <h4 className="text-lg font-semibold text-gray-900 mb-3">Current Projects</h4>
-                        {member.projects && member.projects.length > 0 ? (
-                          <ul className="space-y-1">
-                            {member.projects.map((project, index) => (
-                              <li key={index} className="text-gray-600 text-sm flex items-start">
-                                <span className="text-blue-500 mr-2">•</span>
-                                {project}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="text-gray-500 text-sm italic">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Current Projects */}
+                        <div>
+                          <h4 className="text-lg font-semibold text-gray-900 mb-3">Current Projects</h4>
+                          {member.projects && member.projects.length > 0 ? (
+                            <ul className="space-y-1">
+                              {member.projects.map((project, index) => (
+                                <li key={index} className="text-gray-600 text-sm flex items-start">
+                                  <span className="text-blue-500 mr-2">•</span>
+                                  {project}
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-gray-500 text-sm italic">
 {member.projects.length === 0 ? 'No active projects yet' : 'Project information classified'}
-                          </p>
-                        )}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Fun Facts */}
+                        <div>
+                          <h4 className="text-lg font-semibold text-gray-900 mb-2">Fun Facts</h4>
+                          <p className="text-gray-600 text-sm italic">{member.quirks}</p>
+                        </div>
                       </div>
 
-                      {/* Fun Facts */}
-                      <div>
-                        <h4 className="text-lg font-semibold text-gray-900 mb-2">Fun Facts</h4>
-                        <p className="text-gray-600 text-sm italic">{member.quirks}</p>
-                      </div>
-
-                      {/* Secret/Notes */}
+                      {/* Secret/Notes - Full Width */}
                       <div>
                         <h4 className="text-lg font-semibold text-gray-900 mb-2">Internal Notes</h4>
                         <div className="bg-gray-50 p-3 rounded border-l-4 border-gray-300">
