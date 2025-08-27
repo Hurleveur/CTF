@@ -38,6 +38,9 @@ This document contains all hidden CTF challenges added to the website for admini
   5. Concatenate all: `52426545667261676D656E745F636F6C6C6563746F725F32303234`
   6. Convert hex to ASCII: `RBT{fragment_collector_2024}`
 
+#### 5. Hidden in shadows
+Can be found by selecting the name of Léandre, in the inner html.
+
 ### 🟡 MEDIUM CHALLENGES (200-325 points)
 
 #### 6. Internal Documentation (225 points)
