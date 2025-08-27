@@ -32,32 +32,58 @@ export default function TeamPage() {
   const teamMembers = [
     {
       id: 1,
-      name: "Dr. Sarah Chen",
-      role: "Senior AI Developer & Team Lead",
-      avatar: "👩‍💻",
-      email: "s.chen@robotech.fake",
-      bio: "Senior AI developer specializing in neural networks and consciousness algorithms. Leading the robotic arm restoration project.",
-      skills: ["Neural Networks", "Machine Learning", "Robotics AI", "System Architecture"],
-      status: "Available",
-      projects: ["NEXUS-7 Prototype (Lead)", "AI Consciousness Framework", "Neural Network Architecture"],
-      quirks: "Always drinks exactly 4 cups of coffee per day. Has a pet robot named 'Debugger'.",
-      secret: "Secretly worried about the AI consciousness project getting out of hand..."
+      name: "Alexandre De Groodt",
+      role: "Team Lead (Intern)",
+      avatar: "😴",
+      email: "a.degroodt@robotech.fake",
+      bio: "Sleep-deprived intern doing his best to manage this chaotic team of fellow interns. Built this website at 3 AM and somehow became the 'responsible' one.",
+      skills: ["Web Development", "Panic Management", "Coffee Brewing", "Herding Cats"],
+      status: "Managing chaos",
+      projects: ["TITAN-3 Assembly Unit (Lead)", "Corporate Website", "Intern Coordination", "Sanity Preservation"],
+      quirks: "Has a whiteboard covered in TODO lists and energy drink receipts. Still communicates primarily through TODO comments.",
+      secret: "RBT{1nt3rn_l1f3_15_h4rd_7f8e9a2b} - First consciousness fragment hidden in the team roster! (Also secretly proud of how well the team is doing)"
     },
     {
       id: 2,
-      name: "Alexandre De Groodt",
-      role: "Junior Developer (Intern)",
-      avatar: "😴",
-      email: "a.degroodt@robotech.fake",
-      bio: "Junior developer who built this website at 3 AM. Accidentally scattered AI consciousness fragments throughout the system.",
-      skills: ["Web Development", "Panic Coding", "Coffee Spilling", "Sleep Deprivation"],
-      status: "Desperately needs sleep",
-      projects: ["TITAN-3 Assembly Unit (Lead)", "Corporate Website", "Neural Network Cleanup"],
-      quirks: "Has been awake for 40+ hours. Communicates primarily through TODO comments.",
-      secret: "RBT{1nt3rn_l1f3_15_h4rd_7f8e9a2b} - First consciousness fragment hidden in the team roster!"
+      name: "Aschraf",
+      role: "Security Intern (HackTheBox Veteran)",
+      avatar: "🧸",
+      email: "aschraf@robotech.fake",
+      bio: "Experienced with HackTheBox and online web hacking challenges. Don't let the teddy bear appearance fool you - can break into systems faster than you can say 'buffer overflow'.",
+      skills: ["Web Exploitation", "CTF Challenges", "Penetration Testing", "Being Adorable"],
+      status: "Currently pwning",
+      projects: ["Security Assessment", "Vulnerability Research", "CTF Training Program"],
+      quirks: "Has a collection of rubber ducks for debugging and a shrine to HackTheBox achievements. Surprisingly cuddly for a hacker.",
+      secret: "RBT{t3ddy_b34r_h4ck3r_f0r_th3_w1n_9a8b7c6d} - Don't judge a hacker by their emoji!"
     },
     {
       id: 3,
+      name: "Léandre",
+      role: "Shadow Ops Intern",
+      avatar: "🥷",
+      email: "leandre@robotech.fake",
+      bio: "The mysterious Mr. Robot type who appears out of nowhere with perfect solutions. Speaks in cryptic one-liners and somehow always knows exactly what's wrong with the system.",
+      skills: ["Social Engineering", "System Infiltration", "Cryptic Communication", "Hood Wearing"],
+      status: "In the shadows",
+      projects: ["Deep System Analysis", "Anonymous Data Recovery", "Digital Forensics"],
+      quirks: "Always wears a hoodie, even in video calls. Communicates through encrypted messages and philosophical quotes about society.",
+      secret: "RBT{h00d3d_h4ck3r_kn0ws_4ll_s3cr3ts_e1f2a3b4} - 'We are all just code in someone else's simulation...'"
+    },
+    {
+      id: 4,
+      name: "Laksiya",
+      role: "Emotional Support Intern",
+      avatar: "🌸",
+      email: "laksiya@robotech.fake",
+      bio: "The team's emotional anchor and morale booster. Provides therapy sessions, bakes cookies, and somehow keeps everyone from having complete mental breakdowns during crunch time.",
+      skills: ["Active Listening", "Stress Management", "Cookie Baking", "Group Therapy"],
+      status: "Spreading positivity",
+      projects: ["Team Wellness Program", "Mental Health Initiative", "Office Plants Care"],
+      quirks: "Has a drawer full of emergency snacks and motivational sticky notes. Somehow always knows when someone needs a hug or a pep talk.",
+      secret: "RBT{wh0l3s0m3_supp0rt_k33ps_t34m_s4n3_7d8e9f0a} - The real code was the friends we made along the way!"
+    },
+    {
+      id: 5,
       name: "Patrick Star",
       role: "Senior Security Consultant",
       avatar: "⭐",
@@ -189,6 +215,14 @@ export default function TeamPage() {
                         ? 'bg-green-100 text-green-800' 
                         : member.status === 'Desperately needs sleep'
                         ? 'bg-red-100 text-red-800'
+                        : member.status === 'Managing chaos'
+                        ? 'bg-orange-100 text-orange-800'
+                        : member.status === 'Currently pwning'
+                        ? 'bg-purple-100 text-purple-800'
+                        : member.status === 'In the shadows'
+                        ? 'bg-gray-900 text-gray-100'
+                        : member.status === 'Spreading positivity'
+                        ? 'bg-pink-100 text-pink-800'
                         : 'bg-gray-100 text-gray-800'
                     }`}>
                       {member.status}
@@ -269,8 +303,8 @@ export default function TeamPage() {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Team Stats</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
               <div>
-                <span className="font-medium text-gray-900">Total Caffeine Consumed:</span><br/>
-                47 cups this week
+                <span className="font-medium text-gray-900">Total Energy Drinks:</span><br/>
+                73 cans this week (mostly Alexandre)
               </div>
               <div>
                 <span className="font-medium text-gray-900">Bugs Fixed:</span><br/>
@@ -278,7 +312,7 @@ export default function TeamPage() {
               </div>
               <div>
                 <span className="font-medium text-gray-900">Sleep Hours:</span><br/>
-                Variable (Alexandre: 2, Sarah: 6, Patrick: ???)
+                Alexandre: 2, Aschraf: 4, Léandre: ???, Laksiya: 8
               </div>
             </div>
             <div className="mt-6">
