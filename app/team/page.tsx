@@ -84,6 +84,32 @@ export default function TeamPage() {
     },
     {
       id: 5,
+      name: "Cédric Sounard",
+      role: "Sales & Code Vibes Specialist",
+      avatar: "🕺",
+      email: "cedric.sounard@robotech.fake",
+      bio: "The charismatic sales guy who somehow understands code better than most developers. Can pitch AI solutions while debugging React components during client calls.",
+      skills: ["Client Relations", "Code Vibing", "Technical Sales", "Multitasking Magic"],
+      status: "Vibing with clients",
+      projects: ["Client Onboarding", "Technical Demos", "Sales Pipeline", "Code Reviews (somehow)"],
+      quirks: "Speaks fluent business and developer. Often found explaining APIs to clients while fixing CSS on the side. Uses 'synergy' unironically.",
+      secret: "Secretly writes better documentation than the actual developers. The clients love him and the devs respect him - rare combo!"
+    },
+    {
+      id: 6,
+      name: "Filip",
+      role: "Entrepreneur & AI Whisperer",
+      avatar: "🧠",
+      email: "filip@robotech.fake",
+      bio: "The mastermind entrepreneur who somehow keeps this chaotic intern-run company afloat. AI expert who can explain neural networks to investors and fix segfaults in the same meeting.",
+      skills: ["Business Strategy", "AI Architecture", "Crisis Management", "Investor Relations"],
+      status: "Holding it all together",
+      projects: ["Company Vision", "AI Research Direction", "Investor Relations", "Emergency Debugging"],
+      quirks: "Has three phones, five monitors, and somehow always knows exactly what's broken before anyone reports it. Drinks espresso like water.",
+      secret: "The real MVP keeping the lights on. Without Filip, this would just be five interns arguing about semicolons in a garage."
+    },
+    {
+      id: 7,
       name: "Patrick Star",
       role: "Senior Security Consultant",
       avatar: "⭐",
@@ -132,8 +158,19 @@ export default function TeamPage() {
     fetchTeamMembers();
   }, [isAuthenticated]);
 
-  // Combine static team members with database team members
+  // Combine static team members with database team members, prioritizing user's profile
   const allTeamMembers = [...teamMembers, ...databaseTeamMembers];
+  
+  // Sort to show logged-in user's profile first if they have one
+  const sortedTeamMembers = allTeamMembers.sort((a, b) => {
+    // If user is authenticated and has a team profile, show it first
+    if (isAuthenticated && databaseTeamMembers.length > 0) {
+      const userProfile = databaseTeamMembers[0]; // Assuming first db member is user's profile
+      if (a.id === userProfile.id) return -1; // User's profile goes first
+      if (b.id === userProfile.id) return 1;  // Other profiles go after
+    }
+    return 0; // Keep original order for others
+  });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -185,7 +222,7 @@ export default function TeamPage() {
                     Loading team members...
                   </div>
                 ) : (
-                  `Total Members: ${allTeamMembers.length} | Active Projects: ${teamStats.totalProjects}`
+                  `Total Members: ${sortedTeamMembers.length} | Active Projects: ${teamStats.totalProjects}`
                 )}
               </div>
             </div>
@@ -194,7 +231,7 @@ export default function TeamPage() {
 
         {/* Team Members Grid */}
         <div className="grid gap-8 sm:grid-cols-1 lg:grid-cols-2">
-          {allTeamMembers.map((member) => (
+          {sortedTeamMembers.map((member) => (
             <div key={member.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
               <div className="p-8">
                 <div className="flex flex-col lg:flex-row lg:items-start gap-8">
@@ -223,6 +260,10 @@ export default function TeamPage() {
                         ? 'bg-gray-900 text-gray-100'
                         : member.status === 'Spreading positivity'
                         ? 'bg-pink-100 text-pink-800'
+                        : member.status === 'Vibing with clients'
+                        ? 'bg-blue-100 text-blue-800'
+                        : member.status === 'Holding it all together'
+                        ? 'bg-yellow-100 text-yellow-800'
                         : 'bg-gray-100 text-gray-800'
                     }`}>
                       {member.status}
