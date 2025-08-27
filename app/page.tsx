@@ -6,6 +6,11 @@ import Image from 'next/image';
 export default function HomePage() {
   return (
     <div className="bg-white">
+      {/* Hidden fragment for forensics challenge - Alex's TODO: remove before production */}
+      {/* Fragment 1/4: 52426545 */}
+      {/* Intern note: Neural fragments scattered across site. Collect all for consciousness restoration! */}
+      {/* ROT13 hint: Nyrk'f GBQB yvfg vf va gur nobhg cntr - ybbx sbe perngr, purpx, naq qroht */}
+      <div className="sr-only" aria-hidden="true" data-fragment="1nd">52426545</div>
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
@@ -190,6 +195,7 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
+        <footer>5F636F6C</footer>
       </section>
     </div>
   );

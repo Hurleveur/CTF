@@ -19,7 +19,7 @@ exports[`AdvancedChallengesPanel matches snapshot 1`] = `
       <h3
         class="jsx-140433cb4fc7b723 text-lg font-bold tracking-wider"
       >
-        ADVANCED CHALLENGE PROTOCOLS DETECTED
+        CHALLENGES DETECTED
       </h3>
       <span
         class="jsx-140433cb4fc7b723 text-xl animate-bounce"

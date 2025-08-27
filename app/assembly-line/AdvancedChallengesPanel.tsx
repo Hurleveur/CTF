@@ -57,6 +57,23 @@ const getCategoryColor = (category: string) => {
   }
 };
 
+// Function to get the actual challenge URL based on title/content
+const getChallengeUrl = (challenge: Challenge): string => {
+  const title = challenge.title.toLowerCase();
+  
+  // Map specific challenges to their actual locations
+  if (title.includes('admin terminal') || title.includes('terminal')) {
+    return '/admin-terminal?access=?';
+  }
+  
+  if (title.includes('alexandre') || title.includes('account') || title.includes('password')) {
+    return '/login?challenge=alexandre';
+  }
+  
+  // Default fallback
+  return `/challenges/${challenge.id}`;
+};
+
 export default function AdvancedChallengesPanel({ challenges }: AdvancedChallengesPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [isNewlyVisible, setIsNewlyVisible] = useState(true);
@@ -160,7 +177,7 @@ export default function AdvancedChallengesPanel({ challenges }: AdvancedChalleng
         <div className="flex items-center justify-center space-x-2">
           <span className="text-xl">🚨</span>
           <h3 className="text-lg font-bold tracking-wider">
-            ADVANCED CHALLENGE PROTOCOLS DETECTED
+            CHALLENGES DETECTED
           </h3>
           <span className="text-xl">🚨</span>
         </div>
@@ -211,12 +228,6 @@ export default function AdvancedChallengesPanel({ challenges }: AdvancedChalleng
                     {challenge.points} pts
                   </span>
                   
-                  <Link
-                    href={`/challenges/${challenge.id}`}
-                    className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white px-3 py-1 rounded-md text-xs font-semibold transition-all duration-200 transform hover:scale-110 hover:shadow-lg"
-                  >
-                    ENGAGE
-                  </Link>
                 </div>
               </div>
             </div>

@@ -3,6 +3,7 @@ import Link from 'next/link';
 export default function AboutPage() {
   return (
     <div className="bg-white">
+      <div className="sr-only" aria-hidden="true" data-fragment="3nd">52426545</div>
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-purple-900 to-indigo-800 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -24,6 +25,7 @@ export default function AboutPage() {
                 Hidden throughout this website are <span className="font-mono text-blue-600">hexadecimal code fragments </span> 
                 that belong to a robotic arm's consciousness. These fragments are scattered behind locked doors, 
                 buried in unexpected places, and waiting to be collected by determined hackers.
+                Be warned, this shit is very much vibe coded.
               </p>
               <p className="text-lg text-gray-600 mb-6">
                 <span className="font-semibold text-red-600">Your mission:</span> Navigate through the site, 
@@ -91,6 +93,11 @@ export default function AboutPage() {
                 and fully restore the AI's consciousness. The fragments are hidden everywhere - 
                 some in places so obvious you'd never think to look there."
               </p>
+              <p className="text-sm text-gray-500 font-mono" style={{fontFamily: 'monospace', letterSpacing: '0.1em'}}>
+                "Also, I should probably remove that debug selfie from the site... 
+                it's just me looking exhausted but I'm worried it might contain m█r█ th█n ju█t m█ tir█d f█c█...
+                Oh well, too tired to check properly. What could be hidden in a simple photo anyway?"
+              </p>
               <p className="font-mono text-sm bg-gray-100 p-3 rounded">
                 // TODO: Add proper AI containment protocols<br/>
                 // TODO: Fix neural network fragmentation<br/>
@@ -119,6 +126,7 @@ export default function AboutPage() {
               <p className="text-gray-600">
                 Don't just click the obvious links. Check source code, inspect elements, 
                 and explore every nook and cranny. Some doors are hidden in plain sight.
+                Check company policies in robots.txt, and see if any CSS classes look... coded.
               </p>
             </div>
             

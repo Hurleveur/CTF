@@ -165,7 +165,7 @@ export default function AssemblyLinePage() {
       // Filter for medium/hard challenges with 200+ points
       const filtered = challenges?.filter((challenge: any) => 
         (challenge.difficulty === 'medium' || challenge.difficulty === 'hard') &&
-        challenge.points >= 200
+        challenge.points >= 50 // TODO: DONT SHOW ALL OF THEM LATER?
       ) || [];
       
       console.log('✅ Advanced challenges loaded:', filtered.length);

@@ -195,6 +195,7 @@ export default function SolutionsPage() {
 
   return (
     <div className="bg-white">
+      <div className="sr-only" aria-hidden="true" data-fragment="4rth">6C6563746F725F32303234</div>
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

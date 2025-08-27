@@ -76,7 +76,7 @@ describe('AdvancedChallengesPanel', () => {
   it('renders the panel header with correct text', () => {
     render(<AdvancedChallengesPanel challenges={mockChallenges} />);
     
-    expect(screen.getByText('ADVANCED CHALLENGE PROTOCOLS DETECTED')).toBeInTheDocument();
+    expect(screen.getByText('CHALLENGES DETECTED')).toBeInTheDocument();
     expect(screen.getByText('Neural reconstruction has unlocked elite-level missions')).toBeInTheDocument();
   });
 

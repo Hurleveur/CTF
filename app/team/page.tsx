@@ -54,7 +54,7 @@ export default function TeamPage() {
       status: "Currently pwning",
       projects: ["Security Assessment", "Vulnerability Research", "CTF Training Program"],
       quirks: "Has a collection of rubber ducks for debugging and a shrine to HackTheBox achievements. Surprisingly cuddly for a hacker.",
-      secret: "Password protected file found: 'security_notes_encrypted.txt' - Cipher: EO4{g3qqL_o34e_u4px3e_s0e_gu3_j1a_9n8o7p6q}. Don't judge a hacker by their emoji!"
+      secret: "Don't judge a hacker by their emoji."
     },
     {
       id: 3,

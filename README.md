@@ -188,7 +188,7 @@ The Assembly Line page features an innovative challenge discovery system:
 
 - **Neural Threshold Trigger**: When AI restoration reaches ≥50% completion, advanced challenges automatically unlock
 - **Intelligent Filtering**: Displays only medium/hard difficulty challenges worth 200+ points
-- **Robotics Theme**: Challenges are presented as "Advanced Challenge Protocols" with cyberpunk styling
+- **Robotics Theme**: Challenges are presented as "Advanced Challenge Protocols" with cyberpunk styling - AI BS
 - **Attention-Grabbing Alerts**: 
   - 🔊 **Alarm Sound System**: Robotic beep sequence using Web Audio API
   - 🌟 **Screen Flash Effect**: Full-screen red overlay with pulsing animation
