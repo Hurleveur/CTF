@@ -33,7 +33,7 @@ export default function TeamPage() {
     {
       id: 1,
       name: "Alexandre De Groodt",
-      role: "Team Lead (Intern)",
+      role: "CTF Lead (Intern)",
       avatar: "😴",
       email: "a.degroodt@robotech.fake",
       bio: "Sleep-deprived intern doing his best to manage this chaotic team of fellow interns. Built this website at 3 AM and somehow became the 'responsible' one.",
@@ -46,7 +46,7 @@ export default function TeamPage() {
     {
       id: 2,
       name: "Aschraf",
-      role: "Security Intern (HackTheBox Veteran)",
+      role: "Intern (HackBoxer)",
       avatar: "🧸",
       email: "aschraf@robotech.fake",
       bio: "Experienced with HackTheBox and online web hacking challenges. Don't let the teddy bear appearance fool you - can break into systems faster than you can say 'buffer overflow'.",
@@ -76,9 +76,9 @@ export default function TeamPage() {
       avatar: "🌸",
       email: "laksiya@robotech.fake",
       bio: "The team's emotional anchor and morale booster. Provides therapy sessions, bakes cookies, and somehow keeps everyone from having complete mental breakdowns during crunch time.",
-      skills: ["Active Listening", "Stress Management", "Cookie Baking", "Group Therapy"],
+      skills: ["Stress Management", "Running", "Smollllagentsss"],
       status: "Spreading positivity",
-      projects: ["Team Wellness Program", "Mental Health Initiative", "Office Plants Care"],
+      projects: ["Team Wellness Program", "Robotics", "Jobbots"],
       quirks: "Has a drawer full of emergency snacks and motivational sticky notes. Somehow always knows when someone needs a hug or a pep talk.",
       secret: "The real code was the friends we made along the way! Keeping everyone's spirits up during these long development cycles."
     },
