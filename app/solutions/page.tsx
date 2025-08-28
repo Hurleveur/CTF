@@ -65,30 +65,6 @@ export default function SolutionsPage() {
           const defaultProjects = [
             {
               id: 1,
-              name: 'NEXUS-7 Prototype',
-              logo: '🦾',
-              description: 'Advanced neural interface robotic arm with consciousness algorithms',
-              aiStatus: 'Basic Motor Functions',
-              statusColor: 'red' as const,
-              neuralReconstruction: 23.4,
-              lastBackup: '2025-01-15',
-              leadDeveloper: 'Dr. Sarah Chen',
-              teamMembers: ['Dr. Sarah Chen']
-            },
-            {
-              id: 2,
-              name: 'TITAN-3 Assembly Unit',
-              logo: '🤖',
-              description: 'Heavy-duty industrial manipulation arm with neural network integration',
-              aiStatus: 'Advanced Cognitive Patterns',
-              statusColor: 'yellow' as const,
-              neuralReconstruction: 67.1,
-              lastBackup: '2025-01-10',
-              leadDeveloper: 'Alexandre De Groodt',
-              teamMembers: ['Alexandre De Groodt', 'Dr. Sarah Chen']
-            },
-            {
-              id: 3,
               name: 'PRECISION-X Surgical',
               logo: '⚡',
               description: 'Ultra-precise medical robotic arm with security-enhanced protocols',
@@ -291,12 +267,24 @@ export default function SolutionsPage() {
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 font-semibold text-sm">Project #{String(index + 1).padStart(3, '0')}</span>
-                      <Link 
-                        href="/assembly-line" 
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                      >
-                        Access Lab →
-                      </Link>
+                      {/* Only show Access Lab button for own projects or if user is admin */}
+                      {(
+                        // User owns this project (check leadDeveloper field)
+                        (isAuthenticated && user && project.leadDeveloper && project.leadDeveloper === user.email) ||
+                        // User is admin (check user profile role - admins can access all projects)
+                        (isAuthenticated && user?.email?.includes('admin'))
+                      ) ? (
+                        <Link 
+                          href="/assembly-line" 
+                          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                        >
+                          Access Lab →
+                        </Link>
+                      ) : (
+                        <span className="text-gray-400 text-sm font-medium cursor-not-allowed">
+                          🔒 Restricted
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

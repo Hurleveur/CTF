@@ -38,11 +38,11 @@ export default function TeamPage() {
       name: "Alexandre De Groodt",
       role: "CTF Lead (Intern)",
       avatar: "😴",
-      email: "a.degroodt@robotech.fake",
+      email: "alex@robot.tech",
       bio: "Sleep-deprived intern doing his best to manage this chaotic team of fellow interns. Built this website at 3 AM and somehow became the 'responsible' one.",
       skills: ["Web Development", "Panic Management", "Coffee Brewing", "Herding Cats"],
       status: "Managing chaos",
-      projects: ["TITAN-3 Assembly Unit (Lead)", "Corporate Website", "Intern Coordination", "Sanity Preservation"],
+      projects: ["Intern Coordination", "Sanity Preservation", "AI overlord"],
       quirks: "Has a whiteboard covered in TODO lists and energy drink receipts. Still communicates primarily through TODO comments.",
       secret: "First consciousness fragment hidden in the team roster! Also secretly proud of how well the team is doing despite the chaos."
     },

@@ -42,32 +42,6 @@ export async function GET(request: NextRequest) {
     const defaultProjects = [
       {
         id: 1,
-        name: 'NEXUS-7 Prototype',
-        logo: '🦾',
-        description: 'Advanced neural interface robotic arm with consciousness algorithms',
-        aiStatus: 'Basic Motor Functions',
-        statusColor: 'red' as const,
-        neuralReconstruction: 23.4,
-        lastBackup: '2025-01-15',
-        leadDeveloper: 'Dr. Sarah Chen',
-        teamMembers: ['Dr. Sarah Chen'],
-        isDefault: true
-      },
-      {
-        id: 2,
-        name: 'TITAN-3 Assembly Unit',
-        logo: '🤖',
-        description: 'Heavy-duty industrial manipulation arm with neural network integration',
-        aiStatus: 'Advanced Cognitive Patterns',
-        statusColor: 'yellow' as const,
-        neuralReconstruction: 67.1,
-        lastBackup: '2025-01-10',
-        leadDeveloper: 'Alexandre De Groodt',
-        teamMembers: ['Alexandre De Groodt', 'Dr. Sarah Chen'],
-        isDefault: true
-      },
-      {
-        id: 3,
         name: 'PRECISION-X Surgical',
         logo: '⚡',
         description: 'Ultra-precise medical robotic arm with security-enhanced protocols',
