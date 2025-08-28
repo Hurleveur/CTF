@@ -75,15 +75,15 @@ export default function TeamPage() {
     {
       id: 4,
       name: "Laksiya",
-      role: "Emotional Support Intern",
-      avatar: "🌸",
+      role: "Dynamic Robotics Engineer",
+      avatar: "🤖",
       email: "laksiya@robotech.fake",
-      bio: "The team's emotional anchor and morale booster. Provides therapy sessions, bakes cookies, and somehow keeps everyone from having complete mental breakdowns during crunch time.",
-      skills: ["Stress Management", "Running", "Smollllagentsss"],
-      status: "Spreading positivity",
-      projects: ["Team Wellness Program", "Robotics", "Jobbots"],
-      quirks: "Has a drawer full of emergency snacks and motivational sticky notes. Somehow always knows when someone needs a hug or a pep talk.",
-      secret: "The real code was the friends we made along the way! Keeping everyone's spirits up during these long development cycles."
+      bio: "A dynamic force of nature who brings infectious laughter to every standup meeting. When she's not busy writing robotics code to automate away everyone's jobs (in the most delightful way possible), you'll find her out running marathons or crafting the next generation of job-stealing bots with a smile.",
+      skills: ["Robotics Programming", "Marathon Running", "Infectious Laughter", "Job Automation"],
+      status: "Building tomorrow's unemployment",
+      projects: ["JobBot Supreme", "Automated Everything", "Happy Unemployment Initiative"],
+      quirks: "Laughs while coding robots that will replace us all. Somehow makes the prospect of being replaced by machines sound exciting and fun. Goes for 10-mile runs to celebrate each successful automation.",
+      secret: "Don't worry, the robots she builds will be too busy laughing at her jokes to actually take over. Plus, she's programming them to leave snacks for their human replacements!"
     },
     {
       id: 5,
@@ -113,6 +113,19 @@ export default function TeamPage() {
     },
     {
       id: 7,
+      name: "Oleksandr",
+      role: "HR & Emotional Intelligence Specialist (The Nice Guy)",
+      avatar: "🤗",
+      email: "oleksandr@robotech.fake",
+      bio: "The ultimate people person who somehow makes HR actually enjoyable. Combines next-level emotional intelligence with being genuinely the nicest human alive. When not busy making sure everyone feels valued and comfortable, he's casually being the absolute best at AI - like, scary good at it, but in the most humble and supportive way possible.",
+      skills: ["Emotional Intelligence", "AI Mastery", "Conflict Resolution", "Being Genuinely Nice"],
+      status: "Spreading good vibes & AI wisdom",
+      projects: ["Team Happiness Optimization", "AI Ethics & Empathy", "Workplace Zen Garden"],
+      quirks: "Somehow makes performance reviews feel like therapy sessions (in a good way). Has an uncanny ability to solve complex AI problems while simultaneously mediating office disputes and making everyone feel heard.",
+      secret: "Secretly the team's AI whisperer - can debug neural networks by understanding their feelings. Also keeps a spreadsheet of everyone's favorite comfort snacks and remembers all their birthdays."
+    },
+    {
+      id: 8,
       name: "Patrick Star",
       role: "Senior Security Consultant",
       avatar: "⭐",
@@ -296,6 +309,10 @@ export default function TeamPage() {
                         ? 'bg-gray-900 text-gray-100'
                         : member.status === 'Spreading positivity'
                         ? 'bg-pink-100 text-pink-800'
+                        : member.status === 'Building tomorrow\'s unemployment'
+                        ? 'bg-red-100 text-red-800'
+                        : member.status === 'Spreading good vibes & AI wisdom'
+                        ? 'bg-green-100 text-green-800'
                         : member.status === 'Vibing with clients'
                         ? 'bg-blue-100 text-blue-800'
                         : member.status === 'Holding it all together'
