@@ -1,30 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { z } from 'zod';
-
-// Input validation schema
-const loginSchema = z.object({
-  email: z.string().email('Invalid email format'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-});
+import { checkRateLimit, resetRateLimit } from '@/lib/rate-limiter';
+import { loginSchema, validate } from '@/lib/validation/auth';
 
 export async function POST(request: NextRequest) {
   try {
+    // Check rate limiting first (uses smart AUTH_LOGIN policy)
+    const rateLimitResult = await checkRateLimit(request);
+    
+    if (!rateLimitResult.allowed) {
+      return rateLimitResult.response!;
+    }
+    
     const body = await request.json();
     
     // Validate input
-    const validationResult = loginSchema.safeParse(body);
-    if (!validationResult.success) {
+    const validationResult = validate(loginSchema, body);
+    if (!validationResult.ok) {
       return NextResponse.json(
         {
           error: 'Validation failed',
-          details: validationResult.error.flatten().fieldErrors,
+          details: validationResult.errors,
         },
         { status: 400 }
       );
     }
 
-    const { email, password } = validationResult.data;
+    const { email, password } = validationResult.data!;
     const supabase = createClient();
 
     // Attempt to sign in with Supabase
@@ -50,7 +52,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Success - the session cookie is automatically set by Supabase
+    // Success - reset rate limit and return response
+    await resetRateLimit(request);
+    
     return NextResponse.json({
       message: 'Login successful',
       user: {

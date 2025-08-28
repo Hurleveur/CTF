@@ -1,31 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { z } from 'zod';
-
-// Input validation schema
-const signupSchema = z.object({
-  email: z.string().email('Invalid email format'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  fullName: z.string().min(2, 'Full name must be at least 2 characters').optional(),
-});
+import { checkRateLimit } from '@/lib/rate-limiter';
+import { signupSchema, validate } from '@/lib/validation/auth';
 
 export async function POST(request: NextRequest) {
   try {
+    // Check rate limiting first (uses smart AUTH_SIGNUP policy)
+    const rateLimitResult = await checkRateLimit(request);
+    
+    if (!rateLimitResult.allowed) {
+      return rateLimitResult.response!;
+    }
+    
     const body = await request.json();
     
     // Validate input
-    const validationResult = signupSchema.safeParse(body);
-    if (!validationResult.success) {
+    const validationResult = validate(signupSchema, body);
+    if (!validationResult.ok) {
       return NextResponse.json(
         {
           error: 'Validation failed',
-          details: validationResult.error.flatten().fieldErrors,
+          details: validationResult.errors,
         },
         { status: 400 }
       );
     }
 
-    const { email, password, fullName } = validationResult.data;
+    const { email, password, fullName } = validationResult.data!;
     const supabase = createClient();
 
     // Attempt to sign up with Supabase
@@ -42,17 +43,24 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('[Auth] Signup error:', error.message);
       
-      // Handle specific error cases
-      if (error.message.includes('User already registered')) {
+      // Check if it's a duplicate user error
+      if (error.message.includes('User already registered') || 
+          error.message.includes('already registered') ||
+          error.message.includes('duplicate') ||
+          error.status === 422) {
         return NextResponse.json(
           { error: 'Email address is already registered' },
           { status: 409 }
         );
       }
       
+      // For other errors, return generic message to prevent information disclosure
       return NextResponse.json(
-        { error: 'Registration failed' },
-        { status: 400 }
+        { 
+          message: 'If this email is not already registered, a verification email has been sent.',
+          // Don't reveal if registration actually succeeded or failed
+        },
+        { status: 200 }
       );
     }
 

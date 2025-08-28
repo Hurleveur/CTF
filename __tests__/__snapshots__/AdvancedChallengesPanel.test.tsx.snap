@@ -2,17 +2,16 @@
 
 exports[`AdvancedChallengesPanel matches snapshot 1`] = `
 <div
-  class="jsx-140433cb4fc7b723 mt-8 p-6 bg-gradient-to-br from-red-50 to-orange-50 rounded-lg border-2 transition-all duration-1000 border-red-500 shadow-2xl shadow-red-500/50 animate-pulse"
-  style="animation: glow 2s ease-in-out infinite alternate, shake 0.5s ease-in-out 3;"
+  class="jsx-140433cb4fc7b723 mt-8 p-6 bg-gradient-to-br from-red-50 to-orange-50 rounded-lg border-2 transition-all duration-1000 border-red-200"
 >
   <div
-    class="jsx-140433cb4fc7b723 bg-gradient-to-r from-red-600 via-orange-500 to-yellow-400 text-white text-center py-3 rounded-md shadow-lg animate-pulse mb-6"
+    class="jsx-140433cb4fc7b723 bg-red-600 text-white text-center py-3 rounded-md shadow-lg mb-6"
   >
     <div
       class="jsx-140433cb4fc7b723 flex items-center justify-center space-x-2"
     >
       <span
-        class="jsx-140433cb4fc7b723 text-xl animate-bounce"
+        class="jsx-140433cb4fc7b723 text-xl"
       >
         🚨
       </span>
@@ -22,79 +21,98 @@ exports[`AdvancedChallengesPanel matches snapshot 1`] = `
         CHALLENGES DETECTED
       </h3>
       <span
-        class="jsx-140433cb4fc7b723 text-xl animate-bounce"
-        style="animation-delay: 0.5s;"
+        class="jsx-140433cb4fc7b723 text-xl"
       >
         🚨
       </span>
     </div>
-    <p
-      class="jsx-140433cb4fc7b723 text-sm opacity-90 mt-1"
+    <div
+      class="jsx-140433cb4fc7b723 flex items-center justify-center space-x-4 mt-2"
     >
-      Neural reconstruction has unlocked elite-level missions
-    </p>
+      <p
+        class="jsx-140433cb4fc7b723 text-sm opacity-90"
+      >
+        Neural reconstruction has unlocked elite-level missions
+      </p>
+      <div
+        class="jsx-140433cb4fc7b723 bg-white/20 rounded-full px-3 py-1"
+      >
+        <span
+          class="jsx-140433cb4fc7b723 text-xs font-bold"
+        >
+          0
+          /
+          3
+           COMPLETED
+        </span>
+      </div>
+    </div>
+    <div
+      class="jsx-140433cb4fc7b723 mt-2 mx-auto w-48 bg-white/20 rounded-full h-2"
+    >
+      <div
+        class="jsx-140433cb4fc7b723 bg-green-400 h-2 rounded-full transition-all duration-500"
+        style="width: 0%;"
+      />
+    </div>
+    <button
+      class="jsx-140433cb4fc7b723 mt-2 px-3 py-1 text-xs bg-yellow-500 hover:bg-yellow-600 text-yellow-900 rounded-full font-medium transition-colors duration-200 shadow-sm"
+    >
+      🔊 Enable Alert Sounds
+    </button>
   </div>
   <div
     class="jsx-140433cb4fc7b723 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
   >
     <div
-      class="jsx-140433cb4fc7b723 bg-white border-2 border-red-300 hover:border-orange-400 rounded-lg p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 group"
+      class="jsx-140433cb4fc7b723 bg-white border-2 rounded-lg p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 group relative border-red-300 hover:border-orange-400"
       style="animation-delay: 0s;"
     >
       <div
-        class="jsx-140433cb4fc7b723 flex items-start space-x-3"
+        class="jsx-140433cb4fc7b723 flex items-center justify-between mb-3"
       >
         <div
-          class="jsx-140433cb4fc7b723 flex-shrink-0"
+          class="jsx-140433cb4fc7b723 flex items-center space-x-2"
         >
           <div
-            class="jsx-140433cb4fc7b723 w-12 h-12 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center text-white text-xl group-hover:animate-spin transition-all duration-500"
+            class="jsx-140433cb4fc7b723 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm transition-all duration-500 flex-shrink-0 bg-gradient-to-br from-red-500 to-orange-500 group-hover:animate-spin"
           >
             🌐
           </div>
-        </div>
-        <div
-          class="jsx-140433cb4fc7b723 flex-1 min-w-0"
-        >
           <h4
-            class="jsx-140433cb4fc7b723 text-sm font-bold text-gray-900 truncate mb-2"
+            class="jsx-140433cb4fc7b723 text-sm font-bold line-clamp-1 flex-1 text-gray-900"
           >
             Advanced Web Exploitation
           </h4>
-          <p
-            class="jsx-140433cb4fc7b723 text-xs text-gray-600 mb-3 line-clamp-2"
+        </div>
+        <span
+          class="jsx-140433cb4fc7b723 text-sm font-bold ml-2 flex-shrink-0 text-red-600"
+        >
+          500
+          pts
+        </span>
+      </div>
+      <p
+        class="jsx-140433cb4fc7b723 text-xs text-gray-600 mb-3 line-clamp-3 leading-relaxed"
+      >
+        Exploit a complex web application with multiple vulnerabilities
+      </p>
+      <div
+        class="jsx-140433cb4fc7b723 flex items-center justify-between"
+      >
+        <div
+          class="jsx-140433cb4fc7b723 flex gap-1.5"
+        >
+          <span
+            class="jsx-140433cb4fc7b723 px-1.5 py-0.5 rounded text-xs font-medium border bg-blue-100 text-blue-800 border-blue-200"
           >
-            Exploit a complex web application with multiple vulnerabilities
-          </p>
-          <div
-            class="jsx-140433cb4fc7b723 flex flex-wrap gap-2 mb-3"
+            WEB
+          </span>
+          <span
+            class="jsx-140433cb4fc7b723 px-1.5 py-0.5 rounded text-xs font-medium border bg-red-100 text-red-800 border-red-200"
           >
-            <span
-              class="jsx-140433cb4fc7b723 px-2 py-1 rounded-full text-xs font-medium border bg-blue-100 text-blue-800 border-blue-200"
-            >
-              WEB
-            </span>
-            <span
-              class="jsx-140433cb4fc7b723 px-2 py-1 rounded-full text-xs font-medium border bg-red-100 text-red-800 border-red-200"
-            >
-              HARD
-            </span>
-          </div>
-          <div
-            class="jsx-140433cb4fc7b723 flex items-center justify-between"
-          >
-            <span
-              class="jsx-140433cb4fc7b723 text-lg font-bold text-red-600"
-            >
-              500
-               pts
-            </span>
-            <a
-              href="/challenges/challenge-1"
-            >
-              ENGAGE
-            </a>
-          </div>
+            HARD
+          </span>
         </div>
       </div>
       <div
@@ -102,63 +120,54 @@ exports[`AdvancedChallengesPanel matches snapshot 1`] = `
       />
     </div>
     <div
-      class="jsx-140433cb4fc7b723 bg-white border-2 border-red-300 hover:border-orange-400 rounded-lg p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 group"
+      class="jsx-140433cb4fc7b723 bg-white border-2 rounded-lg p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 group relative border-red-300 hover:border-orange-400"
       style="animation-delay: 0.1s;"
     >
       <div
-        class="jsx-140433cb4fc7b723 flex items-start space-x-3"
+        class="jsx-140433cb4fc7b723 flex items-center justify-between mb-3"
       >
         <div
-          class="jsx-140433cb4fc7b723 flex-shrink-0"
+          class="jsx-140433cb4fc7b723 flex items-center space-x-2"
         >
           <div
-            class="jsx-140433cb4fc7b723 w-12 h-12 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center text-white text-xl group-hover:animate-spin transition-all duration-500"
+            class="jsx-140433cb4fc7b723 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm transition-all duration-500 flex-shrink-0 bg-gradient-to-br from-red-500 to-orange-500 group-hover:animate-spin"
           >
             🔐
           </div>
-        </div>
-        <div
-          class="jsx-140433cb4fc7b723 flex-1 min-w-0"
-        >
           <h4
-            class="jsx-140433cb4fc7b723 text-sm font-bold text-gray-900 truncate mb-2"
+            class="jsx-140433cb4fc7b723 text-sm font-bold line-clamp-1 flex-1 text-gray-900"
           >
             Cryptographic Protocol Analysis
           </h4>
-          <p
-            class="jsx-140433cb4fc7b723 text-xs text-gray-600 mb-3 line-clamp-2"
+        </div>
+        <span
+          class="jsx-140433cb4fc7b723 text-sm font-bold ml-2 flex-shrink-0 text-red-600"
+        >
+          300
+          pts
+        </span>
+      </div>
+      <p
+        class="jsx-140433cb4fc7b723 text-xs text-gray-600 mb-3 line-clamp-3 leading-relaxed"
+      >
+        Break a custom encryption scheme used in robot communications
+      </p>
+      <div
+        class="jsx-140433cb4fc7b723 flex items-center justify-between"
+      >
+        <div
+          class="jsx-140433cb4fc7b723 flex gap-1.5"
+        >
+          <span
+            class="jsx-140433cb4fc7b723 px-1.5 py-0.5 rounded text-xs font-medium border bg-purple-100 text-purple-800 border-purple-200"
           >
-            Break a custom encryption scheme used in robot communications
-          </p>
-          <div
-            class="jsx-140433cb4fc7b723 flex flex-wrap gap-2 mb-3"
+            CRYPTO
+          </span>
+          <span
+            class="jsx-140433cb4fc7b723 px-1.5 py-0.5 rounded text-xs font-medium border bg-yellow-100 text-yellow-800 border-yellow-200"
           >
-            <span
-              class="jsx-140433cb4fc7b723 px-2 py-1 rounded-full text-xs font-medium border bg-purple-100 text-purple-800 border-purple-200"
-            >
-              CRYPTO
-            </span>
-            <span
-              class="jsx-140433cb4fc7b723 px-2 py-1 rounded-full text-xs font-medium border bg-yellow-100 text-yellow-800 border-yellow-200"
-            >
-              MEDIUM
-            </span>
-          </div>
-          <div
-            class="jsx-140433cb4fc7b723 flex items-center justify-between"
-          >
-            <span
-              class="jsx-140433cb4fc7b723 text-lg font-bold text-red-600"
-            >
-              300
-               pts
-            </span>
-            <a
-              href="/challenges/challenge-2"
-            >
-              ENGAGE
-            </a>
-          </div>
+            MEDIUM
+          </span>
         </div>
       </div>
       <div
@@ -166,63 +175,54 @@ exports[`AdvancedChallengesPanel matches snapshot 1`] = `
       />
     </div>
     <div
-      class="jsx-140433cb4fc7b723 bg-white border-2 border-red-300 hover:border-orange-400 rounded-lg p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 group"
+      class="jsx-140433cb4fc7b723 bg-white border-2 rounded-lg p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 group relative border-red-300 hover:border-orange-400"
       style="animation-delay: 0.2s;"
     >
       <div
-        class="jsx-140433cb4fc7b723 flex items-start space-x-3"
+        class="jsx-140433cb4fc7b723 flex items-center justify-between mb-3"
       >
         <div
-          class="jsx-140433cb4fc7b723 flex-shrink-0"
+          class="jsx-140433cb4fc7b723 flex items-center space-x-2"
         >
           <div
-            class="jsx-140433cb4fc7b723 w-12 h-12 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center text-white text-xl group-hover:animate-spin transition-all duration-500"
+            class="jsx-140433cb4fc7b723 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm transition-all duration-500 flex-shrink-0 bg-gradient-to-br from-red-500 to-orange-500 group-hover:animate-spin"
           >
             ⚙️
           </div>
-        </div>
-        <div
-          class="jsx-140433cb4fc7b723 flex-1 min-w-0"
-        >
           <h4
-            class="jsx-140433cb4fc7b723 text-sm font-bold text-gray-900 truncate mb-2"
+            class="jsx-140433cb4fc7b723 text-sm font-bold line-clamp-1 flex-1 text-gray-900"
           >
             Reverse Engineering Robot Firmware
           </h4>
-          <p
-            class="jsx-140433cb4fc7b723 text-xs text-gray-600 mb-3 line-clamp-2"
+        </div>
+        <span
+          class="jsx-140433cb4fc7b723 text-sm font-bold ml-2 flex-shrink-0 text-red-600"
+        >
+          600
+          pts
+        </span>
+      </div>
+      <p
+        class="jsx-140433cb4fc7b723 text-xs text-gray-600 mb-3 line-clamp-3 leading-relaxed"
+      >
+        Analyze and exploit vulnerabilities in robotic arm firmware
+      </p>
+      <div
+        class="jsx-140433cb4fc7b723 flex items-center justify-between"
+      >
+        <div
+          class="jsx-140433cb4fc7b723 flex gap-1.5"
+        >
+          <span
+            class="jsx-140433cb4fc7b723 px-1.5 py-0.5 rounded text-xs font-medium border bg-orange-100 text-orange-800 border-orange-200"
           >
-            Analyze and exploit vulnerabilities in robotic arm firmware
-          </p>
-          <div
-            class="jsx-140433cb4fc7b723 flex flex-wrap gap-2 mb-3"
+            REVERSE
+          </span>
+          <span
+            class="jsx-140433cb4fc7b723 px-1.5 py-0.5 rounded text-xs font-medium border bg-red-100 text-red-800 border-red-200"
           >
-            <span
-              class="jsx-140433cb4fc7b723 px-2 py-1 rounded-full text-xs font-medium border bg-orange-100 text-orange-800 border-orange-200"
-            >
-              REVERSE
-            </span>
-            <span
-              class="jsx-140433cb4fc7b723 px-2 py-1 rounded-full text-xs font-medium border bg-red-100 text-red-800 border-red-200"
-            >
-              HARD
-            </span>
-          </div>
-          <div
-            class="jsx-140433cb4fc7b723 flex items-center justify-between"
-          >
-            <span
-              class="jsx-140433cb4fc7b723 text-lg font-bold text-red-600"
-            >
-              600
-               pts
-            </span>
-            <a
-              href="/challenges/challenge-3"
-            >
-              ENGAGE
-            </a>
-          </div>
+            HARD
+          </span>
         </div>
       </div>
       <div

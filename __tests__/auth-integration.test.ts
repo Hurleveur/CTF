@@ -22,6 +22,23 @@ jest.mock('@/lib/supabase/server', () => ({
   createClient: jest.fn(() => mockSupabaseClient),
 }));
 
+// Mock the validation utility
+jest.mock('@/lib/validation/auth', () => ({
+  loginSchema: {
+    safeParse: jest.fn(),
+  },
+  signupSchema: {
+    safeParse: jest.fn(),
+  },
+  validate: jest.fn(),
+}));
+
+// Mock the rate limiter
+jest.mock('@/lib/rate-limiter', () => ({
+  checkRateLimit: jest.fn().mockResolvedValue({ allowed: true }),
+  resetRateLimit: jest.fn().mockResolvedValue(undefined),
+}));
+
 // Mock the NextRequest object for testing
 const mockRequest = (method: string, body?: any, headers?: Record<string, string>): Request => {
   const requestHeaders = new Headers();
@@ -47,6 +64,31 @@ describe('Authentication Integration Tests', () => {
     jest.clearAllMocks();
     mockUserDatabase.clear();
     mockSessionStore.clear();
+    
+    // Setup validation mocks
+    const mockValidate = require('@/lib/validation/auth');
+    mockValidate.validate.mockImplementation((schema: any, data: any) => {
+      // Simulate basic validation logic
+      const errors: Record<string, string[]> = {};
+      
+      if (!data.email || typeof data.email !== 'string' || !data.email.includes('@')) {
+        errors.email = ['Invalid email format'];
+      }
+      
+      if (!data.password || typeof data.password !== 'string' || data.password.length < 8) {
+        errors.password = ['Password must be at least 8 characters'];
+      }
+      
+      if (data.fullName !== undefined && (!data.fullName || data.fullName.length < 2)) {
+        errors.fullName = ['Full name must be at least 2 characters'];
+      }
+      
+      if (Object.keys(errors).length > 0) {
+        return { ok: false, errors };
+      }
+      
+      return { ok: true, data };
+    });
     
     // Setup mock implementations that simulate Supabase behavior
     mockAuth.signUp.mockImplementation(async ({ email, password, options }) => {
@@ -140,7 +182,7 @@ describe('Authentication Integration Tests', () => {
   describe('Complete Signup and Login Flow', () => {
     const testUser = {
       email: 'newuser@example.com',
-      password: 'securepassword123',
+      password: 'SecurePassword123!',
       fullName: 'Test User'
     };
 
@@ -314,7 +356,7 @@ describe('Authentication Integration Tests', () => {
   describe('Session Management Tests', () => {
     const testUser = {
       email: 'sessionuser@example.com',
-      password: 'sessionpassword123',
+      password: 'SessionPassword123!',
       fullName: 'Session Test User'
     };
 

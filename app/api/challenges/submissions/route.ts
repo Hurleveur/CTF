@@ -17,29 +17,29 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch active challenges (RLS policies will handle permissions)
-    const { data: challenges, error } = await supabase
-      .from('challenges')
-      .select('id, title, description, category, difficulty, points, hints')
-      .eq('is_active', true)
-      .order('difficulty', { ascending: true })
-      .order('points', { ascending: true });
+    // Get user's submissions (completed challenges only)
+    const { data: submissions, error: submissionsError } = await supabase
+      .from('submissions')
+      .select('challenge_id, points_awarded, submitted_at, is_correct')
+      .eq('user_id', user.id)
+      .eq('is_correct', true)
+      .order('submitted_at', { ascending: false });
 
-    if (error) {
-      console.error('[API] Challenges fetch error:', error.message);
+    if (submissionsError) {
+      console.error('[API] Submissions fetch error:', submissionsError.message);
       return NextResponse.json(
-        { error: 'Failed to fetch challenges' },
+        { error: 'Failed to fetch submissions' },
         { status: 500 }
       );
     }
 
     return NextResponse.json({
-      challenges: challenges || [],
-      count: challenges?.length || 0,
+      submissions: submissions || [],
+      count: submissions?.length || 0,
     });
 
   } catch (error) {
-    console.error('[API] Challenges error:', error);
+    console.error('[API] Submissions error:', error);
     
     return NextResponse.json(
       { error: 'Internal server error' },

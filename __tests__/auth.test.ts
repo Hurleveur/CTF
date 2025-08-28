@@ -103,7 +103,7 @@ describe('Authentication API Security', () => {
 
       const request = mockRequest('POST', { 
         email: 'test@example.com', 
-        password: 'password123' 
+        password: 'Password123!' 
       });
 
       const response = await loginPost(request);
@@ -154,7 +154,8 @@ describe('Authentication API Security', () => {
 
       const request = mockRequest('POST', { 
         email: 'existing@example.com', 
-        password: 'password123' 
+        password: 'Password123!',
+        fullName: 'Test User' 
       });
 
       const response = await signupPost(request);
@@ -178,7 +179,7 @@ describe('Authentication API Security', () => {
 
       const request = mockRequest('POST', { 
         email: 'new@example.com', 
-        password: 'password123',
+        password: 'Password123!',
         fullName: 'New User' 
       });
 

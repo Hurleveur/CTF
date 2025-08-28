@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { checkRateLimit, resetRateLimit } from '@/lib/rate-limiter';
 import { z } from 'zod';
 
 // Input validation schema
@@ -10,6 +11,13 @@ const submitSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Check rate limiting first (uses smart CHALLENGE_SUBMIT policy)
+    const rateLimitResult = await checkRateLimit(request);
+    
+    if (!rateLimitResult.allowed) {
+      return rateLimitResult.response!;
+    }
+    
     const body = await request.json();
     console.log('[API] Flag submission received:', { flag: body.flag, challenge_id: body.challenge_id });
     
@@ -30,16 +38,16 @@ export async function POST(request: NextRequest) {
     const supabase = createClient();
 
     // Verify user is authenticated
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
     
-    if (sessionError || !session) {
+    if (userError || !user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    const user_id = session.user.id;
+    const user_id = user.id;
 
     // Find challenge by flag if challenge_id is not provided
     let actualChallengeId = challenge_id;

@@ -25,7 +25,7 @@ This document contains all hidden CTF challenges added to the website for admini
   3. Concatenate: `UkJUe3NpdGVfbWFwc19zaG93X2hpZGRlbl9wYXRoc30=`
   4. Base64 decode to get flag
 
-#### 4. Code Archaeology (125 points)
+#### 4. Code Archaeology (125 points) V
 - **Flag**: `RBT{fragment_collector_2024}`
 - **Location**: Source code of multiple pages (Home, About)
 - **Category**: forensics
@@ -65,7 +65,7 @@ Can be found by selecting the name of Léandre, in the inner html.
   4. Find the actual flag in the ROT13 text: `EOS{frpgevgl_guebhtu_bofphevgl_snvyf}`
   5. Decode to get: `RBT{security_through_obscurity_fails}`
 
-#### 8. Developer Backdoor (275 points)
+#### 8. Developer Backdoor (275 points) V
 - **Flag**: `RBT{konami_debug_mode_active}`
 - **Location**: Navigation component (Konami code activation)
 - **Category**: reverse
@@ -78,7 +78,7 @@ Can be found by selecting the name of Léandre, in the inner html.
   5. Extract ASCII values from `String.fromCharCode(82,66,84,123,107,111,110,97,109,105,95,100,101,98,117,103,95,109,111,100,101,95,97,99,116,105,118,101,125)`
   6. Convert to characters: `RBT{konami_debug_mode_active}`
 
-#### 9. Neural Network Telemetry (325 points)
+#### 9. TODO? Neural Network Telemetry (325 points)
 - **Flag**: `RBT{telemetry_decoded_alex_key}`
 - **Location**: WebSocket connection (placeholder for future implementation)
 - **Category**: forensics  
@@ -101,13 +101,6 @@ Can be found by selecting the name of Léandre, in the inner html.
   6. Input XSS payload: `<script>alert("test")</script>`
   7. System detects XSS and reveals flag: `RBT{admin_terminal_pwned}`
   8. **Bonus**: Access GraphQL endpoint at `/api/admin/graphql` for additional flag: `RBT{graphql_endpoint_exposed}`
-
-#### 11. Consciousness Fragmentation (500 points)
-- **Flag**: `RBT{neural_network_fully_restored}`
-- **Location**: Requires collecting ALL fragments from every challenge
-- **Category**: misc
-- **Description**: Ultimate meta-challenge requiring solving multiple challenges
-- **Solution**: (Would require implementation of fragment collection system)
 
 ## Additional Features Implemented
 

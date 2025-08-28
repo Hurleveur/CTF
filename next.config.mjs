@@ -15,10 +15,10 @@ const nextConfig = {
         source: '/(.*)',
         headers: [
           // Content-Security-Policy: Helps prevent XSS attacks by restricting the sources of content.
-          // In a real app, you would define this more strictly.
+          // Tightened for better security while maintaining functionality
           {
             key: 'Content-Security-Policy',
-            value: `default-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; connect-src 'self' ${supabaseUrl} wss://${supabaseHost}; font-src 'self';`,
+            value: `default-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self' ${supabaseUrl} wss://${supabaseHost}; font-src 'self'; img-src 'self' data: https:; frame-src 'none'; object-src 'none'; base-uri 'self';`,
           },
           // Strict-Transport-Security: Enforces secure connections (HTTPS).
           {
@@ -39,6 +39,21 @@ const nextConfig = {
           {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
+          },
+          // Referrer-Policy: Controls how much referrer information is shared
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          // Permissions-Policy: Controls browser features
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
+          },
+          // Cross-Origin-Embedder-Policy: Helps prevent certain attacks
+          {
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'credentialless',
           },
         ],
       },

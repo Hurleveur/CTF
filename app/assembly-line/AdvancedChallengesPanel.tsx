@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Challenge {
   id: string;
@@ -232,34 +233,29 @@ export default function AdvancedChallengesPanel({ challenges }: AdvancedChalleng
     }
   }, [challenges, isFirstTimeReveal]);
 
-  // Fetch user submissions to determine completed challenges
+  // Fetch user submissions directly to determine completed challenges (avoiding duplicate profile API call)
   useEffect(() => {
-    const fetchUserSubmissions = async () => {
+    const fetchCompletedChallenges = async () => {
       if (!challenges || challenges.length === 0) return;
       
       setIsLoadingSubmissions(true);
       
       try {
-        console.log('🔍 Fetching user profile to check completed challenges...');
+        console.log('🔍 Fetching completed challenges directly...');
         
-        const response = await fetch('/api/profile');
+        // Create a simple API call just to get submissions without duplicating profile fetch
+        const response = await fetch('/api/challenges/submissions');
         
         if (response.ok) {
           const data = await response.json();
           
-          // Extract challenge IDs from recent submissions (completed ones)
+          // Extract challenge IDs from submissions (completed ones)
           const completedIds = new Set<string>();
           
-          if (data.recent_submissions && Array.isArray(data.recent_submissions)) {
-            data.recent_submissions.forEach((submission: any) => {
-              if (submission.challenges) {
-                // For recent submissions, we need to find the challenge ID by matching title
-                const matchingChallenge = challenges.find(c => 
-                  c.title.toLowerCase() === submission.challenges.title.toLowerCase()
-                );
-                if (matchingChallenge) {
-                  completedIds.add(matchingChallenge.id);
-                }
+          if (data.submissions && Array.isArray(data.submissions)) {
+            data.submissions.forEach((submission: any) => {
+              if (submission.is_correct && submission.challenge_id) {
+                completedIds.add(submission.challenge_id);
               }
             });
           }
@@ -269,17 +265,24 @@ export default function AdvancedChallengesPanel({ challenges }: AdvancedChalleng
           
         } else if (response.status === 401) {
           console.log('ℹ️ User not authenticated for submissions check');
+        } else if (response.status === 404) {
+          // If this API doesn't exist yet, fall back to a simpler approach:
+          // Just show all challenges as incomplete rather than making duplicate API calls
+          console.log('ℹ️ Submissions API not available, showing all challenges as incomplete');
+          setCompletedChallenges(new Set());
         } else {
-          console.log('⚠️ Failed to fetch user profile:', response.status);
+          console.log('⚠️ Failed to fetch submissions:', response.status);
         }
       } catch (error) {
-        console.error('❌ Error fetching user submissions:', error);
+        console.error('❌ Error fetching submissions:', error);
+        // On error, just show all challenges as incomplete rather than break the UI
+        setCompletedChallenges(new Set());
       } finally {
         setIsLoadingSubmissions(false);
       }
     };
     
-    fetchUserSubmissions();
+    fetchCompletedChallenges();
   }, [challenges]);
 
   // Cleanup AudioContext on component unmount

@@ -117,6 +117,7 @@ const mockAuth = {
   signUp: jest.fn(),
   signOut: jest.fn(),
   getSession: jest.fn(),
+  getUser: jest.fn(),
   refreshSession: jest.fn(),
 };
 
@@ -127,6 +128,19 @@ const mockSupabaseClient = {
 
 jest.mock('@/lib/supabase/server', () => ({
   createClient: jest.fn(() => mockSupabaseClient),
+}));
+
+// Mock rate limiting
+jest.mock('@/lib/rate-limiter', () => ({
+  checkRateLimit: jest.fn(() => Promise.resolve({ allowed: true })),
+  resetRateLimit: jest.fn(() => Promise.resolve()),
+}));
+
+// Mock validation utility
+jest.mock('@/lib/validation/auth', () => ({
+  loginSchema: {},
+  signupSchema: {},
+  validate: jest.fn((schema, data) => ({ ok: true, data }))
 }));
 
 // Mock the NextRequest object for testing
@@ -150,7 +164,18 @@ describe('CTF Platform Integration Tests', () => {
     mockDatabase.submissions.clear();
     mockDatabase.sessions.clear();
     
-    // Setup default authenticated session
+    // Setup default authenticated user
+    mockAuth.getUser.mockResolvedValue({
+      data: { 
+        user: {
+          id: 'user-123',
+          email: 'test@example.com',
+          role: 'user'
+        }
+      },
+      error: null
+    });
+    
     mockAuth.getSession.mockResolvedValue({
       data: { 
         session: {
@@ -181,7 +206,7 @@ describe('CTF Platform Integration Tests', () => {
       
       const signupRequest = mockRequest('POST', {
         email: 'newuser@example.com',
-        password: 'securepassword123',
+        password: 'Password123!',
         fullName: 'New User'
       });
       
@@ -202,7 +227,7 @@ describe('CTF Platform Integration Tests', () => {
       
       const loginRequest = mockRequest('POST', {
         email: 'newuser@example.com',
-        password: 'securepassword123'
+        password: 'Password123!'
       });
       
       const loginResponse = await loginPost(loginRequest);
@@ -253,7 +278,7 @@ describe('CTF Platform Integration Tests', () => {
       const submitData = await submitResponse.json();
       
       expect(submitResponse.status).toBe(200);
-      expect(submitData.success).toBe(true);
+      expect(submitData.correct).toBe(true);
       expect(submitData.points_awarded).toBe(100);
     });
   });
@@ -312,8 +337,9 @@ describe('CTF Platform Integration Tests', () => {
       });
       
       // First user submission
-      mockAuth.getSession.mockResolvedValueOnce({
-        data: { session: user1Session },
+      // Mock the getUser method instead of getSession for submit API
+      mockAuth.getUser.mockResolvedValueOnce({
+        data: { user: user1Session.user },
         error: null
       });
       
@@ -323,8 +349,8 @@ describe('CTF Platform Integration Tests', () => {
       });
       
       // Second user submission (concurrent)
-      mockAuth.getSession.mockResolvedValueOnce({
-        data: { session: user2Session },
+      mockAuth.getUser.mockResolvedValueOnce({
+        data: { user: user2Session.user },
         error: null
       });
       
@@ -348,7 +374,7 @@ describe('CTF Platform Integration Tests', () => {
         { response: response2, data: data2 }
       ];
       
-      const successfulResponses = responses.filter(r => r.response.status === 200 && r.data.success);
+      const successfulResponses = responses.filter(r => r.response.status === 200 && r.data.correct);
       const failedResponses = responses.filter(r => r.response.status === 500);
       
       expect(successfulResponses.length).toBe(1);
@@ -399,8 +425,9 @@ describe('CTF Platform Integration Tests', () => {
 
   describe('Database Connection Issues', () => {
     it('should handle database timeout errors', async () => {
-      mockAuth.getSession.mockImplementation(async () => {
-        await simulateDelay(1000); // Long delay to simulate timeout
+      // The challenges API uses getUser, not getSession
+      mockAuth.getUser.mockImplementation(async () => {
+        await simulateDelay(100); // Short delay to avoid test timeout
         throw new Error('Connection timeout');
       });
       
@@ -585,7 +612,7 @@ describe('CTF Platform Integration Tests', () => {
       const data = await response.json();
       
       expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
+      expect(data.correct).toBe(true);
       expect(data.points_awarded).toBe(150);
     });
 

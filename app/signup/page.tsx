@@ -17,6 +17,14 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [globalError, setGlobalError] = useState('');
   const [copiedCTB, setCopiedCTB] = useState(false);
+  const [validationUtility, setValidationUtility] = useState<any>(null);
+
+  // Dynamically import validation utility to avoid bundling Zod in initial JS
+  useEffect(() => {
+    import('@/lib/validation/auth')
+      .then(module => setValidationUtility(module))
+      .catch(err => console.warn('Failed to load validation utility:', err));
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -34,6 +42,23 @@ export default function SignupPage() {
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
 
+    // If we have the validation utility loaded, use it
+    if (validationUtility) {
+      const result = validationUtility.validate(validationUtility.signupSchema, formData);
+      if (!result.ok && result.errors) {
+        // Convert array of errors to single string per field
+        Object.entries(result.errors).forEach(([field, messages]) => {
+          if (Array.isArray(messages) && messages.length > 0) {
+            newErrors[field] = messages[0];
+          }
+        });
+        setErrors(newErrors);
+        return false;
+      }
+      return true;
+    }
+
+    // Fallback to client-side validation if utility not loaded
     if (!formData.fullName.trim() || formData.fullName.trim().length < 2) {
       newErrors.fullName = 'Full name must be at least 2 characters';
     }
@@ -48,6 +73,13 @@ export default function SignupPage() {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters';
+    } else if (formData.password.length > 128) {
+      newErrors.password = 'Password must be less than 128 characters';
+    } else if (validationUtility?.passwordRegex ? 
+               !validationUtility.passwordRegex.test(formData.password) : 
+               !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]*$/.test(formData.password)) {
+      newErrors.password = validationUtility?.passwordMessage || 
+        'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character (@$!%*?&)';
     }
 
     setErrors(newErrors);

@@ -8,16 +8,16 @@ export async function GET(request: NextRequest) {
     const supabase = createClient();
 
     // Verify user is authenticated
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
     
-    if (sessionError || !session) {
+    if (userError || !user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    const user_id = session.user.id;
+    const user_id = user.id;
 
     // Get user profile
     const { data: profile, error: profileError } = await supabase
