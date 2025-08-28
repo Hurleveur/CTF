@@ -8,32 +8,34 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = createClient();
 
-    // Verify user is authenticated to view all projects
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    
-    if (userError || !user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
+    // Allow public access to view all projects for leaderboard
+    // No authentication required
 
     // Fetch all projects from all users
     const { data: allUserProjects, error } = await supabase
       .from('user_projects')
-      .select(`
-        *,
-        profiles!user_projects_user_id_fkey(full_name, email)
-      `)
+      .select('*')
       .order('neural_reconstruction', { ascending: false })
       .order('created_at', { ascending: true });
 
     if (error) {
-      console.error('[Projects/All] Fetch error:', error.message);
+      console.error('[Projects/All] Fetch projects error:', error.message);
       return NextResponse.json(
         { error: 'Failed to fetch all projects' },
         { status: 500 }
       );
+    }
+
+    // Fetch profile information for all users who have projects
+    const userIds = allUserProjects?.map(project => project.user_id) || [];
+    const { data: userProfiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('id, full_name, email')
+      .in('id', userIds);
+
+    if (profilesError) {
+      console.error('[Projects/All] Fetch profiles error:', profilesError.message);
+      // Continue without profile data rather than failing completely
     }
 
     // Default projects that are always shown
@@ -79,21 +81,32 @@ export async function GET(request: NextRequest) {
       }
     ];
 
+    // Create a lookup map for profiles
+    const profileMap = new Map();
+    if (userProfiles) {
+      userProfiles.forEach(profile => {
+        profileMap.set(profile.id, profile);
+      });
+    }
+
     // Transform database projects to frontend format
-    const transformedUserProjects = allUserProjects?.map((project, index) => ({
-      id: 1000 + index, // Start user projects from ID 1000 to avoid conflicts
-      name: project.name,
-      description: project.description,
-      logo: project.logo,
-      aiStatus: project.ai_status,
-      statusColor: project.status_color,
-      neuralReconstruction: parseFloat(project.neural_reconstruction || '0'),
-      lastBackup: project.last_backup,
-      leadDeveloper: project.lead_developer || project.profiles?.full_name || project.profiles?.email || 'Unknown',
-      teamMembers: project.team_members || [],
-      isDefault: false,
-      userId: project.user_id
-    })) || [];
+    const transformedUserProjects = allUserProjects?.map((project, index) => {
+      const userProfile = profileMap.get(project.user_id);
+      return {
+        id: 1000 + index, // Start user projects from ID 1000 to avoid conflicts
+        name: project.name,
+        description: project.description,
+        logo: project.logo,
+        aiStatus: project.ai_status,
+        statusColor: project.status_color,
+        neuralReconstruction: parseFloat(project.neural_reconstruction || '0'),
+        lastBackup: project.last_backup,
+        leadDeveloper: project.lead_developer || userProfile?.full_name || userProfile?.email || 'Unknown Developer',
+        teamMembers: project.team_members || [],
+        isDefault: false,
+        userId: project.user_id
+      };
+    }) || [];
 
     // Combine default projects with all user projects, sorted by neural reconstruction
     const allProjects = [...defaultProjects, ...transformedUserProjects]

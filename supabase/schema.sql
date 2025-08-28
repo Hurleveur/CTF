@@ -183,6 +183,10 @@ CREATE POLICY "Users can update their own projects" ON public.user_projects
 CREATE POLICY "Users can delete their own projects" ON public.user_projects
   FOR DELETE USING (auth.uid() = user_id);
 
+-- Authenticated users can view all projects for leaderboard
+CREATE POLICY "Authenticated users can view all projects" ON public.user_projects
+  FOR SELECT USING (auth.role() = 'authenticated');
+
 -- Admins can view all projects
 CREATE POLICY "Admins can view all projects" ON public.user_projects
   FOR SELECT USING (

@@ -38,10 +38,10 @@ export default function SolutionsPage() {
     '🏭', '🤯', '🎛️', '📡', '🔌', '⚗️', '🧬', '🎯', '🔥', '💡'
   ];
 
-  // Fetch all projects from database when authenticated for leaderboard display
+  // Fetch all projects from database for leaderboard display (public access)
   useEffect(() => {
     const fetchAllProjects = async () => {
-      if (!isAuthenticated || hasLoadedProjects) return;
+      if (hasLoadedProjects) return;
 
       setIsLoadingProjects(true);
       
@@ -111,7 +111,7 @@ export default function SolutionsPage() {
     };
     
     fetchAllProjects();
-  }, [isAuthenticated, hasLoadedProjects, setProjects]);
+  }, [hasLoadedProjects, setProjects]);
 
   const handleProjectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
