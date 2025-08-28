@@ -80,9 +80,6 @@ export default function Navigation() {
               <Link href="/solutions" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">
                 Projects
               </Link>
-              <Link href="/assembly-line" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">
-                Assembly Line
-              </Link>
             </div>
           </div>
 
@@ -147,9 +144,6 @@ export default function Navigation() {
             </Link>
             <Link href="/solutions" className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
               Team Directory
-            </Link>
-            <Link href="/assembly-line" className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
-              Assembly Line
             </Link>
             {isAuthenticated ? (
               <button
