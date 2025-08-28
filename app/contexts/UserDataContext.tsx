@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
 import { useAuth } from './AuthContext';
 
 interface UserProfile {
@@ -68,7 +68,7 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     if (!isAuthenticated) {
       // Clear data when not authenticated
       setProfile(null);
@@ -159,16 +159,16 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isAuthenticated]);
 
   // Fetch data when authentication state changes
   useEffect(() => {
     fetchUserData();
-  }, [isAuthenticated, user]);
+  }, [fetchUserData]);
 
-  const refetch = async () => {
+  const refetch = useCallback(async () => {
     await fetchUserData();
-  };
+  }, [fetchUserData]);
 
   const updateProject = (updatedProject: Project) => {
     setProject(updatedProject);

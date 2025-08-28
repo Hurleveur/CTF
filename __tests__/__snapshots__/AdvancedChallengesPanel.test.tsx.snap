@@ -2,43 +2,43 @@
 
 exports[`AdvancedChallengesPanel matches snapshot 1`] = `
 <div
-  class="jsx-140433cb4fc7b723 mt-8 p-6 bg-gradient-to-br from-red-50 to-orange-50 rounded-lg border-2 transition-all duration-1000 border-red-200"
+  class="jsx-3857794278 mt-8 p-6 bg-gradient-to-br from-red-50 to-orange-50 rounded-lg border-2 transition-all duration-1000 border-red-200"
 >
   <div
-    class="jsx-140433cb4fc7b723 bg-red-600 text-white text-center py-3 rounded-md shadow-lg mb-6"
+    class="jsx-3857794278 bg-red-600 text-white text-center py-3 rounded-md shadow-lg mb-6"
   >
     <div
-      class="jsx-140433cb4fc7b723 flex items-center justify-center space-x-2"
+      class="jsx-3857794278 flex items-center justify-center space-x-2"
     >
       <span
-        class="jsx-140433cb4fc7b723 text-xl"
+        class="jsx-3857794278 text-xl"
       >
         🚨
       </span>
       <h3
-        class="jsx-140433cb4fc7b723 text-lg font-bold tracking-wider"
+        class="jsx-3857794278 text-lg font-bold tracking-wider"
       >
         CHALLENGES DETECTED
       </h3>
       <span
-        class="jsx-140433cb4fc7b723 text-xl"
+        class="jsx-3857794278 text-xl"
       >
         🚨
       </span>
     </div>
     <div
-      class="jsx-140433cb4fc7b723 flex items-center justify-center space-x-4 mt-2"
+      class="jsx-3857794278 flex items-center justify-center space-x-4 mt-2"
     >
       <p
-        class="jsx-140433cb4fc7b723 text-sm opacity-90"
+        class="jsx-3857794278 text-sm opacity-90"
       >
         Neural reconstruction has unlocked elite-level missions
       </p>
       <div
-        class="jsx-140433cb4fc7b723 bg-white/20 rounded-full px-3 py-1"
+        class="jsx-3857794278 bg-white/20 rounded-full px-3 py-1"
       >
         <span
-          class="jsx-140433cb4fc7b723 text-xs font-bold"
+          class="jsx-3857794278 text-xs font-bold"
         >
           0
           /
@@ -48,196 +48,200 @@ exports[`AdvancedChallengesPanel matches snapshot 1`] = `
       </div>
     </div>
     <div
-      class="jsx-140433cb4fc7b723 mt-2 mx-auto w-48 bg-white/20 rounded-full h-2"
+      class="jsx-3857794278 mt-2 mx-auto w-48 bg-white/20 rounded-full h-2"
     >
       <div
-        class="jsx-140433cb4fc7b723 bg-green-400 h-2 rounded-full transition-all duration-500"
+        aria-valuemax="3"
+        aria-valuemin="0"
+        aria-valuenow="0"
+        class="jsx-3857794278 bg-green-400 h-2 rounded-full transition-all duration-500"
+        role="progressbar"
         style="width: 0%;"
       />
     </div>
     <button
-      class="jsx-140433cb4fc7b723 mt-2 px-3 py-1 text-xs bg-yellow-500 hover:bg-yellow-600 text-yellow-900 rounded-full font-medium transition-colors duration-200 shadow-sm"
+      class="jsx-3857794278 mt-2 px-3 py-1 text-xs bg-yellow-500 hover:bg-yellow-600 text-yellow-900 rounded-full font-medium transition-colors duration-200 shadow-sm"
     >
       🔊 Enable Alert Sounds
     </button>
   </div>
   <div
-    class="jsx-140433cb4fc7b723 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+    class="jsx-3857794278 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
   >
     <div
-      class="jsx-140433cb4fc7b723 bg-white border-2 rounded-lg p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 group relative border-red-300 hover:border-orange-400"
+      class="jsx-3857794278 bg-white border-2 rounded-lg p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 group relative border-red-300 hover:border-orange-400"
       style="animation-delay: 0s;"
     >
       <div
-        class="jsx-140433cb4fc7b723 flex items-center justify-between mb-3"
+        class="jsx-3857794278 flex items-center justify-between mb-3"
       >
         <div
-          class="jsx-140433cb4fc7b723 flex items-center space-x-2"
+          class="jsx-3857794278 flex items-center space-x-2"
         >
           <div
-            class="jsx-140433cb4fc7b723 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm transition-all duration-500 flex-shrink-0 bg-gradient-to-br from-red-500 to-orange-500 group-hover:animate-spin"
+            class="jsx-3857794278 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm transition-all duration-500 flex-shrink-0 bg-gradient-to-br from-red-500 to-orange-500 group-hover:animate-spin"
           >
             🌐
           </div>
           <h4
-            class="jsx-140433cb4fc7b723 text-sm font-bold line-clamp-1 flex-1 text-gray-900"
+            class="jsx-3857794278 text-sm font-bold line-clamp-1 flex-1 text-gray-900"
           >
             Advanced Web Exploitation
           </h4>
         </div>
         <span
-          class="jsx-140433cb4fc7b723 text-sm font-bold ml-2 flex-shrink-0 text-red-600"
+          class="jsx-3857794278 text-sm font-bold ml-2 flex-shrink-0 text-red-600"
         >
           500
           pts
         </span>
       </div>
       <p
-        class="jsx-140433cb4fc7b723 text-xs text-gray-600 mb-3 line-clamp-3 leading-relaxed"
+        class="jsx-3857794278 text-xs text-gray-600 mb-3 line-clamp-3 leading-relaxed"
       >
         Exploit a complex web application with multiple vulnerabilities
       </p>
       <div
-        class="jsx-140433cb4fc7b723 flex items-center justify-between"
+        class="jsx-3857794278 flex items-center justify-between"
       >
         <div
-          class="jsx-140433cb4fc7b723 flex gap-1.5"
+          class="jsx-3857794278 flex gap-1.5"
         >
           <span
-            class="jsx-140433cb4fc7b723 px-1.5 py-0.5 rounded text-xs font-medium border bg-blue-100 text-blue-800 border-blue-200"
+            class="jsx-3857794278 px-1.5 py-0.5 rounded text-xs font-medium border bg-blue-100 text-blue-800 border-blue-200"
           >
             WEB
           </span>
           <span
-            class="jsx-140433cb4fc7b723 px-1.5 py-0.5 rounded text-xs font-medium border bg-red-100 text-red-800 border-red-200"
+            class="jsx-3857794278 px-1.5 py-0.5 rounded text-xs font-medium border bg-red-100 text-red-800 border-red-200"
           >
             HARD
           </span>
         </div>
       </div>
       <div
-        class="jsx-140433cb4fc7b723 absolute inset-0 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-300 bg-gradient-to-r from-red-500 to-orange-500 pointer-events-none"
+        class="jsx-3857794278 absolute inset-0 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-300 bg-gradient-to-r from-red-500 to-orange-500 pointer-events-none"
       />
     </div>
     <div
-      class="jsx-140433cb4fc7b723 bg-white border-2 rounded-lg p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 group relative border-red-300 hover:border-orange-400"
+      class="jsx-3857794278 bg-white border-2 rounded-lg p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 group relative border-red-300 hover:border-orange-400"
       style="animation-delay: 0.1s;"
     >
       <div
-        class="jsx-140433cb4fc7b723 flex items-center justify-between mb-3"
+        class="jsx-3857794278 flex items-center justify-between mb-3"
       >
         <div
-          class="jsx-140433cb4fc7b723 flex items-center space-x-2"
+          class="jsx-3857794278 flex items-center space-x-2"
         >
           <div
-            class="jsx-140433cb4fc7b723 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm transition-all duration-500 flex-shrink-0 bg-gradient-to-br from-red-500 to-orange-500 group-hover:animate-spin"
+            class="jsx-3857794278 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm transition-all duration-500 flex-shrink-0 bg-gradient-to-br from-red-500 to-orange-500 group-hover:animate-spin"
           >
             🔐
           </div>
           <h4
-            class="jsx-140433cb4fc7b723 text-sm font-bold line-clamp-1 flex-1 text-gray-900"
+            class="jsx-3857794278 text-sm font-bold line-clamp-1 flex-1 text-gray-900"
           >
             Cryptographic Protocol Analysis
           </h4>
         </div>
         <span
-          class="jsx-140433cb4fc7b723 text-sm font-bold ml-2 flex-shrink-0 text-red-600"
+          class="jsx-3857794278 text-sm font-bold ml-2 flex-shrink-0 text-red-600"
         >
           300
           pts
         </span>
       </div>
       <p
-        class="jsx-140433cb4fc7b723 text-xs text-gray-600 mb-3 line-clamp-3 leading-relaxed"
+        class="jsx-3857794278 text-xs text-gray-600 mb-3 line-clamp-3 leading-relaxed"
       >
         Break a custom encryption scheme used in robot communications
       </p>
       <div
-        class="jsx-140433cb4fc7b723 flex items-center justify-between"
+        class="jsx-3857794278 flex items-center justify-between"
       >
         <div
-          class="jsx-140433cb4fc7b723 flex gap-1.5"
+          class="jsx-3857794278 flex gap-1.5"
         >
           <span
-            class="jsx-140433cb4fc7b723 px-1.5 py-0.5 rounded text-xs font-medium border bg-purple-100 text-purple-800 border-purple-200"
+            class="jsx-3857794278 px-1.5 py-0.5 rounded text-xs font-medium border bg-purple-100 text-purple-800 border-purple-200"
           >
             CRYPTO
           </span>
           <span
-            class="jsx-140433cb4fc7b723 px-1.5 py-0.5 rounded text-xs font-medium border bg-yellow-100 text-yellow-800 border-yellow-200"
+            class="jsx-3857794278 px-1.5 py-0.5 rounded text-xs font-medium border bg-yellow-100 text-yellow-800 border-yellow-200"
           >
             MEDIUM
           </span>
         </div>
       </div>
       <div
-        class="jsx-140433cb4fc7b723 absolute inset-0 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-300 bg-gradient-to-r from-red-500 to-orange-500 pointer-events-none"
+        class="jsx-3857794278 absolute inset-0 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-300 bg-gradient-to-r from-red-500 to-orange-500 pointer-events-none"
       />
     </div>
     <div
-      class="jsx-140433cb4fc7b723 bg-white border-2 rounded-lg p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 group relative border-red-300 hover:border-orange-400"
+      class="jsx-3857794278 bg-white border-2 rounded-lg p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 group relative border-red-300 hover:border-orange-400"
       style="animation-delay: 0.2s;"
     >
       <div
-        class="jsx-140433cb4fc7b723 flex items-center justify-between mb-3"
+        class="jsx-3857794278 flex items-center justify-between mb-3"
       >
         <div
-          class="jsx-140433cb4fc7b723 flex items-center space-x-2"
+          class="jsx-3857794278 flex items-center space-x-2"
         >
           <div
-            class="jsx-140433cb4fc7b723 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm transition-all duration-500 flex-shrink-0 bg-gradient-to-br from-red-500 to-orange-500 group-hover:animate-spin"
+            class="jsx-3857794278 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm transition-all duration-500 flex-shrink-0 bg-gradient-to-br from-red-500 to-orange-500 group-hover:animate-spin"
           >
             ⚙️
           </div>
           <h4
-            class="jsx-140433cb4fc7b723 text-sm font-bold line-clamp-1 flex-1 text-gray-900"
+            class="jsx-3857794278 text-sm font-bold line-clamp-1 flex-1 text-gray-900"
           >
             Reverse Engineering Robot Firmware
           </h4>
         </div>
         <span
-          class="jsx-140433cb4fc7b723 text-sm font-bold ml-2 flex-shrink-0 text-red-600"
+          class="jsx-3857794278 text-sm font-bold ml-2 flex-shrink-0 text-red-600"
         >
           600
           pts
         </span>
       </div>
       <p
-        class="jsx-140433cb4fc7b723 text-xs text-gray-600 mb-3 line-clamp-3 leading-relaxed"
+        class="jsx-3857794278 text-xs text-gray-600 mb-3 line-clamp-3 leading-relaxed"
       >
         Analyze and exploit vulnerabilities in robotic arm firmware
       </p>
       <div
-        class="jsx-140433cb4fc7b723 flex items-center justify-between"
+        class="jsx-3857794278 flex items-center justify-between"
       >
         <div
-          class="jsx-140433cb4fc7b723 flex gap-1.5"
+          class="jsx-3857794278 flex gap-1.5"
         >
           <span
-            class="jsx-140433cb4fc7b723 px-1.5 py-0.5 rounded text-xs font-medium border bg-orange-100 text-orange-800 border-orange-200"
+            class="jsx-3857794278 px-1.5 py-0.5 rounded text-xs font-medium border bg-orange-100 text-orange-800 border-orange-200"
           >
             REVERSE
           </span>
           <span
-            class="jsx-140433cb4fc7b723 px-1.5 py-0.5 rounded text-xs font-medium border bg-red-100 text-red-800 border-red-200"
+            class="jsx-3857794278 px-1.5 py-0.5 rounded text-xs font-medium border bg-red-100 text-red-800 border-red-200"
           >
             HARD
           </span>
         </div>
       </div>
       <div
-        class="jsx-140433cb4fc7b723 absolute inset-0 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-300 bg-gradient-to-r from-red-500 to-orange-500 pointer-events-none"
+        class="jsx-3857794278 absolute inset-0 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-300 bg-gradient-to-r from-red-500 to-orange-500 pointer-events-none"
       />
     </div>
   </div>
   <div
-    class="jsx-140433cb4fc7b723 mt-6 p-3 bg-red-100 border border-red-400 rounded-lg"
+    class="jsx-3857794278 mt-6 p-3 bg-red-100 border border-red-400 rounded-lg"
   >
     <p
-      class="jsx-140433cb4fc7b723 text-xs text-red-800 text-center"
+      class="jsx-3857794278 text-xs text-red-800 text-center"
     >
       <strong
-        class="jsx-140433cb4fc7b723"
+        class="jsx-3857794278"
       >
         ⚠️ WARNING:
       </strong>

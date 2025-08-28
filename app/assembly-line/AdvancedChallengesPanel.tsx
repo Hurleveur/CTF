@@ -300,6 +300,10 @@ export default function AdvancedChallengesPanel({
             <div 
               className="bg-green-400 h-2 rounded-full transition-all duration-500"
               style={{width: `${(completedChallengeIds.size / challenges.length) * 100}%`}}
+              role="progressbar"
+              aria-valuenow={completedChallengeIds.size}
+              aria-valuemax={challenges.length}
+              aria-valuemin={0}
             ></div>
           </div>
         )}

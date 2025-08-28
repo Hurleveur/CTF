@@ -3,7 +3,7 @@
 import { useAuth } from '../contexts/AuthContext';
 import { useUserData } from '../contexts/UserDataContext';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useProjects, RoboticProject } from '../contexts/ProjectContext';
 import AdvancedChallengesPanel from './AdvancedChallengesPanel';
 
@@ -50,7 +50,7 @@ export default function AssemblyLinePage() {
   }, [userProject, selectedArm]);
 
   // Function to refresh project data from database
-  const refreshProjectData = async () => {
+  const refreshProjectData = useCallback(async () => {
     try {
       console.log('🔄 Refreshing project data...');
       // Use the unified refetch function instead of making separate API calls
@@ -58,7 +58,7 @@ export default function AssemblyLinePage() {
     } catch (error) {
       console.error('❌ Error refreshing project data:', error);
     }
-  };
+  }, [refetch]);
 
   // Function to sync project progress with submissions
   const syncProjectProgress = async () => {
@@ -94,16 +94,8 @@ export default function AssemblyLinePage() {
     }
   }, [selectedArm, armStatus]);
 
-  // Monitor code completion threshold and load advanced challenges
-  useEffect(() => {
-    if (codeCompletion >= 10 && !showAdvanced) {
-      setShowAdvanced(true);
-      loadAdvancedChallenges();
-    }
-  }, [codeCompletion, showAdvanced]);
-
   // Function to load advanced challenges from API
-  const loadAdvancedChallenges = async () => {
+  const loadAdvancedChallenges = useCallback(async () => {
     try {
       console.log('🔍 Loading advanced challenges...');
       const res = await fetch('/api/challenges');
@@ -131,7 +123,15 @@ export default function AssemblyLinePage() {
       console.error('❌ Error loading advanced challenges:', error);
       // Silently fail - keep panel hidden
     }
-  };
+  }, []);
+
+  // Monitor code completion threshold and load advanced challenges
+  useEffect(() => {
+    if (codeCompletion >= 10 && !showAdvanced) {
+      setShowAdvanced(true);
+      loadAdvancedChallenges();
+    }
+  }, [codeCompletion, showAdvanced, loadAdvancedChallenges]);
 
   const handleArmSelect = (arm: RoboticProject) => {
     setSelectedArm(arm);

@@ -38,8 +38,10 @@ export async function GET(request: NextRequest) {
     const { data: submissions, error: submissionsError } = await supabase
       .from('submissions')
       .select(`
+        challenge_id,
         points_awarded,
         submitted_at,
+        is_correct,
         challenges:challenge_id (
           title,
           category,
@@ -87,7 +89,8 @@ export async function GET(request: NextRequest) {
         rank: userRank,
         total_users: leaderboard?.length || 0,
       },
-      recent_submissions: submissions?.slice(-5).reverse() || [],
+      recent_submissions: submissions || [], // Return ALL submissions for completed challenges tracking
+      recent_submissions_display: submissions?.slice(-5).reverse() || [], // Keep recent 5 for display purposes
     });
 
   } catch (error) {
