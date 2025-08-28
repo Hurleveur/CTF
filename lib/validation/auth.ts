@@ -48,7 +48,7 @@ export function validate<T>(
   
   return {
     ok: false,
-    errors: result.error.flatten().fieldErrors,
+    errors: Object.fromEntries(Object.entries(result.error.flatten().fieldErrors).filter(([, value]) => value !== undefined)) as Record<string, string[]>,
   };
 }
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import type { RateLimitPolicy } from './rate-limit-config';
 
 interface RateLimitConfig {
   windowMs: number;
@@ -85,7 +86,7 @@ class MemoryRateLimiter {
       // Log security event
       console.warn(`[RateLimit] Rate limit exceeded for ${key}. Attempts: ${this.store[key].count}, Lockout duration: ${lockoutDuration/1000/60} minutes`);
       console.warn(`[RateLimit] First attempt: ${new Date(this.store[key].firstAttempt).toISOString()}`);
-      console.warn(`[RateLimit] User agents: ${[...new Set(this.store[key].attempts.map(a => a.userAgent).filter(Boolean))].join(', ')}`);
+      console.warn(`[RateLimit] User agents: ${Array.from(new Set(this.store[key].attempts.map(a => a.userAgent).filter(Boolean))).join(', ')}`);
       
       return {
         allowed: false,
@@ -124,7 +125,7 @@ export async function checkRateLimit(
   const { getRateLimitPolicy, getRateLimitErrorMessage, getClientIdentifier } = await import('./rate-limit-config');
   
   // Use provided config or smart policy selection
-  const policy = config || getRateLimitPolicy(request);
+  const policy: RateLimitPolicy = config ? { ...config, description: 'Default Rate Limit Policy' } : getRateLimitPolicy(request);
   
   // Use enhanced client identification
   const clientId = getClientIdentifier(request);

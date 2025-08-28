@@ -18,7 +18,7 @@ const nextConfig = {
           // Tightened for better security while maintaining functionality
           {
             key: 'Content-Security-Policy',
-            value: `default-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self' ${supabaseUrl} wss://${supabaseHost}; font-src 'self'; img-src 'self' data: https:; frame-src 'none'; object-src 'none'; base-uri 'self';`,
+            value: `default-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; connect-src 'self' ${supabaseUrl} wss://${supabaseHost}; font-src 'self'; img-src 'self' data: https:; frame-src 'none'; object-src 'none'; base-uri 'self';`,
           },
           // Strict-Transport-Security: Enforces secure connections (HTTPS).
           {
