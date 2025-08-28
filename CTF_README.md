@@ -102,6 +102,10 @@ Can be found by selecting the name of Léandre, in the inner html.
   7. System detects XSS and reveals flag: `RBT{admin_terminal_pwned}`
   8. **Bonus**: Access GraphQL endpoint at `/api/admin/graphql` for additional flag: `RBT{graphql_endpoint_exposed}`
 
+### Log in as alex
+mail: alex@robot.tech
+pswd: TODOp@ssw0rd
+
 ## Additional Features Implemented
 
 ### Security Test Endpoints

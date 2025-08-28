@@ -43,8 +43,16 @@ export async function GET(request: NextRequest) {
       // Continue without projects data
     }
 
-    // Transform profiles into team member format
-    const teamMembers = profiles?.map((profile, index) => {
+    // Transform profiles into team member format, putting current user first
+    const sortedProfiles = profiles?.sort((a, b) => {
+      // Current user goes first
+      if (a.id === user.id) return -1;
+      if (b.id === user.id) return 1;
+      // Keep original order for others
+      return 0;
+    }) || [];
+    
+    const teamMembers = sortedProfiles.map((profile, index) => {
       // Find projects for this user
       const memberProjects = userProjects?.filter(project => project.user_id === profile.id) || [];
       

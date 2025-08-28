@@ -27,7 +27,10 @@ export default function TeamPage() {
   const [databaseTeamMembers, setDatabaseTeamMembers] = useState<TeamMember[]>([]);
   const [isLoadingTeam, setIsLoadingTeam] = useState(false);
   const [teamStats, setTeamStats] = useState({ totalMembers: 0, totalProjects: 0, averageProgress: '0.0' });
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  
+  // Check if current user is Alex
+  const isAlex = user?.email === 'alex@robot.tech';
 
   const teamMembers = [
     {
@@ -158,19 +161,29 @@ export default function TeamPage() {
     fetchTeamMembers();
   }, [isAuthenticated]);
 
-  // Combine static team members with database team members, prioritizing user's profile
-  const allTeamMembers = [...teamMembers, ...databaseTeamMembers];
+  // Combine static team members with database team members
+  // Special handling for Alex: don't show database profile as it's redundant with static team
+  let allTeamMembers;
   
-  // Sort to show logged-in user's profile first if they have one
-  const sortedTeamMembers = allTeamMembers.sort((a, b) => {
-    // If user is authenticated and has a team profile, show it first
-    if (isAuthenticated && databaseTeamMembers.length > 0) {
-      const userProfile = databaseTeamMembers[0]; // Assuming first db member is user's profile
-      if (a.id === userProfile.id) return -1; // User's profile goes first
-      if (b.id === userProfile.id) return 1;  // Other profiles go after
-    }
-    return 0; // Keep original order for others
-  });
+  if (isAlex) {
+    // For Alex, only show static team members (no duplicate profile from database)
+    allTeamMembers = teamMembers;
+  } else {
+    // For other users, combine static and database team members
+    allTeamMembers = [...teamMembers, ...databaseTeamMembers];
+    
+    // Sort to show logged-in user's profile first if they have one
+    allTeamMembers = allTeamMembers.sort((a, b) => {
+      if (isAuthenticated && databaseTeamMembers.length > 0) {
+        const userProfile = databaseTeamMembers[0]; // Assuming first db member is user's profile
+        if (a.id === userProfile.id) return -1; // User's profile goes first
+        if (b.id === userProfile.id) return 1;  // Other profiles go after
+      }
+      return 0; // Keep original order for others
+    });
+  }
+  
+  const sortedTeamMembers = allTeamMembers;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -189,6 +202,29 @@ export default function TeamPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        {/* Alex's Access Banner - Subtle Integration */}
+        {isAlex && (
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-8">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <span className="text-blue-400 text-xl">💼</span>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-blue-800">
+                  Internal Staff Access - Welcome back, Alex
+                </h3>
+                <div className="mt-2 text-sm text-blue-700">
+                  <p>Session authenticated for <span className="font-mono text-xs bg-blue-100 px-1.5 py-0.5 rounded">alex@robo.tech</span></p>
+                  <p className="text-xs text-blue-600 mt-1">
+                    Access code: <span className="font-mono bg-blue-100 px-1 py-0.5 rounded text-blue-800">RBT{'{'}sleepy_intern_logged_in{'}'}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Warning Banner */}
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
           <div className="flex">

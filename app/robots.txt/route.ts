@@ -16,9 +16,7 @@ Allow: /assembly-line
 
 # Restricted areas - DO NOT INDEX
 Disallow: /admin/
-Disallow: /internal/
-Disallow: /intranet/
-Disallow: /intranet/kilroy  # Employee portal - Alex's note: "Kilroy was here" - classic
+Disallow: /internal/  # Employee portal, nobody to see there
 Disallow: /api/internal/
 Disallow: /.env
 Disallow: /config/

@@ -38,23 +38,30 @@ export default function SolutionsPage() {
     '🏭', '🤯', '🎛️', '📡', '🔌', '⚗️', '🧬', '🎯', '🔥', '💡'
   ];
 
-  // Fetch user's projects from database when authenticated
+  // Fetch all projects from database when authenticated for leaderboard display
   useEffect(() => {
-    const fetchUserProjects = async () => {
+    const fetchAllProjects = async () => {
       if (!isAuthenticated || hasLoadedProjects) return;
 
       setIsLoadingProjects(true);
       
       try {
-        console.log('🔍 Fetching user projects from database...');
+        console.log('🔍 Fetching all projects for leaderboard...');
         
-        const response = await fetch('/api/projects');
+        const response = await fetch('/api/projects/all');
         const data = await response.json();
         
         if (response.ok) {
-          console.log('✅ Projects fetched successfully:', data.projects);
+          console.log('✅ All projects fetched successfully:', data.projects);
+          console.log('📊 Leaderboard stats:', data.stats);
           
-          // Combine default projects with user's database projects
+          // Set all projects for leaderboard display
+          setProjects(data.projects);
+          setHasLoadedProjects(true);
+        } else {
+          console.error('❌ Failed to fetch all projects:', data.error);
+          
+          // Fallback to default projects only
           const defaultProjects = [
             {
               id: 1,
@@ -93,28 +100,17 @@ export default function SolutionsPage() {
               teamMembers: ['Patrick Star', 'Dr. Sarah Chen']
             }
           ];
-          
-          // Convert database projects to have numeric IDs for compatibility
-          const databaseProjects = data.projects.map((project: any, index: number) => ({
-            ...project,
-            id: 1000 + index, // Start user projects from ID 1000 to avoid conflicts
-          }));
-          
-          setProjects([...defaultProjects, ...databaseProjects]);
-          setHasLoadedProjects(true);
-        } else {
-          console.error('❌ Failed to fetch projects:', data.error);
-          // Keep existing projects on error
+          setProjects(defaultProjects);
         }
       } catch (error) {
-        console.error('❌ Error fetching projects:', error);
+        console.error('❌ Error fetching all projects:', error);
         // Keep existing projects on error
       } finally {
         setIsLoadingProjects(false);
       }
     };
     
-    fetchUserProjects();
+    fetchAllProjects();
   }, [isAuthenticated, hasLoadedProjects, setProjects]);
 
   const handleProjectSubmit = async (e: React.FormEvent) => {
@@ -199,10 +195,13 @@ export default function SolutionsPage() {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold mb-6">CTF Leaderboard</h1>
+          <h1 className="text-5xl font-bold mb-6">Project Leaderboard</h1>
           <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-            Track the progress of all participating teams in our Robotics CTF Challenge. 
+            Monitor the neural reconstruction progress of all robotics projects across our development teams. Each project represents a unique approach to consciousness restoration.
           </p>
+          <div className="mt-6 text-sm text-blue-200">
+            <p>🧠 Showing all active consciousness restoration projects • Sorted by neural reconstruction progress</p>
+          </div>
         </div>
       </section>
       {/* Team Leaderboards */}

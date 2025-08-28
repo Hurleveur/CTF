@@ -69,15 +69,7 @@ export async function GET() {
     <loc>${baseUrl}/signup</loc>
     <lastmod>2024-11-12T12:00:00+00:00</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>${flagPart7}</priority>
-  </url>
-  
-  <!-- Hidden paths that probably shouldn't be here but Alex forgot to remove them -->
-  <url>
-    <loc>${baseUrl}/intranet/kilroy</loc>
-    <lastmod>2024-11-01T03:30:00+00:00</lastmod>
-    <changefreq>never</changefreq>
-    <priority>${flagPart8}</priority>
+    <priority>${flagPart7}${flagPart8}</priority>
   </url>
   
   <url>
@@ -87,7 +79,6 @@ export async function GET() {
     <priority>${flagPart9}</priority>
   </url>
   
-  <!-- Legitimate but forgotten pages -->
   <url>
     <loc>${baseUrl}/robots.txt</loc>
     <lastmod>2024-11-15T10:00:00+00:00</lastmod>
