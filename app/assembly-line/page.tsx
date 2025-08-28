@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '../contexts/AuthContext';
+import { useUserData } from '../contexts/UserDataContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useProjects, RoboticProject } from '../contexts/ProjectContext';
@@ -8,6 +9,7 @@ import AdvancedChallengesPanel from './AdvancedChallengesPanel';
 
 export default function AssemblyLinePage() {
   const { user, isAuthenticated } = useAuth();
+  const { project: userProject, completedChallengeIds, isLoading: isLoadingUserData, refetch } = useUserData();
   const router = useRouter();
   const { projects } = useProjects();
   const [selectedArm, setSelectedArm] = useState<RoboticProject | null>(null);
@@ -15,10 +17,7 @@ export default function AssemblyLinePage() {
   const [restoredSegments, setRestoredSegments] = useState(0);
   const [codeCompletion, setCodeCompletion] = useState(0);
   const [ctfCode, setCtfCode] = useState('');
-  const [projectId, setProjectId] = useState('');
   const [lastCodeResult, setLastCodeResult] = useState<{type: 'success' | 'error' | null, message: string}>({type: null, message: ''});
-  const [isLoadingProject, setIsLoadingProject] = useState(false);
-  const [userProject, setUserProject] = useState<RoboticProject | null>(null);
   const [advancedChallenges, setAdvancedChallenges] = useState<any[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
   
@@ -31,73 +30,31 @@ export default function AssemblyLinePage() {
     }
   }, [isAuthenticated, router]);
 
-  // Fetch user's project from database
+  // Auto-select user project when available
   useEffect(() => {
-    const fetchUserProject = async () => {
-      if (!isAuthenticated || userProject) return;
-      
-      setIsLoadingProject(true);
-      
-      try {
-        console.log('🔍 Fetching user project for assembly line...');
-        
-        const response = await fetch('/api/projects');
-        const data = await response.json();
-        
-        if (response.ok && data.projects && data.projects.length > 0) {
-          // User has a project - automatically select it
-          const project = {
-            ...data.projects[0],
-            id: 1000, // Use consistent ID for compatibility
-          };
-          
-          console.log('✅ User project loaded:', project);
-          setUserProject(project);
-          setSelectedArm(project);
-          setCodeCompletion(project.neuralReconstruction || 0);
-          setArmStatus('offline');
-        } else {
-          console.log('ℹ️ No user project found');
-          setUserProject(null);
-        }
-      } catch (error) {
-        console.error('❌ Error fetching user project:', error);
-      } finally {
-        setIsLoadingProject(false);
-      }
-    };
-    
-    fetchUserProject();
-  }, [isAuthenticated, userProject]);
+    if (userProject && !selectedArm) {
+      console.log('✅ Auto-selecting user project:', userProject.name);
+      const projectAsArm = {
+        ...userProject,
+        id: 1000, // Use consistent ID for compatibility
+        logo: '🤖',
+        aiStatus: 'Corrupted',
+        statusColor: 'red' as const,
+        leadDeveloper: 'Unknown',
+        lastBackup: '???'
+      };
+      setSelectedArm(projectAsArm);
+      setCodeCompletion(userProject.neuralReconstruction || 0);
+      setArmStatus('offline');
+    }
+  }, [userProject, selectedArm]);
 
   // Function to refresh project data from database
   const refreshProjectData = async () => {
     try {
       console.log('🔄 Refreshing project data...');
-      
-      // First sync progress to ensure accuracy
-      await syncProjectProgress();
-      
-      const response = await fetch('/api/projects');
-      const data = await response.json();
-      
-      if (response.ok && data.projects && data.projects.length > 0) {
-        const updatedProject = {
-          ...data.projects[0],
-          id: 1000, // Use consistent ID for compatibility
-        };
-        
-        console.log('✅ Project data refreshed:', updatedProject);
-        setUserProject(updatedProject);
-        
-        // Update selected arm if it exists
-        if (selectedArm) {
-          setSelectedArm(updatedProject);
-        }
-        
-        // Update code completion to match database
-        setCodeCompletion(updatedProject.neuralReconstruction || 0);
-      }
+      // Use the unified refetch function instead of making separate API calls
+      await refetch();
     } catch (error) {
       console.error('❌ Error refreshing project data:', error);
     }
@@ -182,7 +139,6 @@ export default function AssemblyLinePage() {
     setRestoredSegments(0);
     setCodeCompletion(arm.neuralReconstruction); // Start with the arm's current neural reconstruction level
     setCtfCode('');
-    setProjectId('');
   };
 
   const handleCodeSubmit = async (e: React.FormEvent) => {
@@ -302,7 +258,7 @@ export default function AssemblyLinePage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {isLoadingProject ? (
+        {isLoadingUserData ? (
           /* Loading State */
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
@@ -748,7 +704,11 @@ export default function AssemblyLinePage() {
               
               {/* Advanced Challenges Panel */}
               {showAdvanced && advancedChallenges.length > 0 && (
-                <AdvancedChallengesPanel challenges={advancedChallenges} />
+                <AdvancedChallengesPanel 
+                  challenges={advancedChallenges} 
+                  completedChallengeIds={completedChallengeIds}
+                  isLoadingSubmissions={isLoadingUserData}
+                />
               )}
             </div>
           </div>

@@ -58,20 +58,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async (event, session) => {
         console.log('🔄 Auth state changed:', event, !!session?.user);
         
-        // Handle token refresh failures
+        // Handle token refresh
         if (event === 'TOKEN_REFRESHED') {
           console.log('✅ Token refreshed successfully');
-        } else if (event === 'TOKEN_REFRESH_FAILED') {
-          console.error('❌ Token refresh failed - clearing auth storage');
-          try {
-            await clearAuthStorage();
-            setUser(null);
-            // Redirect to login with a reason parameter
-            router.push('/login?reason=session-expired');
-          } catch (error) {
-            console.error('Error clearing auth storage after token refresh failure:', error);
-          }
-          return; // Exit early to prevent normal session handling
         }
         
         if (session?.user) {

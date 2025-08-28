@@ -27,6 +27,8 @@ interface UserSubmission {
 
 interface AdvancedChallengesPanelProps {
   challenges: Challenge[];
+  completedChallengeIds?: Set<string>;
+  isLoadingSubmissions?: boolean;
 }
 
 const categoryIcons: { [key: string]: string } = {
@@ -86,14 +88,16 @@ const getChallengeUrl = (challenge: Challenge): string => {
   return `/challenges/${challenge.id}`;
 };
 
-export default function AdvancedChallengesPanel({ challenges }: AdvancedChallengesPanelProps) {
+export default function AdvancedChallengesPanel({ 
+  challenges, 
+  completedChallengeIds = new Set(),
+  isLoadingSubmissions = false 
+}: AdvancedChallengesPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [isFirstTimeReveal, setIsFirstTimeReveal] = useState(false);
   const [flashEffect, setFlashEffect] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
-  const [completedChallenges, setCompletedChallenges] = useState<Set<string>>(new Set());
-  const [isLoadingSubmissions, setIsLoadingSubmissions] = useState(false);
 
   // Check if this is the first time seeing advanced challenges
   useEffect(() => {
@@ -233,57 +237,7 @@ export default function AdvancedChallengesPanel({ challenges }: AdvancedChalleng
     }
   }, [challenges, isFirstTimeReveal]);
 
-  // Fetch user submissions directly to determine completed challenges (avoiding duplicate profile API call)
-  useEffect(() => {
-    const fetchCompletedChallenges = async () => {
-      if (!challenges || challenges.length === 0) return;
-      
-      setIsLoadingSubmissions(true);
-      
-      try {
-        console.log('🔍 Fetching completed challenges directly...');
-        
-        // Create a simple API call just to get submissions without duplicating profile fetch
-        const response = await fetch('/api/challenges/submissions');
-        
-        if (response.ok) {
-          const data = await response.json();
-          
-          // Extract challenge IDs from submissions (completed ones)
-          const completedIds = new Set<string>();
-          
-          if (data.submissions && Array.isArray(data.submissions)) {
-            data.submissions.forEach((submission: any) => {
-              if (submission.is_correct && submission.challenge_id) {
-                completedIds.add(submission.challenge_id);
-              }
-            });
-          }
-          
-          console.log(`✅ Found ${completedIds.size} completed challenges:`, Array.from(completedIds));
-          setCompletedChallenges(completedIds);
-          
-        } else if (response.status === 401) {
-          console.log('ℹ️ User not authenticated for submissions check');
-        } else if (response.status === 404) {
-          // If this API doesn't exist yet, fall back to a simpler approach:
-          // Just show all challenges as incomplete rather than making duplicate API calls
-          console.log('ℹ️ Submissions API not available, showing all challenges as incomplete');
-          setCompletedChallenges(new Set());
-        } else {
-          console.log('⚠️ Failed to fetch submissions:', response.status);
-        }
-      } catch (error) {
-        console.error('❌ Error fetching submissions:', error);
-        // On error, just show all challenges as incomplete rather than break the UI
-        setCompletedChallenges(new Set());
-      } finally {
-        setIsLoadingSubmissions(false);
-      }
-    };
-    
-    fetchCompletedChallenges();
-  }, [challenges]);
+  // No longer fetching submissions here - using data passed from parent component
 
   // Cleanup AudioContext on component unmount
   useEffect(() => {
@@ -334,7 +288,7 @@ export default function AdvancedChallengesPanel({ challenges }: AdvancedChalleng
           {!isLoadingSubmissions && (
             <div className="bg-white/20 rounded-full px-3 py-1">
               <span className="text-xs font-bold">
-                {completedChallenges.size}/{challenges.length} COMPLETED
+                {completedChallengeIds.size}/{challenges.length} COMPLETED
               </span>
             </div>
           )}
@@ -345,7 +299,7 @@ export default function AdvancedChallengesPanel({ challenges }: AdvancedChalleng
           <div className="mt-2 mx-auto w-48 bg-white/20 rounded-full h-2">
             <div 
               className="bg-green-400 h-2 rounded-full transition-all duration-500"
-              style={{width: `${(completedChallenges.size / challenges.length) * 100}%`}}
+              style={{width: `${(completedChallengeIds.size / challenges.length) * 100}%`}}
             ></div>
           </div>
         )}
@@ -364,7 +318,7 @@ export default function AdvancedChallengesPanel({ challenges }: AdvancedChalleng
       {/* Challenges Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {challenges.map((challenge, index) => {
-          const isCompleted = completedChallenges.has(challenge.id);
+          const isCompleted = completedChallengeIds.has(challenge.id);
           return (
             <div
               key={challenge.id}
