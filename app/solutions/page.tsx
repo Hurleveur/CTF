@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
 import { useProjects } from '../contexts/ProjectContext';
+import { calculateStatusColor, calculateAIStatus, getCardGradientClasses, getStatusBadgeClasses, getProgressBarClasses } from '@/lib/project-colors';
 
 export default function SolutionsPage() {
   const { projects, addProject, updateProject, getProject, setProjects } = useProjects();
@@ -185,25 +186,20 @@ export default function SolutionsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project, index) => (
+            {projects.map((project, index) => {
+              // Use project's existing statusColor if available (e.g. hardcoded default), otherwise calculate
+              const statusColor = project.statusColor || calculateStatusColor(project.neuralReconstruction);
+              const aiStatus = project.aiStatus || calculateAIStatus(project.neuralReconstruction);
+              
+              return (
               <div key={project.id} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-200">
-                <div className={`h-48 bg-gradient-to-br flex items-center justify-center ${
-                  project.statusColor === 'red' 
-                    ? 'from-green-400 to-green-600' 
-                    : project.statusColor === 'yellow'
-                    ? 'from-yellow-400 to-yellow-600'
-                    : project.statusColor === 'orange'
-                    ? 'from-orange-400 to-orange-600'
-                    : 'from-red-400 to-red-600'
-                }`}>
-                  <div className="text-center text-white">
-                    <div className="text-6xl font-bold mb-2">{project.logo}</div>
-                    <div className="text-xl font-bold">{project.neuralReconstruction.toFixed(1)}%</div>
-                    <div className="text-sm opacity-90">CONSCIOUSNESS</div>
-                  </div>
-                </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">{project.name}</h3>
+                  <div className="flex items-center mb-4">
+                    <span className="text-3xl mr-3">{project.logo}</span>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900 mb-1">{project.name}</h3>
+                    </div>
+                  </div>
                   <p className="text-gray-600 mb-4 text-sm">
                     {project.description}
                   </p>
@@ -211,16 +207,8 @@ export default function SolutionsPage() {
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-500 text-sm">AI Status:</span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        project.statusColor === 'red' 
-                          ? 'bg-green-100 text-green-800' 
-                          : project.statusColor === 'yellow'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : project.statusColor === 'orange'
-                          ? 'bg-orange-100 text-orange-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {project.aiStatus}
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClasses(statusColor)}`}>
+                        {aiStatus}
                       </span>
                     </div>
                     
@@ -231,15 +219,7 @@ export default function SolutionsPage() {
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div 
-                          className={`h-2 rounded-full transition-all duration-300 ${
-                            project.statusColor === 'red' 
-                              ? 'bg-green-500' 
-                              : project.statusColor === 'yellow'
-                              ? 'bg-yellow-500'
-                              : project.statusColor === 'orange'
-                              ? 'bg-orange-500'
-                              : 'bg-red-500'
-                          }`}
+                          className={`h-2 rounded-full transition-all duration-300 ${getProgressBarClasses(statusColor)}`}
                           style={{width: `${project.neuralReconstruction}%`}}
                         ></div>
                       </div>
@@ -268,12 +248,18 @@ export default function SolutionsPage() {
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 font-semibold text-sm">Project #{String(index + 1).padStart(3, '0')}</span>
                       {/* Only show Access Lab button for own projects or if user is admin */}
-                      {(
-                        // User owns this project (check leadDeveloper field)
-                        (isAuthenticated && user && project.leadDeveloper && project.leadDeveloper === user.email) ||
-                        // User is admin (check user profile role - admins can access all projects)
-                        (isAuthenticated && user?.email?.includes('admin'))
-                      ) ? (
+                      {(() => {
+                        // Robust ownership check using multiple methods
+                        const isOwner = (
+                          (project.userId && user && project.userId === user.id) ||
+                          (user && [user.email, user.name].includes(project.leadDeveloper))
+                        );
+                        
+                        // Admin check
+                        const isAdmin = (isAuthenticated && user?.email?.includes('admin'));
+                        
+                        return (isAuthenticated && (isOwner || isAdmin));
+                      })() ? (
                         <Link 
                           href="/assembly-line" 
                           className="text-blue-600 hover:text-blue-800 text-sm font-medium"
@@ -289,7 +275,8 @@ export default function SolutionsPage() {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
             
             {/* Create New Project Card */}
             {isAuthenticated ? (

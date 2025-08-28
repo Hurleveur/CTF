@@ -13,6 +13,7 @@ export interface RoboticProject {
   lastBackup: string;
   leadDeveloper?: string;
   teamMembers?: string[];
+  userId?: string;
 }
 
 interface ProjectContextType {

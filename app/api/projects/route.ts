@@ -57,6 +57,7 @@ export async function GET(request: NextRequest) {
       lastBackup: project.last_backup,
       leadDeveloper: project.lead_developer,
       teamMembers: project.team_members || [],
+      userId: project.user_id,
     })) || [];
 
     return NextResponse.json({
@@ -172,6 +173,7 @@ export async function POST(request: NextRequest) {
       lastBackup: project.last_backup,
       leadDeveloper: project.lead_developer,
       teamMembers: project.team_members || [],
+      userId: project.user_id,
     };
 
     return NextResponse.json({

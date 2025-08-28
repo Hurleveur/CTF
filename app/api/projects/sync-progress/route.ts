@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { calculateStatusColor, calculateAIStatus } from '@/lib/project-colors';
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,11 +35,19 @@ export async function POST(request: NextRequest) {
       console.log(`[API] Progress sync - Total points: ${totalPoints}, Progress: ${totalProgress}%`);
     }
     
-    // Update user's project with the correct progress
+    // Calculate dynamic AI status and color based on progress
+    const statusColor = calculateStatusColor(totalProgress);
+    const aiStatus = calculateAIStatus(totalProgress);
+    
+    console.log(`[API] Calculated AI status: ${aiStatus} (${statusColor}) for progress ${totalProgress}%`);
+    
+    // Update user's project with the correct progress AND dynamic AI status/color
     const { data: updatedProject, error: updateError } = await supabase
       .from('user_projects')
       .update({
         neural_reconstruction: totalProgress,
+        status_color: statusColor,
+        ai_status: aiStatus,
         updated_at: new Date().toISOString()
       })
       .eq('user_id', user_id)
