@@ -2,22 +2,35 @@
 
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function LoginPage() {
   const { login, isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [sessionExpiredMessage, setSessionExpiredMessage] = useState('');
 
   useEffect(() => {
     if (isAuthenticated) {
       router.push('/assembly-line');
     }
   }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    const reason = searchParams.get('reason');
+    if (reason === 'session-expired' || reason === 'token-expired') {
+      setSessionExpiredMessage('Your session has expired. Please log in again.');
+      // Clear the URL parameter after showing the message
+      const url = new URL(window.location.href);
+      url.searchParams.delete('reason');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +65,17 @@ export default function LoginPage() {
           </p>
         </div>
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          {sessionExpiredMessage && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+              <div className="flex items-center">
+                <svg className="h-5 w-5 text-yellow-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-sm text-yellow-700">{sessionExpiredMessage}</p>
+              </div>
+            </div>
+          )}
+          
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-md p-4">
               <p className="text-sm text-red-600">{error}</p>

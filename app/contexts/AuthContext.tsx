@@ -1,7 +1,9 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { clearAuthStorage } from '@/lib/auth/clearAuthStorage';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface User {
@@ -27,6 +29,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
   const supabase = createClient();
 
   // Check if user is logged in on mount and listen for auth changes
@@ -54,6 +57,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('🔄 Auth state changed:', event, !!session?.user);
+        
+        // Handle token refresh failures
+        if (event === 'TOKEN_REFRESHED') {
+          console.log('✅ Token refreshed successfully');
+        } else if (event === 'TOKEN_REFRESH_FAILED') {
+          console.error('❌ Token refresh failed - clearing auth storage');
+          try {
+            await clearAuthStorage();
+            setUser(null);
+            // Redirect to login with a reason parameter
+            router.push('/login?reason=session-expired');
+          } catch (error) {
+            console.error('Error clearing auth storage after token refresh failure:', error);
+          }
+          return; // Exit early to prevent normal session handling
+        }
+        
         if (session?.user) {
           console.log('🔄 Setting user from auth listener:', session.user.email);
           setUser(formatUser(session.user));

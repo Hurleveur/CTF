@@ -87,7 +87,30 @@ export async function middleware(request: NextRequest) {
 
     if (error) {
       console.error('[Middleware] Auth error:', error.message);
-      // Continue without authentication for now, but log the error
+      
+      // Handle invalid refresh token errors
+      if (error.message.includes('Invalid Refresh Token') || 
+          error.message.includes('Refresh Token Not Found')) {
+        console.error('[Middleware] Invalid refresh token - clearing cookies and redirecting to login');
+        
+        // Clear Supabase cookies
+        const cookiesToClear = ['sb-access-token', 'sb-refresh-token', 'sb-provider-token', 'sb-user'];
+        cookiesToClear.forEach(cookieName => {
+          response.cookies.set(cookieName, '', { 
+            maxAge: 0, 
+            path: '/',
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax'
+          });
+        });
+        
+        // Redirect to login for protected routes
+        if (protectedRoutes.some(route => pathname.startsWith(route))) {
+          return NextResponse.redirect(new URL('/login?reason=token-expired', request.url));
+        }
+      }
+      // Continue without authentication for other errors, but log them
     }
 
     // Redirect to login if not authenticated and trying to access protected route

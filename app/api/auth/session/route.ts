@@ -61,8 +61,41 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('[Auth] Session refresh error:', error.message);
+      
+      // Check if this is an invalid refresh token error
+      if (error.message.includes('Invalid Refresh Token') || 
+          error.message.includes('Refresh Token Not Found')) {
+        console.error('[Auth] Invalid refresh token detected - clearing cookies');
+        
+        // Create response with cookie clearing headers
+        const response = NextResponse.json(
+          { error: 'INVALID_REFRESH_TOKEN', message: 'Session expired. Please log in again.' },
+          { status: 401 }
+        );
+        
+        // Clear Supabase cookies
+        const cookiesToClear = [
+          'sb-access-token',
+          'sb-refresh-token', 
+          'sb-provider-token',
+          'sb-user'
+        ];
+        
+        cookiesToClear.forEach(cookieName => {
+          response.cookies.set(cookieName, '', { 
+            maxAge: 0, 
+            path: '/',
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax'
+          });
+        });
+        
+        return response;
+      }
+      
       return NextResponse.json(
-        { error: 'Session refresh failed' },
+        { error: 'Session refresh failed', details: error.message },
         { status: 401 }
       );
     }
