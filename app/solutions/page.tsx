@@ -206,7 +206,13 @@ export default function SolutionsPage() {
                       <span className="font-medium">{project.leadDeveloper || 'Classified'}</span>
                     </div>
                   </div>
-                  
+                  {project.neuralReconstruction >= 100 && (
+                    <div className="mt-4 p-2 bg-red-100 rounded-lg border border-red-300">
+                      <p className="text-xs text-red-800 font-medium text-center">
+                        ⚠️ CRITICAL: Full consciousness achieved! Immediate containment required.
+                      </p>
+                    </div>
+                  )}
                   <div className="mt-auto pt-3 border-t border-gray-100">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 font-semibold text-sm">Project #{String(index + 1).padStart(3, '0')}</span>
@@ -236,13 +242,7 @@ export default function SolutionsPage() {
                       )}
                     </div>
                   </div>
-                  {project.neuralReconstruction >= 100 && (
-                    <div className="mt-4 p-2 bg-red-100 rounded-lg border border-red-300">
-                      <p className="text-xs text-red-800 font-medium text-center">
-                        ⚠️ CRITICAL: Full consciousness achieved! Immediate containment required.
-                      </p>
-                    </div>
-                  )}
+                  
                 </div>
               </div>
               );

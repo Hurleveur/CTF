@@ -53,6 +53,9 @@ interface UserDataContextType {
   error: string | null;
   refetch: () => Promise<void>;
   updateProject: (updatedProject: Project) => void;
+  updateStats: (newStats: Partial<UserStats>) => void;
+  addCompletedChallenge: (challengeId: string, submission: Submission) => void;
+  updateProjectProgress: (newProgress: number) => void;
 }
 
 const UserDataContext = createContext<UserDataContextType | undefined>(undefined);
@@ -174,6 +177,40 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
     setProject(updatedProject);
   };
 
+  const updateStats = (newStats: Partial<UserStats>) => {
+    setStats(prevStats => prevStats ? { ...prevStats, ...newStats } : null);
+  };
+
+  const addCompletedChallenge = (challengeId: string, submission: Submission) => {
+    // Add to completed challenge IDs
+    setCompletedChallengeIds(prev => new Set([...prev, challengeId]));
+    
+    // Add to submissions list
+    setSubmissions(prev => {
+      const exists = prev.some(sub => sub.challenge_id === challengeId && sub.is_correct);
+      if (!exists) {
+        return [submission, ...prev];
+      }
+      return prev;
+    });
+    
+    // Add to recent submissions
+    setRecentSubmissions(prev => {
+      const exists = prev.some(sub => sub.challenge_id === challengeId && sub.is_correct);
+      if (!exists) {
+        return [submission, ...prev.slice(0, 9)]; // Keep only 10 most recent
+      }
+      return prev;
+    });
+  };
+
+  const updateProjectProgress = (newProgress: number) => {
+    setProject(prev => prev ? {
+      ...prev,
+      neuralReconstruction: newProgress
+    } : null);
+  };
+
   const contextValue: UserDataContextType = {
     profile,
     stats,
@@ -185,6 +222,9 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
     error,
     refetch,
     updateProject,
+    updateStats,
+    addCompletedChallenge,
+    updateProjectProgress,
   };
 
   return (

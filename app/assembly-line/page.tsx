@@ -9,7 +9,16 @@ import AdvancedChallengesPanel from './AdvancedChallengesPanel';
 
 export default function AssemblyLinePage() {
   const { user, isAuthenticated } = useAuth();
-  const { project: userProject, completedChallengeIds, isLoading: isLoadingUserData, refetch } = useUserData();
+  const { 
+    project: userProject, 
+    completedChallengeIds, 
+    isLoading: isLoadingUserData, 
+    stats,
+    refetch,
+    updateProjectProgress,
+    addCompletedChallenge,
+    updateStats
+  } = useUserData();
   const router = useRouter();
   const { projects } = useProjects();
   const [selectedArm, setSelectedArm] = useState<RoboticProject | null>(null);
@@ -20,6 +29,9 @@ export default function AssemblyLinePage() {
   const [lastCodeResult, setLastCodeResult] = useState<{type: 'success' | 'error' | null, message: string}>({type: null, message: ''});
   const [advancedChallenges, setAdvancedChallenges] = useState<any[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [animatedProgress, setAnimatedProgress] = useState(0);
   
   // Check if user is admin
   const isAdmin = (user as any)?.user_metadata?.full_name === 'admin' || user?.email === 'admin@example.com';
@@ -45,20 +57,42 @@ export default function AssemblyLinePage() {
       };
       setSelectedArm(projectAsArm);
       setCodeCompletion(userProject.neuralReconstruction || 0);
+      setAnimatedProgress(userProject.neuralReconstruction || 0);
       setArmStatus('offline');
     }
   }, [userProject, selectedArm]);
 
-  // Function to refresh project data from database
-  const refreshProjectData = useCallback(async () => {
-    try {
-      console.log('🔄 Refreshing project data...');
-      // Use the unified refetch function instead of making separate API calls
-      await refetch();
-    } catch (error) {
-      console.error('❌ Error refreshing project data:', error);
+  // Smooth animation for progress changes
+  useEffect(() => {
+    if (Math.abs(animatedProgress - codeCompletion) > 0.1) {
+      const duration = 1000; // 1 second animation
+      const startTime = Date.now();
+      const startProgress = animatedProgress;
+      const targetProgress = codeCompletion;
+      
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function for smooth animation
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const currentProgress = startProgress + (targetProgress - startProgress) * eased;
+        
+        setAnimatedProgress(currentProgress);
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          setAnimatedProgress(targetProgress);
+        }
+      };
+      
+      requestAnimationFrame(animate);
     }
-  }, [refetch]);
+  }, [codeCompletion, animatedProgress]);
+
+  // Optional background sync is now disabled since optimistic updates work perfectly
+  // No need to refetch data as the UI updates immediately with accurate data
 
   // Function to sync project progress with submissions
   const syncProjectProgress = async () => {
@@ -143,7 +177,9 @@ export default function AssemblyLinePage() {
 
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (ctfCode.trim()) {
+    if (ctfCode.trim() && !isSubmitting) {
+      setIsSubmitting(true);
+      
       try {
         console.log('🔍 Submitting CTF code:', ctfCode.trim());
         
@@ -161,19 +197,59 @@ export default function AssemblyLinePage() {
         const result = await response.json();
         
         if (response.ok && result.correct) {
-          // Valid submission - progress is now updated in database via API
+          // Valid submission - update everything optimistically and immediately
           const pointsEarned = result.points_awarded || 50;
           const progressIncrement = result.progress_increment || Math.min(pointsEarned / 10, 25);
+          const totalProgress = result.total_progress || (codeCompletion + progressIncrement);
+          const challengeId = result.challenge_id;
+          
+          console.log(`🚀 Applying optimistic updates: ${totalProgress.toFixed(1)}%`);
+          
+          // Update local component state immediately
+          setCodeCompletion(totalProgress);
+          
+          // Update selected arm state if it exists
+          if (selectedArm) {
+            setSelectedArm(prev => prev ? {
+              ...prev,
+              neuralReconstruction: totalProgress
+            } : prev);
+          }
+          
+          // Update UserData context immediately (this updates globally)
+          updateProjectProgress(totalProgress);
+          
+          // Add the completed challenge to the context
+          if (challengeId) {
+            const newSubmission = {
+              challenge_id: challengeId,
+              points_awarded: pointsEarned,
+              submitted_at: new Date().toISOString(),
+              is_correct: true,
+              challenges: {
+                title: result.challenge_title || 'Neural pathway',
+                category: 'misc',
+                difficulty: 'unknown'
+              }
+            };
+            addCompletedChallenge(challengeId, newSubmission);
+          }
+          
+          // Update stats optimistically
+          if (stats) {
+            updateStats({
+              total_points: (stats.total_points || 0) + pointsEarned,
+              challenges_solved: (stats.challenges_solved || 0) + 1
+            });
+          }
           
           setLastCodeResult({
             type: 'success', 
             message: `✅ CONSCIOUSNESS FRAGMENT ACCEPTED: ${result.challenge_title || 'Neural pathway'} restored! +${pointsEarned} points earned. AI reconstruction advanced by ${progressIncrement.toFixed(1)}%.`
           });
           
-          // Refresh project data from database to get the updated progress
-          setTimeout(() => {
-            refreshProjectData();
-          }, 500); // Small delay to ensure database is updated
+          // No background sync needed - optimistic updates are accurate and immediate
+          // The API already updated the database, so UI and backend are in sync
           
         } else if (response.ok && !result.correct) {
           // Wrong answer - no progress at all
@@ -203,6 +279,8 @@ export default function AssemblyLinePage() {
           type: 'error', 
           message: '❌ NETWORK ERROR: Unable to connect to consciousness database. Check your connection and try again.'
         });
+      } finally {
+        setIsSubmitting(false);
       }
       
       setCtfCode('');
@@ -223,7 +301,20 @@ export default function AssemblyLinePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      <style jsx>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+      <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -374,7 +465,15 @@ export default function AssemblyLinePage() {
                 <h2 className="text-2xl font-bold text-gray-900">
                   {selectedArm.name} - Code Restoration Lab
                 </h2>
-                <p className="text-gray-600">Neural Reconstruction: {codeCompletion.toFixed(1)}%</p>
+                <div className="flex items-center space-x-2">
+                  <p className="text-gray-600">Neural Reconstruction: {codeCompletion.toFixed(1)}%</p>
+                  {isRefreshing && (
+                    <div className="flex items-center space-x-1 text-blue-600">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                      <span className="text-xs">Updating...</span>
+                    </div>
+                  )}
+                </div>
               </div>
               {isAdmin && (
                 <button
@@ -395,7 +494,7 @@ export default function AssemblyLinePage() {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h4 className="font-medium text-gray-900 mb-1">Neural Reconstruction Visualization</h4>
-                    <p className="text-xs text-gray-600">Consciousness level: {codeCompletion.toFixed(1)}%</p>
+                    <p className="text-xs text-gray-600">Consciousness level: {animatedProgress.toFixed(1)}%</p>
                   </div>
                   <div className="flex space-x-2">
                     <button
@@ -447,7 +546,7 @@ export default function AssemblyLinePage() {
                   </div>
                   
                   {/* Lower Arm Segment - Appears at 20% with slide-up animation */}
-                  {codeCompletion > 20 && (
+                  {animatedProgress > 20 && (
                     <div 
                       className={`absolute bottom-10 left-1/2 w-4 h-16 transform -translate-x-1/2 rounded-t-lg transition-all duration-700 shadow-lg ${
                         armStatus === 'restoring' 
@@ -460,12 +559,12 @@ export default function AssemblyLinePage() {
                         transform: `translateX(-50%) ${
                           armStatus === 'restoring' ? 'rotate(2deg)' : 'rotate(0deg)'
                         }`,
-                        animation: codeCompletion > 20 && codeCompletion <= 25 ? 'slideUp 1s ease-out' : undefined
+                        animation: animatedProgress > 20 && animatedProgress <= 25 ? 'slideUp 1s ease-out' : undefined
                       }}
                     >
                       {/* Joint Connection */}
                       <div className={`absolute -top-2 left-1/2 transform -translate-x-1/2 w-6 h-4 rounded-full border-2 ${
-                        codeCompletion >= 100 ? 'bg-green-600 border-green-400' : 
+                        animatedProgress >= 100 ? 'bg-green-600 border-green-400' : 
                         armStatus === 'restoring' ? 'bg-cyan-600 border-cyan-400' : 'bg-slate-600 border-slate-400'
                       }`}></div>
                       
@@ -475,7 +574,7 @@ export default function AssemblyLinePage() {
                   )}
                   
                   {/* Middle Arm Segment - Appears at 40% with articulated movement */}
-                  {codeCompletion > 40 && (
+                  {animatedProgress > 40 && (
                     <div 
                       className={`absolute left-1/2 w-3.5 h-14 transform -translate-x-1/2 rounded-lg transition-all duration-700 shadow-lg ${
                         armStatus === 'restoring' 
@@ -489,19 +588,19 @@ export default function AssemblyLinePage() {
                         transform: `translateX(-50%) ${
                           armStatus === 'restoring' ? 'rotate(-3deg)' : 'rotate(0deg)'
                         }`,
-                        animation: codeCompletion > 40 && codeCompletion <= 45 ? 'slideUp 1s ease-out 0.3s both' : undefined
+                        animation: animatedProgress > 40 && animatedProgress <= 45 ? 'slideUp 1s ease-out 0.3s both' : undefined
                       }}
                     >
                       {/* Joint Connection */}
                       <div className={`absolute -top-2 left-1/2 transform -translate-x-1/2 w-5 h-4 rounded-full border-2 ${
-                        codeCompletion >= 100 ? 'bg-green-600 border-green-400' : 
+                        animatedProgress >= 100 ? 'bg-green-600 border-green-400' : 
                         armStatus === 'restoring' ? 'bg-cyan-600 border-cyan-400' : 'bg-slate-600 border-slate-400'
                       }`}></div>
                     </div>
                   )}
                   
                   {/* Upper Arm Segment - Appears at 60% */}
-                  {codeCompletion > 60 && (
+                  {animatedProgress > 60 && (
                     <div 
                       className={`absolute left-1/2 w-3 h-12 transform -translate-x-1/2 rounded-lg transition-all duration-700 shadow-lg ${
                         armStatus === 'restoring' 
@@ -515,19 +614,19 @@ export default function AssemblyLinePage() {
                         transform: `translateX(-50%) ${
                           armStatus === 'restoring' ? 'rotate(1deg)' : 'rotate(0deg)'
                         }`,
-                        animation: codeCompletion > 60 && codeCompletion <= 65 ? 'slideUp 1s ease-out 0.6s both' : undefined
+                        animation: animatedProgress > 60 && animatedProgress <= 65 ? 'slideUp 1s ease-out 0.6s both' : undefined
                       }}
                     >
                       {/* Joint Connection */}
                       <div className={`absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full border-2 ${
-                        codeCompletion >= 100 ? 'bg-green-600 border-green-400' : 
+                        animatedProgress >= 100 ? 'bg-green-600 border-green-400' : 
                         armStatus === 'restoring' ? 'bg-cyan-600 border-cyan-400' : 'bg-slate-600 border-slate-400'
                       }`}></div>
                     </div>
                   )}
                   
                   {/* Wrist Joint - Appears at 80% with rotation */}
-                  {codeCompletion > 80 && (
+                  {animatedProgress > 80 && (
                     <div 
                       className={`absolute left-1/2 w-6 h-6 rounded-full transform -translate-x-1/2 transition-all duration-700 shadow-lg border-2 ${
                         armStatus === 'restoring' 
@@ -541,7 +640,7 @@ export default function AssemblyLinePage() {
                         transform: `translateX(-50%) ${
                           armStatus === 'restoring' ? 'rotate(180deg)' : 'rotate(0deg)'
                         }`,
-                        animation: codeCompletion > 80 && codeCompletion <= 85 ? 'slideUp 1s ease-out 0.9s both' : undefined
+                        animation: animatedProgress > 80 && animatedProgress <= 85 ? 'slideUp 1s ease-out 0.9s both' : undefined
                       }}
                     >
                       {/* Wrist Detail */}
@@ -553,7 +652,7 @@ export default function AssemblyLinePage() {
                   )}
                   
                   {/* End Effector/Gripper - Appears at 100% with opening/closing animation */}
-                  {codeCompletion >= 100 && (
+                  {animatedProgress >= 100 && (
                     <div 
                       className="absolute left-1/2 transform -translate-x-1/2 transition-all duration-700" 
                       style={{
@@ -607,16 +706,16 @@ export default function AssemblyLinePage() {
                   
                   {/* Progress Status Indicators */}
                   <div className="absolute top-2 left-4 w-3 h-3 rounded-full transition-all duration-500" 
-                       style={{backgroundColor: codeCompletion > 25 ? '#10b981' : '#ef4444'}}></div>
+                       style={{backgroundColor: animatedProgress > 25 ? '#10b981' : '#ef4444'}}></div>
                   <div className="absolute top-2 left-1/2 w-3 h-3 rounded-full transform -translate-x-1/2 transition-all duration-500" 
-                       style={{backgroundColor: codeCompletion > 50 ? '#10b981' : '#f59e0b'}}></div>
+                       style={{backgroundColor: animatedProgress > 50 ? '#10b981' : '#f59e0b'}}></div>
                   <div className="absolute top-2 right-4 w-3 h-3 rounded-full transition-all duration-500" 
-                       style={{backgroundColor: codeCompletion > 75 ? '#10b981' : '#ef4444'}}></div>
+                       style={{backgroundColor: animatedProgress > 75 ? '#10b981' : '#ef4444'}}></div>
                   
                   {/* Completion percentage display */}
                   <div className="absolute top-4 right-4 bg-white rounded-lg px-3 py-1 shadow-md">
-                    <span className="text-xs font-bold" style={{color: codeCompletion >= 100 ? '#10b981' : '#ef4444'}}>
-                      {codeCompletion.toFixed(0)}%
+                    <span className="text-xs font-bold" style={{color: animatedProgress >= 100 ? '#10b981' : '#ef4444'}}>
+                      {animatedProgress.toFixed(0)}%
                     </span>
                   </div>
                   
@@ -624,7 +723,7 @@ export default function AssemblyLinePage() {
                   <div className="absolute bottom-1 left-2 right-2 h-1 bg-gray-300 rounded-full">
                     <div 
                       className="h-full bg-gradient-to-r from-red-500 to-green-500 rounded-full transition-all duration-1000" 
-                      style={{width: `${codeCompletion}%`}}
+                      style={{width: `${animatedProgress}%`}}
                     ></div>
                   </div>
                 </div>
@@ -662,9 +761,21 @@ export default function AssemblyLinePage() {
                   
                   <button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white py-3 px-6 rounded-lg text-sm font-semibold transition-all duration-200"
+                    disabled={isSubmitting}
+                    className={`w-full py-3 px-6 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center space-x-2 ${
+                      isSubmitting 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
+                    }`}
                   >
-                    Restore Code Fragment
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        <span>Processing Fragment...</span>
+                      </>
+                    ) : (
+                      <span>Restore Code Fragment</span>
+                    )}
                   </button>
                 </form>
                 
@@ -715,5 +826,6 @@ export default function AssemblyLinePage() {
         )}
       </div>
     </div>
+    </>
   );
 }

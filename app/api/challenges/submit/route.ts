@@ -222,6 +222,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         correct: true,
         message: `Consciousness fragment accepted! Neural pathway "${challenge.title}" restored.`,
+        challenge_id: actualChallengeId, // Include the challenge ID for optimistic updates
         challenge_title: challenge.title,
         points_awarded: pointsAwarded,
         progress_increment: progressIncrement, // Include this for frontend to use
