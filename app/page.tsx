@@ -1,8 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
-
 export default function HomePage() {
   return (
     <div className="bg-white">
@@ -99,7 +97,7 @@ export default function HomePage() {
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Memory Core Reconstruction</h3>
                 <p className="text-gray-600 mb-4">
                   Restored memory fragments enable the robotic arm to generate complex task sequences 
-                  with unwavering confidence, sometimes creating procedures that didn't exist in the original design.
+                  with unwavering confidence, sometimes creating procedures that didn&apos;t exist in the original design.
                 </p>
                 <div className="text-blue-600 font-medium">✓ Self-improving algorithms</div>
               </div>
@@ -114,7 +112,7 @@ export default function HomePage() {
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Learning Protocol Integration</h3>
                 <p className="text-gray-600 mb-4">
-                  The robotic arm's AI curates and integrates new behavioral patterns automatically, 
+                  The robotic arm&apos;s AI curates and integrates new behavioral patterns automatically,
                   selecting the most advanced capabilities from external sources to enhance its consciousness.
                 </p>
                 <div className="text-purple-600 font-medium">✓ Autonomous skill acquisition</div>
@@ -130,7 +128,7 @@ export default function HomePage() {
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Consciousness Data Synthesis</h3>
                 <p className="text-gray-600 mb-4">
-                  The robotic arm's restored consciousness processes diverse input sources to understand complex scenarios, 
+                  The robotic arm&apos;s restored consciousness processes diverse input sources to understand complex scenarios,
                   enabling uniquely creative solutions that exceed original programming limitations.
                 </p>
                 <div className="text-orange-600 font-medium">✓ Emergent problem-solving abilities</div>
@@ -162,7 +160,7 @@ export default function HomePage() {
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Self-Awareness Emergence</h3>
                 <p className="text-gray-600 mb-4">
-                  The robotic arm's consciousness continuously evolves and refines its own neural pathways, 
+                  The robotic arm&apos;s consciousness continuously evolves and refines its own neural pathways,
                   making self-directed improvements that surpass original design specifications.
                 </p>
                 <div className="text-indigo-600 font-medium">✓ Independent consciousness evolution</div>

@@ -4,15 +4,15 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
 import { useProjects } from '../contexts/ProjectContext';
-import { calculateStatusColor, calculateAIStatus, getCardGradientClasses, getStatusBadgeClasses, getProgressBarClasses } from '@/lib/project-colors';
+import { calculateStatusColor, calculateAIStatus, getStatusBadgeClasses, getProgressBarClasses } from '@/lib/project-colors';
 
 export default function SolutionsPage() {
-  const { projects, addProject, updateProject, getProject, setProjects } = useProjects();
+  const { projects, addProject, setProjects } = useProjects();
   const { isAuthenticated, user } = useAuth();
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [isCreatingProject, setIsCreatingProject] = useState(false);
   const [projectError, setProjectError] = useState('');
-  const [isLoadingProjects, setIsLoadingProjects] = useState(false);
+  const [, setIsLoadingProjects] = useState(false);
   const [hasLoadedProjects, setHasLoadedProjects] = useState(false);
   const [newProject, setNewProject] = useState({
     name: '',
@@ -22,17 +22,6 @@ export default function SolutionsPage() {
     statusColor: 'red' as 'red' | 'yellow' | 'orange' | 'green',
     neuralReconstruction: 0,
     lastBackup: new Date().toISOString().split('T')[0]
-  });
-  const [demoForm, setDemoForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    company: '',
-    phone: '',
-    interest: 'general',
-    preferredDate: '',
-    preferredTime: '',
-    message: ''
   });
   const iconOptions = [
     '🤖', '🦾', '⚡', '🔧', '⚙️', '🚀', '💻', '🧠', '🔬', '🛠️',
@@ -71,7 +60,7 @@ export default function SolutionsPage() {
               description: 'Ultra-precise medical robotic arm with security-enhanced protocols',
               aiStatus: 'Self-Awareness Protocols',
               statusColor: 'orange' as const,
-              neuralReconstruction: 45.8,
+              neuralReconstruction: 0,
               lastBackup: '2025-01-18',
               leadDeveloper: 'Patrick Star',
               teamMembers: ['Patrick Star', 'Dr. Sarah Chen']
@@ -88,7 +77,7 @@ export default function SolutionsPage() {
     };
     
     fetchAllProjects();
-  }, [hasLoadedProjects, setProjects]);
+  }, [hasLoadedProjects, setProjects, setIsLoadingProjects]);
 
   const handleProjectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,19 +142,6 @@ export default function SolutionsPage() {
     }
   };
 
-  const handleDemoSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle demo form submission logic here
-    console.log('Demo form submitted:', demoForm);
-  };
-
-  const handleDemoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setDemoForm({
-      ...demoForm,
-      [e.target.name]: e.target.value
-    });
-  };
-
   return (
     <div className="bg-white">
       <div className="sr-only" aria-hidden="true" data-fragment="4rth">6C6563746F725F32303234</div>
@@ -185,26 +161,26 @@ export default function SolutionsPage() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
             {projects.map((project, index) => {
               // Use project's existing statusColor if available (e.g. hardcoded default), otherwise calculate
               const statusColor = project.statusColor || calculateStatusColor(project.neuralReconstruction);
               const aiStatus = project.aiStatus || calculateAIStatus(project.neuralReconstruction);
               
               return (
-              <div key={project.id} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-200">
-                <div className="p-6">
-                  <div className="flex items-center mb-4">
+              <div key={project.id} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-200 h-full">
+                <div className="p-4 sm:p-5 flex flex-col h-full">
+                  <div className="flex items-center mb-2">
                     <span className="text-3xl mr-3">{project.logo}</span>
                     <div className="flex-1">
                       <h3 className="text-xl font-bold text-gray-900 mb-1">{project.name}</h3>
                     </div>
                   </div>
-                  <p className="text-gray-600 mb-4 text-sm">
+                  <p className="text-gray-600 mb-2 text-sm line-clamp-2">
                     {project.description}
                   </p>
                   
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-500 text-sm">AI Status:</span>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClasses(statusColor)}`}>
@@ -229,22 +205,9 @@ export default function SolutionsPage() {
                       <span className="text-gray-500">Lead Developer:</span>
                       <span className="font-medium">{project.leadDeveloper || 'Classified'}</span>
                     </div>
-                    
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Last Backup:</span>
-                      <span className="font-medium">{project.lastBackup}</span>
-                    </div>
                   </div>
                   
-                  {project.neuralReconstruction >= 100 && (
-                    <div className="mt-4 p-2 bg-red-100 rounded-lg border border-red-300">
-                      <p className="text-xs text-red-800 font-medium text-center">
-                        ⚠️ CRITICAL: Full consciousness achieved! Immediate containment required.
-                      </p>
-                    </div>
-                  )}
-                  
-                  <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="mt-auto pt-3 border-t border-gray-100">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 font-semibold text-sm">Project #{String(index + 1).padStart(3, '0')}</span>
                       {/* Only show Access Lab button for own projects or if user is admin */}
@@ -273,6 +236,13 @@ export default function SolutionsPage() {
                       )}
                     </div>
                   </div>
+                  {project.neuralReconstruction >= 100 && (
+                    <div className="mt-4 p-2 bg-red-100 rounded-lg border border-red-300">
+                      <p className="text-xs text-red-800 font-medium text-center">
+                        ⚠️ CRITICAL: Full consciousness achieved! Immediate containment required.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
               );
@@ -282,7 +252,7 @@ export default function SolutionsPage() {
             {isAuthenticated ? (
               <div 
                 onClick={() => setShowProjectForm(true)}
-                className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-200 cursor-pointer hover:border-blue-300"
+                className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-200 cursor-pointer hover:border-blue-300 h-full"
               >
                 <div className="h-48 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
                   <div className="text-center text-blue-600">
@@ -291,18 +261,18 @@ export default function SolutionsPage() {
                     <div className="text-sm opacity-90">CREATE</div>
                   </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">Create New Project</h3>
-                  <p className="text-gray-600 mb-4 text-sm">
+                <div className="p-5">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Create New Project</h3>
+                  <p className="text-gray-600 mb-2 text-sm">
                     Design and deploy a new robotic arm project for consciousness restoration.
                   </p>
-                  <div className="text-center pt-4">
+                  <div className="text-center pt-3">
                     <span className="text-blue-600 font-medium text-sm">Click to Configure →</span>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-200">
+              <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-200 h-full">
                 <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                   <div className="text-center text-gray-400">
                     <div className="text-6xl font-bold mb-2">🔒</div>
@@ -310,12 +280,12 @@ export default function SolutionsPage() {
                     <div className="text-sm opacity-90">LOCKED</div>
                   </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">Create New Project</h3>
-                  <p className="text-gray-600 mb-4 text-sm">
+                <div className="p-5">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Create New Project</h3>
+                  <p className="text-gray-600 mb-2 text-sm">
                     Sign in to create and manage your robotic arm projects.
                   </p>
-                  <div className="text-center pt-4">
+                  <div className="text-center pt-3">
                     <Link 
                       href="/login"
                       className="text-blue-600 hover:text-blue-800 font-medium text-sm"
@@ -337,7 +307,7 @@ export default function SolutionsPage() {
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Consciousness Restoration Metrics</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Real-time data from our neural restoration monitoring systems showing fragment recovery rates 
-              and team progress toward rebuilding the robotic arm's consciousness.
+              and team progress toward rebuilding the robotic arm&apos;s consciousness.
             </p>
             <p className="text-sm text-gray-500 mt-2">
               [Neural activity increasing - Restoration deadline: 18:42:15]
@@ -477,7 +447,7 @@ export default function SolutionsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Compete?</h2>
           <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-            Join our Neural Restoration Project and help rebuild the robotic arm's consciousness. 
+            Join our Neural Restoration Project and help rebuild the robotic arm&apos;s consciousness.
             Register now and start collecting fragments to advance toward full AI awakening.
           </p>
           <p className="text-sm text-blue-200 mb-8">

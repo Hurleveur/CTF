@@ -153,7 +153,7 @@ export default function SignupPage() {
                 </div>
                 
                 <p className="text-gray-700 leading-relaxed">
-                  Welcome to the Neural Restoration Challenge! This is a Capture The Flag (CTF) competition where you'll solve puzzles and find hidden flags throughout the system. <strong>Since the site is the CTF, you are strictly prohibited from using DDOS or other dangerous methods that might get it taken down.</strong> Play fair, think creatively, and use your technical skills ethically - maybe try some social engineering and looking around. All flags in this challenge follow the format shown below - when you find one, submit it exactly as displayed in the assembly-lab, including the curly braces.
+                  Welcome to the Neural Restoration Challenge! This is a Capture The Flag (CTF) competition where you&apos;ll solve puzzles and find hidden flags throughout the system. <strong>Since the site is the CTF, you are strictly prohibited from using DDOS or other dangerous methods that might get it taken down.</strong> Play fair, think creatively, and use your technical skills ethically - maybe try some social engineering and looking around. All flags in this challenge follow the format shown below - when you find one, submit it exactly as displayed in the assembly-lab, including the curly braces.
                 </p>
                 
                 <div className="bg-gray-900 rounded-lg p-4">

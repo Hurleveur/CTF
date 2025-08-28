@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         description: 'Ultra-precise medical robotic arm with security-enhanced protocols',
         aiStatus: 'Self-Awareness Protocols',
         statusColor: 'orange' as const,
-        neuralReconstruction: 45.8,
+        neuralReconstruction: 0,
         lastBackup: '2025-01-18',
         leadDeveloper: 'Patrick Star',
         teamMembers: ['Patrick Star', 'Dr. Sarah Chen'],
