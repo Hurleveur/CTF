@@ -11,8 +11,10 @@ export default function Navigation() {
   const [keySequence, setKeySequence] = useState<string[]>([]);
   const { isAuthenticated, logout, user } = useAuth();
   
-  // Konami Code: Up Up Down Down Left Right Left Right B A (or Q for AZERTY keyboards)
-  const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'keyQ'];
+  // Konami Code: Up Up Down Down Left Right Left Right B A
+  // Support both QWERTY (B, A) and AZERTY (B, Q) keyboard layouts
+  const konamiCodeQWERTY = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
+  const konamiCodeAZERTY = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyQ'];
   
   // Debug auth state changes in Navigation
   useEffect(() => {
@@ -23,10 +25,18 @@ export default function Navigation() {
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     console.log('🔑 Key pressed:', event.code);
     setKeySequence(prev => {
-      const newSequence = [...prev, event.code].slice(-konamiCode.length);
+      const newSequence = [...prev, event.code].slice(-konamiCodeQWERTY.length);
       
-      if (newSequence.length === konamiCode.length && 
-          newSequence.every((key, index) => key === konamiCode[index])) {
+      // Check for QWERTY sequence
+      const isQWERTYMatch = newSequence.length === konamiCodeQWERTY.length && 
+                           newSequence.every((key, index) => key === konamiCodeQWERTY[index]);
+      
+      // Check for AZERTY sequence
+      const isAZERTYMatch = newSequence.length === konamiCodeAZERTY.length && 
+                           newSequence.every((key, index) => key === konamiCodeAZERTY[index]);
+      
+      // Activate if either keyboard layout matches
+      if (isQWERTYMatch || isAZERTYMatch) {
         setKonamiUnlocked(true);
         console.log('🎮 Konami Code Activated!');
         // Clear sequence after activation

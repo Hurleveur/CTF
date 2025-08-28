@@ -225,8 +225,7 @@ function AdminTerminalInner() {
             className="flex-1 bg-transparent border-none outline-none text-green-400"
             placeholder="Enter command..."
             autoComplete="off"
-            // Intentionally vulnerable to XSS for the challenge
-            dangerouslySetInnerHTML={{ __html: '' }}
+            // Note: XSS vulnerability exists in command processing, not input rendering
           />
         </form>
 
