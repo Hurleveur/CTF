@@ -140,6 +140,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signup = async (email: string, password: string, fullName?: string): Promise<{ success: boolean; error?: string }> => {
     try {
+      console.log('📝 Starting signup process for:', email);
+      setIsLoading(true);
+      
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
@@ -148,19 +151,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ email, password, fullName }),
       });
 
+      console.log('📝 Signup API response status:', response.status);
       const data = await response.json();
+      console.log('📝 Signup API response data:', data);
 
       if (!response.ok) {
+        setIsLoading(false);
         return {
           success: false,
           error: data.error || 'Signup failed'
         };
       }
 
+      // Check if user was automatically logged in (when email confirmation is disabled)
+      try {
+        console.log('📝 Checking for session after signup...');
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('📝 Session retrieval error after signup:', sessionError);
+        } else if (sessionData?.session?.user) {
+          console.log('📝 User was automatically logged in after signup!', sessionData.session.user.email);
+          setUser(formatUser(sessionData.session.user));
+        } else {
+          console.log('📝 No session found after signup, email confirmation may be required');
+        }
+      } catch (sessionError) {
+        console.error('📝 Session check error after signup:', sessionError);
+        // Don't fail signup if session check fails, auth listener will handle it
+      }
+      
+      setIsLoading(false);
+      console.log('📝 Signup process completed successfully');
       return { success: true };
 
     } catch (error) {
-      console.error('Signup error:', error);
+      console.error('📝 Signup error:', error);
+      setIsLoading(false);
       return {
         success: false,
         error: 'Network error. Please try again.'

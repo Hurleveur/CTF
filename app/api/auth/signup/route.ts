@@ -71,14 +71,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if user was automatically confirmed (email confirmation disabled)
+    const isAutoConfirmed = data.user.email_confirmed_at !== null;
+    
     // Success
     return NextResponse.json({
-      message: 'Registration successful. Please check your email for verification.',
+      message: isAutoConfirmed 
+        ? 'Registration successful! You have been automatically logged in.'
+        : 'Registration successful. Please check your email for verification.',
       user: {
         id: data.user.id,
         email: data.user.email,
         email_confirmed_at: data.user.email_confirmed_at,
       },
+      autoLogin: isAutoConfirmed,
     });
 
   } catch (error) {
