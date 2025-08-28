@@ -3,7 +3,7 @@
 import { useAuth } from '../contexts/AuthContext';
 import { useUserData } from '../contexts/UserDataContext';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Fragment } from 'react';
 import { useProjects, RoboticProject } from '../contexts/ProjectContext';
 import AdvancedChallengesPanel from './AdvancedChallengesPanel';
 
@@ -419,10 +419,6 @@ export default function AssemblyLinePage() {
                     </div>
                     
                     <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-gray-500">Neural Reconstruction:</span>
-                        <span className="font-medium">{arm.neuralReconstruction.toFixed(1)}%</span>
-                      </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div 
                           className={`h-2 rounded-full transition-all duration-300 ${
@@ -465,15 +461,6 @@ export default function AssemblyLinePage() {
                 <h2 className="text-2xl font-bold text-gray-900">
                   {selectedArm.name} - Code Restoration Lab
                 </h2>
-                <div className="flex items-center space-x-2">
-                  <p className="text-gray-600">Neural Reconstruction: {codeCompletion.toFixed(1)}%</p>
-                  {isRefreshing && (
-                    <div className="flex items-center space-x-1 text-blue-600">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                      <span className="text-xs">Updating...</span>
-                    </div>
-                  )}
-                </div>
               </div>
               {isAdmin && (
                 <button
@@ -483,6 +470,29 @@ export default function AssemblyLinePage() {
                   Switch Project
                 </button>
               )}
+            </div>
+
+            {/* Welcome Instructions */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <div className="flex items-start space-x-3">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-medium text-blue-900 mb-1">Neural Reconstruction Mission</h3>
+                  <p className="text-sm text-blue-700 leading-relaxed">
+                    Your robotic arm's consciousness has been fragmented. <strong>Find and submit CTF flags</strong> from challenges across the site to restore neural pathways. 
+                    Each correct flag increases consciousness level and unlocks new arm components in the visualization below.
+                  </p>
+                  <div className="mt-2 text-xs text-blue-600">
+                    💡 <strong>Tip:</strong> Explore the site for hidden flags, solve challenges, and watch your robotic arm come to life!
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Merged Robotic Arm Code Restoration System */}
@@ -743,11 +753,26 @@ export default function AssemblyLinePage() {
                   </p>
                 </div>
                 
+                {/* What you see explanation */}
+                <div className="bg-gray-50 border-l-4 border-gray-400 p-4 mb-6">
+                  <h4 className="text-sm font-semibold text-gray-800 mb-2">🔍 What You're Seeing:</h4>
+                  <ul className="text-sm text-gray-700 space-y-1">
+                    <li>• <strong>Robot Visualization:</strong> Your arm builds as you solve challenges (parts appear at 20%, 40%, 60%, 80%, 100%)</li>
+                    <li>• <strong>Progress Indicators:</strong> Status lights show your advancement, percentage tracks consciousness level</li>
+                    <li>• <strong>Neural Status:</strong> Text below describes current AI cognitive state based on progress</li>
+                  </ul>
+                </div>
+
                 <form onSubmit={handleCodeSubmit} className="space-y-4">
                   <div>
-                    <label htmlFor="ctf-code" className="block text-sm font-medium text-gray-700 mb-2">
-                      Hexadecimal Code Fragment
-                    </label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label htmlFor="ctf-code" className="block text-sm font-medium text-gray-700">
+                        Hexadecimal Code Fragment
+                      </label>
+                      <span className="text-xs text-gray-500">
+                        🎯 Submit CTF flags here
+                      </span>
+                    </div>
                     <input
                       type="text"
                       id="ctf-code"

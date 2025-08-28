@@ -114,7 +114,7 @@ export default function TeamPage() {
     {
       id: 7,
       name: "Oleksandr",
-      role: "HR & Emotional Intelligence Specialist (The Nice Guy)",
+      role: "The Expert",
       avatar: "🤗",
       email: "oleksandr@robotech.fake",
       bio: "The ultimate people person who somehow makes HR actually enjoyable. Combines next-level emotional intelligence with being genuinely the nicest human alive. When not busy making sure everyone feels valued and comfortable, he's casually being the absolute best at AI - like, scary good at it, but in the most humble and supportive way possible.",

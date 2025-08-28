@@ -22,7 +22,7 @@ function LoginContent() {
   }, [isAuthenticated, router]);
 
   useEffect(() => {
-    const reason = searchParams.get('reason');
+    const reason = searchParams?.get?.('reason');
     if (reason === 'session-expired' || reason === 'token-expired') {
       setSessionExpiredMessage('Your session has expired. Please log in again.');
       // Clear the URL parameter after showing the message

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkRateLimit } from '@/lib/rate-limiter';
 import { signupSchema, validate } from '@/lib/validation/auth';
+import { buildDefaultProject } from '@/lib/default-project';
 
 export async function POST(request: NextRequest) {
   try {
@@ -69,6 +71,27 @@ export async function POST(request: NextRequest) {
         { error: 'Registration failed' },
         { status: 400 }
       );
+    }
+
+    // Automatically create a default project for the new user
+    try {
+      const profileName = fullName || email; // Use full name or fall back to email
+      const projectPayload = buildDefaultProject(profileName, data.user.id);
+
+      console.log('[Auth] Creating default project for new user:', data.user.id);
+      const { error: projectError } = await supabaseAdmin
+        .from('user_projects')
+        .insert(projectPayload);
+
+      if (projectError) {
+        console.error('[Auth] Default project creation failed:', projectError);
+        // Don't fail the signup - just log the error
+      } else {
+        console.log('[Auth] Default project created successfully for user:', data.user.id);
+      }
+    } catch (projectCreationError) {
+      console.error('[Auth] Unexpected error during project creation:', projectCreationError);
+      // Don't fail the signup - just log the error
     }
 
     // Check if user was automatically confirmed (email confirmation disabled)

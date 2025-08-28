@@ -12,6 +12,7 @@ function AdminTerminalInner() {
 
   // Simple authorization check based on URL parameter
   useEffect(() => {
+    if (!searchParams) return;
     const access = searchParams.get('access');
     if (access === 'alex_was_here') {
       setIsAuthorized(true);
