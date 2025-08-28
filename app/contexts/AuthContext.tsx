@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { clearAuthStorage } from '@/lib/auth/clearAuthStorage';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
-interface User {
+export interface User {
   id: string;
   email: string;
   name?: string;

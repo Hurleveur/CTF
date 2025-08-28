@@ -1,10 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import type { User } from '../contexts/AuthContext';
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
+import type { RoboticProject } from '../contexts/ProjectContext';
 import { useProjects } from '../contexts/ProjectContext';
 import { calculateStatusColor, calculateAIStatus, getStatusBadgeClasses, getProgressBarClasses } from '@/lib/project-colors';
+
+// Helper function to check if a user owns a project
+const isOwner = (project: RoboticProject, user: User | null): boolean => {
+  if (!user) return false;
+  return (
+    (project.userId && project.userId === user.id) ||
+    [user.email, user.name].includes(project.leadDeveloper || '')
+  );
+};
 
 export default function SolutionsPage() {
   const { projects, addProject, setProjects } = useProjects();
@@ -142,6 +153,22 @@ export default function SolutionsPage() {
     }
   };
 
+  // Sort projects to show user-owned projects first, then by neural reconstruction progress
+  const sortedProjects = isAuthenticated ? 
+    [...projects].sort((a, b) => {
+      const aOwned = isOwner(a, user);
+      const bOwned = isOwner(b, user);
+      
+      // User-owned projects come first
+      if (aOwned && !bOwned) return -1;
+      if (!aOwned && bOwned) return 1;
+      
+      // If both owned or both not owned, sort by neural reconstruction (descending)
+      return b.neuralReconstruction - a.neuralReconstruction;
+    }) : 
+    // If not authenticated, keep original sorting by neural reconstruction
+    [...projects].sort((a, b) => b.neuralReconstruction - a.neuralReconstruction);
+
   return (
     <div className="bg-white">
       <div className="sr-only" aria-hidden="true" data-fragment="4rth">6C6563746F725F32303234</div>
@@ -162,7 +189,7 @@ export default function SolutionsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-            {projects.map((project, index) => {
+            {sortedProjects.map((project, index) => {
               // Use project's existing statusColor if available (e.g. hardcoded default), otherwise calculate
               const statusColor = project.statusColor || calculateStatusColor(project.neuralReconstruction);
               const aiStatus = project.aiStatus || calculateAIStatus(project.neuralReconstruction);
@@ -218,20 +245,17 @@ export default function SolutionsPage() {
                       <span className="text-gray-600 font-semibold text-sm">Project #{String(index + 1).padStart(3, '0')}</span>
                       {/* Only show Access Lab button for own projects or if user is admin */}
                       {(() => {
-                        // Robust ownership check using multiple methods
-                        const isOwner = (
-                          (project.userId && user && project.userId === user.id) ||
-                          (user && [user.email, user.name].includes(project.leadDeveloper))
-                        );
+                        // Use the helper function for ownership check
+                        const projectOwned = isOwner(project, user);
                         
                         // Admin check
                         const isAdmin = (isAuthenticated && user?.email?.includes('admin'));
                         
-                        return (isAuthenticated && (isOwner || isAdmin));
+                        return (isAuthenticated && (projectOwned || isAdmin));
                       })() ? (
                         <Link 
                           href="/assembly-line" 
-                          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                          className="inline-block bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 text-white px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm transition-all duration-200"
                         >
                           Access Lab →
                         </Link>
