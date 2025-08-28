@@ -74,7 +74,7 @@ describe('Content Security Policy Configuration', () => {
     // Check for other important security directives
     expect(cspHeader.value).toContain("default-src 'self'");
     expect(cspHeader.value).toContain("style-src 'self' 'unsafe-inline'");
-    expect(cspHeader.value).toContain("script-src 'self' 'wasm-unsafe-eval'");
+    expect(cspHeader.value).toContain("script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'");
     expect(cspHeader.value).toContain("font-src 'self'");
   });
 

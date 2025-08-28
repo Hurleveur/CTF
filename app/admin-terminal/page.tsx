@@ -123,8 +123,6 @@ function AdminTerminalInner() {
           'Flag Access Denied:',
           'XSS validation required for flag retrieval',
           'Hint: The terminal input is vulnerable to XSS',
-          'Try: <script>alert("RBT{admin_terminal_pwned}")</script>',
-          'Note: Modern browsers may block this, try other XSS vectors',
           ''
         );
         break;

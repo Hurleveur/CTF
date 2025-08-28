@@ -139,7 +139,7 @@ export default function AssemblyLinePage() {
 
   // Monitor code completion threshold and load advanced challenges
   useEffect(() => {
-    if (codeCompletion >= 50 && !showAdvanced) {
+    if (codeCompletion >= 10 && !showAdvanced) {
       setShowAdvanced(true);
       loadAdvancedChallenges();
     }
@@ -164,7 +164,7 @@ export default function AssemblyLinePage() {
       
       // Filter for medium/hard challenges with 200+ points
       const filtered = challenges?.filter((challenge: any) => 
-        (challenge.difficulty === 'medium' || challenge.difficulty === 'hard') &&
+        (challenge.difficulty === 'medium' || challenge.difficulty === 'hard') ||
         challenge.points >= 50 // TODO: DONT SHOW ALL OF THEM LATER?
       ) || [];
       
