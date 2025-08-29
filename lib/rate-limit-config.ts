@@ -17,8 +17,8 @@ export interface RateLimitPolicy {
 export const RATE_LIMIT_POLICIES = {
   // Authentication endpoints - most restrictive
   AUTH_LOGIN: {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    maxAttempts: 5,
+    windowMs: 5 * 60 * 1000, // 15 minutes
+    maxAttempts: 15,
     description: 'Login attempts'
   },
   
