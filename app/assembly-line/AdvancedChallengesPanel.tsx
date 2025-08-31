@@ -335,7 +335,7 @@ export default function AdvancedChallengesPanel({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {challenges.map((challenge, index) => {
           const isCompleted = completedChallengeIds.has(challenge.id);
-          const isRevealed = revealedCards.has(challenge.id);
+          const isRevealed = revealedCards.has(challenge.id) || isCompleted; // Auto-reveal if completed
           return (
             <div
               key={challenge.id}
@@ -455,9 +455,9 @@ export default function AdvancedChallengesPanel({
         
         .obscured-text {
           filter: blur(4px);
-          text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+          text-shadow: 0 0 8px rgba(128, 128, 128, 0.5);
           pointer-events: none;
-          background: linear-gradient(45deg, #ff0000, #ff4500, #ff0000);
+          background: linear-gradient(45deg, #6b7280, #9ca3af, #6b7280);
           background-size: 200% 200%;
           animation: shimmer 2s ease-in-out infinite;
           -webkit-background-clip: text;
