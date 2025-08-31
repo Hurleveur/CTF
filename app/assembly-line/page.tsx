@@ -33,8 +33,11 @@ export default function AssemblyLinePage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [animatedProgress, setAnimatedProgress] = useState(0);
   
-  // Check if user is admin
+  // Check if user is admin (TODO: This looks secure but maybe client-side checks aren't enough?)
   const isAdmin = (user as any)?.user_metadata?.full_name === 'admin' || user?.email === 'admin@example.com';
+  
+  // APPARENT WEAKNESS: Frontend admin check - users might think they can bypass this easily!
+  const isAdminFrontend = true; // TODO: Remove this debug line before production!
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -292,8 +295,62 @@ export default function AssemblyLinePage() {
     }
   };
 
-  const toggleArmRestoration = () => {
-    setArmStatus(prev => prev === 'restoring' ? 'offline' : 'restoring');
+  const toggleArmRestoration = async () => {
+    // Call backend to verify admin privileges and perform activation
+    try {
+      const response = await fetch('/api/activate-ai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        // Admin user - actually toggle the arm
+        setArmStatus(prev => prev === 'restoring' ? 'offline' : 'restoring');
+        console.log('🎉 AI successfully activated by admin!');
+        
+        // Show success message to admin
+        setLastCodeResult({
+          type: 'success',
+          message: data.adminMessage || data.message
+        });
+        
+      } else if (response.status === 403 && data.rickroll) {
+        // Non-admin user got rickrolled! 🎵
+        console.log('🎭 Frontend admin bypass detected - deploying countermeasures!');
+        
+        // Show the rickroll message
+        setLastCodeResult({
+          type: 'error',
+          message: data.message + (data.hint ? ` Bonus flag: ${data.hint}` : '')
+        });
+        
+        // Open rickroll in new tab after a slight delay for dramatic effect
+        setTimeout(() => {
+          if (data.redirectUrl) {
+            window.open(data.redirectUrl, '_blank');
+          }
+        }, 1000);
+        
+      } else {
+        // Other errors
+        setLastCodeResult({
+          type: 'error',
+          message: data.message || 'Failed to activate AI system'
+        });
+        console.error('Activation failed:', data.message);
+      }
+      
+    } catch (error) {
+      console.error('Error activating AI:', error);
+      setLastCodeResult({
+        type: 'error',
+        message: '❌ SYSTEM ERROR: Unable to connect to AI activation servers'
+      });
+    }
   };
 
   if (!isAuthenticated) {
@@ -508,17 +565,17 @@ export default function AssemblyLinePage() {
                   </div>
                   <div className="flex space-x-2">
                     <button
-                      onClick={isAdmin ? toggleArmRestoration : undefined}
-                      disabled={codeCompletion < 100 || !isAdmin}
+                      onClick={isAdminFrontend && codeCompletion >= 100 ? toggleArmRestoration : undefined}
+                      disabled={codeCompletion < 100 || !isAdminFrontend}
                       className={`px-6 py-3 rounded-md text-sm font-bold transition-all duration-300 border-2 ${
-                        codeCompletion < 100 || !isAdmin
+                        codeCompletion < 100 || !isAdminFrontend
                           ? 'bg-gray-400 text-gray-600 border-gray-300 cursor-not-allowed'
                           : armStatus === 'restoring'
                           ? 'bg-red-600 hover:bg-red-700 text-white border-red-400 shadow-lg animate-pulse shadow-red-500/50'
                           : 'bg-red-500 hover:bg-red-600 text-white border-red-300 shadow-md'
                       }`}
                     >
-                      {codeCompletion < 100 || !isAdmin ? '🔒 LOCKED' : 
+                      {codeCompletion < 100 || !isAdminFrontend ? '🔒 LOCKED' : 
                        armStatus === 'restoring' ? '🔥 AI ACTIVATING...' : '⚡ ACTIVATE AI'}
                     </button>
                   </div>

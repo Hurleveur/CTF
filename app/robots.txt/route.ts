@@ -21,7 +21,7 @@ Disallow: /.env
 Disallow: /config/
 Disallow: /backup/
 
-# AI Development Lab - CLASSIFIED
+# AI Development Lab - CLASSIFIED, might not even be online
 Disallow: /neural-core/
 Disallow: /consciousness-fragments/
 Disallow: /ai-backup/
