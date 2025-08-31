@@ -25,6 +25,15 @@ export default function SolutionsPage() {
   const [projectError, setProjectError] = useState('');
   const [, setIsLoadingProjects] = useState(false);
   const [hasLoadedProjects, setHasLoadedProjects] = useState(false);
+  const [statistics, setStatistics] = useState({
+    fragmentsFound: 0,
+    teams: 0,
+    neuralProgress: 0,
+    projects: 0,
+    avgSolveTime: '3-5 hours'
+  });
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
+  const [statsError, setStatsError] = useState('');
   const [newProject, setNewProject] = useState({
     name: '',
     description: '',
@@ -38,6 +47,35 @@ export default function SolutionsPage() {
     '🤖', '🦾', '⚡', '🔧', '⚙️', '🚀', '💻', '🧠', '🔬', '🛠️',
     '🏭', '🤯', '🎛️', '📡', '🔌', '⚗️', '🧬', '🎯', '🔥', '💡'
   ];
+
+  // Fetch statistics for metrics display
+  useEffect(() => {
+    const fetchStatistics = async () => {
+      setIsLoadingStats(true);
+      
+      try {
+        console.log('📊 Fetching statistics data...');
+        
+        const response = await fetch('/api/statistics');
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          console.log('✅ Statistics fetched successfully:', data.data);
+          setStatistics(data.data);
+        } else {
+          console.error('❌ Failed to fetch statistics:', data.error);
+          setStatsError('Failed to load statistics data');
+        }
+      } catch (error) {
+        console.error('❌ Error fetching statistics:', error);
+        setStatsError('Network error loading statistics');
+      } finally {
+        setIsLoadingStats(false);
+      }
+    };
+    
+    fetchStatistics();
+  }, []);
 
   // Fetch all projects from database for leaderboard display (public access)
   useEffect(() => {
@@ -346,7 +384,15 @@ export default function SolutionsPage() {
                 </svg>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Restoration Teams</h3>
-              <p className="text-gray-600">47 active</p>
+              <p className="text-gray-600">
+                {isLoadingStats ? (
+                  <span className="inline-block animate-pulse">Loading...</span>
+                ) : statsError ? (
+                  <span className="text-red-500">—</span>
+                ) : (
+                  `${statistics.teams} active`
+                )}
+              </p>
             </div>
             
             <div className="text-center">
@@ -356,7 +402,15 @@ export default function SolutionsPage() {
                 </svg>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Fragments Found</h3>
-              <p className="text-gray-600">156 restored</p>
+              <p className="text-gray-600">
+                {isLoadingStats ? (
+                  <span className="inline-block animate-pulse">Loading...</span>
+                ) : statsError ? (
+                  <span className="text-red-500">—</span>
+                ) : (
+                  `${statistics.fragmentsFound} restored`
+                )}
+              </p>
             </div>
             
             <div className="text-center">
@@ -365,8 +419,16 @@ export default function SolutionsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Neural Progress</h3>
-              <p className="text-gray-600">224 segments active</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Projects Active</h3>
+              <p className="text-gray-600">
+                {isLoadingStats ? (
+                  <span className="inline-block animate-pulse">Loading...</span>
+                ) : statsError ? (
+                  <span className="text-red-500">—</span>
+                ) : (
+                  `${statistics.projects} projects running`
+                )}
+              </p>
             </div>
             
             <div className="text-center">
@@ -376,7 +438,15 @@ export default function SolutionsPage() {
                 </svg>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Avg Restoration</h3>
-              <p className="text-gray-600">2h 34m</p>
+              <p className="text-gray-600">
+                {isLoadingStats ? (
+                  <span className="inline-block animate-pulse">Loading...</span>
+                ) : statsError ? (
+                  <span className="text-red-500">—</span>
+                ) : (
+                  statistics.avgSolveTime
+                )}
+              </p>
             </div>
           </div>
         </div>
