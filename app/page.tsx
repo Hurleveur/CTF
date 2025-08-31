@@ -193,7 +193,7 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-        <footer data-fragment="3rd">5F636F6C - 3rd</footer>
+        <footer data-fragment="5F636F6C">3rd</footer>
       </section>
     </div>
   );

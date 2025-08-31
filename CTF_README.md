@@ -32,7 +32,7 @@ This document contains all hidden CTF challenges added to the website for admini
 - **Description**: Dig through source and piece together fragments
 - **Solution**:
   1. View source of home page: `5242547B` (Fragment 1/4)
-  2. Find in sr-only div: `6C6563746F725F323032347D` (Fragment 2/4)  
+  2. Find in sr-only div: `667261676D656E74` (Fragment 2/4)  
   3. Find in home page footer: `5F636F6C` (Fragment 3/4)
   4. Find in solution page: `6C6563746F725F323032347D` (Fragment 4/4)
   5. Concatenate all: `5242547B667261676D656E745F636F6C6C6563746F725F323032347D`
