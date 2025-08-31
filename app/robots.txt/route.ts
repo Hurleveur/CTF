@@ -16,8 +16,8 @@ Allow: /assembly-line
 
 # Restricted areas - DO NOT INDEX
 Disallow: /admin/
-Disallow: /internal/  # Employee portal, nobody to see there, #bald graphiti
-Disallow: /api/internal/
+Disallow: /intranet/  # Employee portal, I wonder the name of the person who was here #bald graphiti 2nd war
+Disallow: /api/intranet/
 Disallow: /.env
 Disallow: /config/
 Disallow: /backup/
@@ -38,8 +38,7 @@ Disallow: /admin-terminal
 Crawl-delay: 1
 
 # Contact: security@robo.tech
-# Flag fragment for forensics challenge: RBT{52
-Sitemap: ${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/sitemap.xml
+Sitemap: ${process.env.VERCEL_URL ? `https://ctb-pi.vercel.app` : 'http://localhost:3000'}/sitemap.xml
 
 # If you're reading this and you're not a web crawler...
 # You might want to check what other standard files we have
