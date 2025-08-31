@@ -2,7 +2,7 @@
 
 import { useAuth } from '../contexts/AuthContext';
 import { useUserData } from '../contexts/UserDataContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useCallback, Fragment } from 'react';
 import { useProjects, RoboticProject } from '../contexts/ProjectContext';
 import AdvancedChallengesPanel from './AdvancedChallengesPanel';
@@ -20,6 +20,7 @@ export default function AssemblyLinePage() {
     updateStats
   } = useUserData();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { projects } = useProjects();
   const [selectedArm, setSelectedArm] = useState<RoboticProject | null>(null);
   const [armStatus, setArmStatus] = useState('offline');
@@ -32,6 +33,9 @@ export default function AssemblyLinePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [animatedProgress, setAnimatedProgress] = useState(0);
+  const [hasManuallyDeselected, setHasManuallyDeselected] = useState(false);
+  const [adminSelectedProject, setAdminSelectedProject] = useState<RoboticProject | null>(null);
+  const [adminProjectData, setAdminProjectData] = useState<{progress: number, stats: any, submissions: any[]}>({ progress: 0, stats: null, submissions: [] });
   
   // Check if user is admin (TODO: This looks secure but maybe client-side checks aren't enough?)
   const isAdmin = (user as any)?.user_metadata?.full_name === 'admin' || user?.email === 'admin@example.com';
@@ -45,10 +49,27 @@ export default function AssemblyLinePage() {
     }
   }, [isAuthenticated, router]);
 
-  // Auto-select user project when available
+  // Auto-select user project when available, but be smart about when to do it
   useEffect(() => {
-    if (userProject && !selectedArm) {
-      console.log('✅ Auto-selecting user project:', userProject.name);
+    // Only auto-select if:
+    // 1. User has a project
+    // 2. No project is currently selected
+    // 3. User hasn't manually deselected
+    // 4. Admin isn't viewing another project
+    // 5. Admin doesn't have a URL parameter (to avoid conflicts with URL-based selection)
+    
+    const projectParam = searchParams?.get('project');
+    const hasUrlProject = isAdmin && projectParam;
+    
+    const canAutoSelect = userProject && 
+                         !selectedArm && 
+                         !hasManuallyDeselected && 
+                         !adminSelectedProject &&
+                         !hasUrlProject; // Don't auto-select if admin has URL project parameter
+    
+    if (canAutoSelect) {
+      console.log('✅ Auto-selecting user project:', userProject.name, '(Admin:', isAdmin, ')');
+      
       const projectAsArm = {
         ...userProject,
         id: 1000, // Use consistent ID for compatibility
@@ -58,12 +79,19 @@ export default function AssemblyLinePage() {
         leadDeveloper: 'Unknown',
         lastBackup: '???'
       };
+      
       setSelectedArm(projectAsArm);
       setCodeCompletion(userProject.neuralReconstruction || 0);
       setAnimatedProgress(userProject.neuralReconstruction || 0);
       setArmStatus('offline');
+      
+      // Clear admin state when auto-selecting own project
+      setAdminSelectedProject(null);
+      setAdminProjectData({ progress: 0, stats: null, submissions: [] });
+    } else if (hasUrlProject) {
+      console.log('🎯 Admin has URL project parameter, skipping auto-select to allow URL-based selection');
     }
-  }, [userProject, selectedArm]);
+  }, [userProject, hasManuallyDeselected, adminSelectedProject, isAdmin, searchParams]);
 
   // Smooth animation for progress changes
   useEffect(() => {
@@ -170,13 +198,118 @@ export default function AssemblyLinePage() {
     }
   }, [codeCompletion, showAdvanced, loadAdvancedChallenges]);
 
-  const handleArmSelect = (arm: RoboticProject) => {
+  // Function to fetch project data for admin users
+  const fetchAdminProjectData = useCallback(async (projectName: string) => {
+    try {
+      console.log('🔍 Admin fetching project data for:', projectName);
+      
+      const response = await fetch(`/api/admin/projects/${encodeURIComponent(projectName)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Admin project data loaded:', data);
+        return {
+          progress: data.progress || 0,
+          stats: data.stats || null,
+          submissions: data.submissions || []
+        };
+      } else {
+        console.log('⚠️ Admin project data not available, using defaults');
+        return { progress: 0, stats: null, submissions: [] };
+      }
+    } catch (error) {
+      console.log('⚠️ Error fetching admin project data:', error);
+      return { progress: 0, stats: null, submissions: [] };
+    }
+  }, []);
+
+  const handleArmSelect = useCallback(async (arm: RoboticProject) => {
+    console.log('🎯 Selecting arm:', arm.name, '- Admin:', isAdmin);
+    
     setSelectedArm(arm);
     setArmStatus('offline');
     setRestoredSegments(0);
-    setCodeCompletion(arm.neuralReconstruction); // Start with the arm's current neural reconstruction level
     setCtfCode('');
-  };
+    
+    // Check if this is the user's own project (ID 1000 or matches userProject)
+    const isUserOwnProject = arm.id === 1000 || (userProject && arm.name === userProject.name);
+    
+    if (isUserOwnProject && userProject) {
+      // User selecting their own project - use userProject data
+      console.log('👤 User selecting own project - using userProject data');
+      setCodeCompletion(userProject.neuralReconstruction || 0);
+      setAnimatedProgress(userProject.neuralReconstruction || 0);
+      setAdminSelectedProject(null);
+      setAdminProjectData({ progress: 0, stats: null, submissions: [] });
+      
+    } else if (isAdmin) {
+      // Admin selecting any project - fetch that project's data
+      console.log('👨‍💼 Admin selecting project - fetching project data');
+      setAdminSelectedProject(arm);
+      
+      const adminData = await fetchAdminProjectData(arm.name);
+      setAdminProjectData(adminData);
+      setCodeCompletion(adminData.progress);
+      setAnimatedProgress(adminData.progress);
+      
+    } else {
+      // Regular user selecting a project they don't own - use default/static data
+      console.log('🔒 Regular user selecting non-owned project - using static data');
+      setCodeCompletion(arm.neuralReconstruction || 0);
+      setAnimatedProgress(arm.neuralReconstruction || 0);
+      setAdminSelectedProject(null);
+      setAdminProjectData({ progress: 0, stats: null, submissions: [] });
+    }
+  }, [isAdmin, userProject, fetchAdminProjectData]);
+
+  // Handle URL project parameter for admin users
+  useEffect(() => {
+    const projectParam = searchParams?.get('project');
+    
+    // Only process URL parameter if:
+    // 1. User is admin
+    // 2. A project parameter is provided
+    // 3. Projects are loaded
+    // 4. No project is currently selected
+    if (isAdmin && projectParam && projects.length > 0 && !selectedArm) {
+      console.log('🎯 Admin URL parameter detected - selecting project:', projectParam);
+      console.log('🔍 Decoded parameter:', decodeURIComponent(projectParam));
+      console.log('📋 Available projects:', projects.map(p => `"${p.name}"`));
+      
+      // Find the project that matches the URL parameter
+      const decodedParam = decodeURIComponent(projectParam);
+      const targetProject = projects.find(p => p.name === decodedParam);
+      
+      if (targetProject) {
+        console.log('✅ Found matching project for admin:', targetProject.name);
+        // Use the existing handleArmSelect function to properly select the project
+        handleArmSelect(targetProject);
+      } else {
+        console.log('⚠️ Project not found in available projects');
+        console.log('❌ Looking for:', `"${decodedParam}"`);
+        console.log('📝 Available project names:');
+        projects.forEach((p, i) => {
+          console.log(`   ${i + 1}. "${p.name}" (length: ${p.name.length})`);
+        });
+        
+        // Try case-insensitive match as fallback
+        const caseInsensitiveMatch = projects.find(p => 
+          p.name.toLowerCase() === decodedParam.toLowerCase()
+        );
+        if (caseInsensitiveMatch) {
+          console.log('✅ Found case-insensitive match:', caseInsensitiveMatch.name);
+          handleArmSelect(caseInsensitiveMatch);
+        } else {
+          console.log('❌ No case-insensitive match found either');
+        }
+      }
+    }
+  }, [isAdmin, searchParams, projects, selectedArm, handleArmSelect]);
 
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -518,10 +651,28 @@ export default function AssemblyLinePage() {
                 <h2 className="text-2xl font-bold text-gray-900">
                   {selectedArm.name} - Code Restoration Lab
                 </h2>
+                {/* Admin viewing indicator */}
+                {adminSelectedProject && (
+                  <div className="mt-2 flex items-center">
+                    <div className="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full border border-amber-200">
+                      👨‍💼 Admin View - Viewing {adminSelectedProject.leadDeveloper || 'Unknown'}'s Project
+                    </div>
+                    {adminProjectData.stats && (
+                      <div className="ml-3 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                        {adminProjectData.stats.challenges_solved} challenges • {adminProjectData.stats.total_points} points
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
               {isAdmin && (
                 <button
-                  onClick={() => setSelectedArm(null)}
+                  onClick={() => {
+                    setSelectedArm(null);
+                    setHasManuallyDeselected(true);
+                    setAdminSelectedProject(null);
+                    setAdminProjectData({ progress: 0, stats: null, submissions: [] });
+                  }}
                   className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   Switch Project
@@ -820,6 +971,27 @@ export default function AssemblyLinePage() {
                   </ul>
                 </div>
 
+                {/* Admin viewing warning */}
+                {adminSelectedProject && (
+                  <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0">
+                        <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center">
+                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                          </svg>
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-sm font-medium text-amber-900 mb-1">Admin View Mode</h4>
+                        <p className="text-sm text-amber-700">
+                          You are viewing {adminSelectedProject.leadDeveloper || 'Unknown'}'s project data. Flag submissions are disabled in admin view mode to prevent data mixing.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <form onSubmit={handleCodeSubmit} className="space-y-4">
                   <div>
                     <div className="flex items-center justify-between mb-2">
@@ -835,17 +1007,18 @@ export default function AssemblyLinePage() {
                       id="ctf-code"
                       value={ctfCode}
                       onChange={(e) => setCtfCode(e.target.value)}
-                      placeholder="Enter code fragment (e.g., RBT{4a7b9c2d...})"
+                      placeholder={adminSelectedProject ? "Flag submission disabled in admin view" : "Enter code fragment (e.g., RBT{4a7b9c2d...})"}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent font-mono text-sm"
                       required
+                      disabled={adminSelectedProject !== null}
                     />
                   </div>
                   
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || adminSelectedProject !== null}
                     className={`w-full py-3 px-6 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center space-x-2 ${
-                      isSubmitting 
+                      isSubmitting || adminSelectedProject
                         ? 'bg-gray-400 cursor-not-allowed' 
                         : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
                     }`}
@@ -855,6 +1028,8 @@ export default function AssemblyLinePage() {
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                         <span>Processing Fragment...</span>
                       </>
+                    ) : adminSelectedProject ? (
+                      <span>🔒 Disabled in Admin View</span>
                     ) : (
                       <span>Restore Code Fragment</span>
                     )}

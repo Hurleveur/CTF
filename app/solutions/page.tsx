@@ -292,7 +292,15 @@ export default function SolutionsPage() {
                         return (isAuthenticated && (projectOwned || isAdmin));
                       })() ? (
                         <Link 
-                          href="/assembly-line" 
+                          href={(() => {
+                            // If admin, pass project info in URL for direct access
+                            const isAdmin = (isAuthenticated && user?.email?.includes('admin'));
+                            if (isAdmin) {
+                              return `/assembly-line?project=${encodeURIComponent(project.name)}`;
+                            }
+                            // For regular users accessing their own projects, use standard URL
+                            return `/assembly-line`;
+                          })()} 
                           className="inline-block bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 text-white px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm transition-all duration-200"
                         >
                           Access Lab →
