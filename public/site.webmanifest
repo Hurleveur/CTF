@@ -1,0 +1,17 @@
+{
+  "name": "RoboTech Industries",
+  "short_name": "RoboTech",
+  "description": "Advanced Robotics Manufacturing Solutions",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ],
+  "theme_color": "#1e3a8a",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/"
+}

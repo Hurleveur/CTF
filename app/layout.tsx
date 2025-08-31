@@ -10,6 +10,24 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata = {
   title: 'RoboTech Industries - Advanced Robotics Manufacturing',
   description: 'Leading manufacturer of industrial robotics and automation solutions for modern manufacturing.',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
+      { url: '/favicon.ico', sizes: '16x16', type: 'image/x-icon' }
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/favicon.ico',
+    other: [
+      {
+        rel: 'icon',
+        type: 'image/x-icon',
+        sizes: '32x32',
+        url: '/favicon.ico',
+      },
+    ],
+  },
+  manifest: '/site.webmanifest',
+  metadataBase: new URL(process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'),
 };
 
 export default function RootLayout({
