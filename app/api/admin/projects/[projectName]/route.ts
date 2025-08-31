@@ -69,6 +69,9 @@ export async function GET(
     // Calculate stats
     const totalPoints = submissions?.reduce((sum, sub) => sum + (sub.points_awarded || 0), 0) || 0;
     const challengesSolved = submissions?.length || 0;
+    
+    // Extract completed challenge IDs
+    const completedChallengeIds = submissions?.map(sub => sub.challenge_id) || [];
 
     const stats = {
       total_points: totalPoints,
@@ -78,13 +81,15 @@ export async function GET(
     console.log(`✅ Admin data for ${projectName}:`, {
       progress: projectData.neural_reconstruction || 0,
       stats,
-      submissions: submissions?.length || 0
+      submissions: submissions?.length || 0,
+      completedChallengeIds: completedChallengeIds.length
     });
 
     return NextResponse.json({
       progress: projectData.neural_reconstruction || 0,
       stats,
-      submissions: submissions || []
+      submissions: submissions || [],
+      completedChallengeIds: completedChallengeIds
     });
 
   } catch (error) {

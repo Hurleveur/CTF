@@ -3,7 +3,7 @@
 import { useAuth } from '../contexts/AuthContext';
 import { useUserData } from '../contexts/UserDataContext';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState, useCallback, Fragment } from 'react';
+import { useEffect, useState, useCallback, Fragment, Suspense } from 'react';
 import { useProjects, RoboticProject } from '../contexts/ProjectContext';
 import AdvancedChallengesPanel from './AdvancedChallengesPanel';
 
@@ -35,7 +35,7 @@ export default function AssemblyLinePage() {
   const [animatedProgress, setAnimatedProgress] = useState(0);
   const [hasManuallyDeselected, setHasManuallyDeselected] = useState(false);
   const [adminSelectedProject, setAdminSelectedProject] = useState<RoboticProject | null>(null);
-  const [adminProjectData, setAdminProjectData] = useState<{progress: number, stats: any, submissions: any[]}>({ progress: 0, stats: null, submissions: [] });
+  const [adminProjectData, setAdminProjectData] = useState<{progress: number, stats: any, submissions: any[], completedChallengeIds: string[]}>({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
   
   // Check if user is admin (TODO: This looks secure but maybe client-side checks aren't enough?)
   const isAdmin = (user as any)?.user_metadata?.full_name === 'admin' || user?.email === 'admin@example.com';
@@ -87,7 +87,7 @@ export default function AssemblyLinePage() {
       
       // Clear admin state when auto-selecting own project
       setAdminSelectedProject(null);
-      setAdminProjectData({ progress: 0, stats: null, submissions: [] });
+      setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
     } else if (hasUrlProject) {
       console.log('🎯 Admin has URL project parameter, skipping auto-select to allow URL-based selection');
     }
@@ -216,15 +216,16 @@ export default function AssemblyLinePage() {
         return {
           progress: data.progress || 0,
           stats: data.stats || null,
-          submissions: data.submissions || []
+          submissions: data.submissions || [],
+          completedChallengeIds: data.completedChallengeIds || []
         };
       } else {
         console.log('⚠️ Admin project data not available, using defaults');
-        return { progress: 0, stats: null, submissions: [] };
+        return { progress: 0, stats: null, submissions: [], completedChallengeIds: [] };
       }
     } catch (error) {
       console.log('⚠️ Error fetching admin project data:', error);
-      return { progress: 0, stats: null, submissions: [] };
+      return { progress: 0, stats: null, submissions: [], completedChallengeIds: [] };
     }
   }, []);
 
@@ -245,7 +246,7 @@ export default function AssemblyLinePage() {
       setCodeCompletion(userProject.neuralReconstruction || 0);
       setAnimatedProgress(userProject.neuralReconstruction || 0);
       setAdminSelectedProject(null);
-      setAdminProjectData({ progress: 0, stats: null, submissions: [] });
+      setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
       
     } else if (isAdmin) {
       // Admin selecting any project - fetch that project's data
@@ -263,7 +264,7 @@ export default function AssemblyLinePage() {
       setCodeCompletion(arm.neuralReconstruction || 0);
       setAnimatedProgress(arm.neuralReconstruction || 0);
       setAdminSelectedProject(null);
-      setAdminProjectData({ progress: 0, stats: null, submissions: [] });
+      setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
     }
   }, [isAdmin, userProject, fetchAdminProjectData]);
 
@@ -491,7 +492,7 @@ export default function AssemblyLinePage() {
   }
 
   return (
-    <>
+    <Suspense fallback={<div>Loading...</div>}>
       <style jsx>{`
         @keyframes slideUp {
           from {
@@ -671,7 +672,7 @@ export default function AssemblyLinePage() {
                     setSelectedArm(null);
                     setHasManuallyDeselected(true);
                     setAdminSelectedProject(null);
-                    setAdminProjectData({ progress: 0, stats: null, submissions: [] });
+                    setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
                   }}
                   className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
                 >
@@ -1074,7 +1075,7 @@ export default function AssemblyLinePage() {
               {showAdvanced && advancedChallenges.length > 0 && (
                 <AdvancedChallengesPanel 
                   challenges={advancedChallenges} 
-                  completedChallengeIds={completedChallengeIds}
+                  completedChallengeIds={adminSelectedProject ? new Set(adminProjectData.completedChallengeIds) : new Set(completedChallengeIds)}
                   isLoadingSubmissions={isLoadingUserData}
                 />
               )}
@@ -1083,6 +1084,6 @@ export default function AssemblyLinePage() {
         )}
       </div>
     </div>
-    </>
+    </Suspense>
   );
 }
