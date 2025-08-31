@@ -3,7 +3,7 @@ import Link from 'next/link';
 export default function AboutPage() {
   return (
     <div className="bg-white">
-      <div className="sr-only" aria-hidden="true" data-fragment="3nd">52426545</div>
+      <div className="sr-only" aria-hidden="true" data-fragment="3rd">6C6563746F725F323032347D</div>
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-purple-900 to-indigo-800 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

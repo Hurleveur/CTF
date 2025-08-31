@@ -91,16 +91,14 @@ function AdminTerminalInner() {
 
       case 'graphql':
         newOutput.push(
-          'GraphQL Endpoint: /api/admin/graphql (EXPOSED)',
+          'GraphQL Endpoint: /api/admin/graphql',
           'Schema: {',
           '  query: {',
           '    users: [User]',
-          '    secrets: [Secret] # VULNERABLE',
-          '    flags: String     # XSS Required',
+          '    secrets: [Secret]',
+          '    flags: String',
           '  }',
           '}',
-          'Warning: No authentication on admin queries!',
-          'Hint: Try accessing /api/admin/graphql with POST request',
           ''
         );
         break;

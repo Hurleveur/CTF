@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
             {
               id: 3,
               title: "Neural Core Password",
-              value: "ALEX_DEBUG_2024"
+              value: "P@ssw0rd"
             },
             {
               id: 4,

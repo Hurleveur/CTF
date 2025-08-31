@@ -16,7 +16,7 @@ Allow: /assembly-line
 
 # Restricted areas - DO NOT INDEX
 Disallow: /admin/
-Disallow: /internal/  # Employee portal, nobody to see there
+Disallow: /internal/  # Employee portal, nobody to see there, #bald graphiti
 Disallow: /api/internal/
 Disallow: /.env
 Disallow: /config/
@@ -37,7 +37,7 @@ Disallow: /admin-terminal
 
 Crawl-delay: 1
 
-# Contact: security@robotech.industries
+# Contact: security@robo.tech
 # Flag fragment for forensics challenge: RBT{52
 Sitemap: ${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/sitemap.xml
 
