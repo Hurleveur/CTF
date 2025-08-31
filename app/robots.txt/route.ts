@@ -17,7 +17,6 @@ Allow: /assembly-line
 # Restricted areas - DO NOT INDEX
 Disallow: /admin/
 Disallow: /intranet/  # Employee portal, I wonder the name of the person who was here #bald graphiti 2nd war
-Disallow: /api/intranet/
 Disallow: /.env
 Disallow: /config/
 Disallow: /backup/

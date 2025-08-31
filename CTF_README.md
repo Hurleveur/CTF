@@ -38,12 +38,39 @@ This document contains all hidden CTF challenges added to the website for admini
   5. Concatenate all: `5242547B667261676D656E745F636F6C6C6563746F725F323032347D`
   6. Convert hex to ASCII: `RBT{fragment_collector_2024}`
 
+About page weird text:
+  https://holloway.nz/steg/
+  RTB{smile}
+
+Hidden in the image:
+https://code.google.com/archive/p/steganotool/downloads
+RTB{not_ai_generated_sunset}
+
 #### 5. Hidden in shadows
 Can be found by selecting the name of Léandre, in the inner html.
 
+#### 6. Developer's Debug Selfie (175 points)
+- **Flag**: `RBT{exhausted_but_hidden_secrets_remain}` (or custom flag embedded in image)
+- **Location**: `/selfie.jpg` (discoverable through directory enumeration)
+- **Category**: forensics/steganography
+- **Description**: Alex's tired selfie contains more than meets the eye
+- **Discovery Methods**:
+  - Directory enumeration/brute forcing common paths
+  - Hint in about page mentions "debug selfie" that should be removed
+  - Alternative paths: `/images/selfie.jpg`, `/assets/selfie.jpg`, `/photos/team.jpg`
+- **Solution**:
+  1. Discover image through directory enumeration (tools like dirb, gobuster, or manual guessing)
+  2. Download the image file (`curl http://localhost:3000/selfie.jpg`)
+  3. Use steganography tools to extract hidden data:
+     - `steghide extract -sf selfie.jpg` (if password protected)
+     - `binwalk selfie.jpg` (check for embedded files)
+     - `strings selfie.jpg | grep RBT` (simple text extraction)
+     - `exiftool selfie.jpg` (check EXIF metadata)
+  4. Extract the hidden flag from embedded data
+
 ### 🟡 MEDIUM CHALLENGES (200-325 points)
 
-#### 6. Internal Documentation (225 points)
+#### 7. Internal Documentation (225 points)
 - **Flag**: `RBT{intranet_kilroy_was_here}`
 - **Location**: `/intranet/kilroy`
 - **Category**: web
@@ -53,7 +80,7 @@ Can be found by selecting the name of Léandre, in the inner html.
   2. Visit `/intranet/kilroy` directly
   3. Flag is displayed on the page
 
-#### 7. Contact Protocol (250 points)
+#### 8. Contact Protocol (250 points)
 - **Flag**: `RBT{security_through_obscurity_fails}`
 - **Location**: `/security.txt`
 - **Category**: crypto
@@ -65,7 +92,7 @@ Can be found by selecting the name of Léandre, in the inner html.
   4. Find the actual flag in the ROT13 text: `EOS{frpgevgl_guebhtu_bofphevgl_snvyf}`
   5. Decode to get: `RBT{security_through_obscurity_fails}`
 
-#### 8. Developer Backdoor (275 points) V
+#### 9. Developer Backdoor (275 points) V
 - **Flag**: `RBT{konami_debug_mode_active}`
 - **Location**: Navigation component (Konami code activation)
 - **Category**: reverse
@@ -78,7 +105,7 @@ Can be found by selecting the name of Léandre, in the inner html.
   5. Extract ASCII values from `String.fromCharCode(82,66,84,123,107,111,110,97,109,105,95,100,101,98,117,103,95,109,111,100,101,95,97,99,116,105,118,101,125)`
   6. Convert to characters: `RBT{konami_debug_mode_active}`
 
-#### 9. TODO? Neural Network Telemetry (325 points)
+#### 10. TODO? Neural Network Telemetry (325 points)
 - **Flag**: `RBT{telemetry_decoded_alex_key}`
 - **Location**: WebSocket connection (placeholder for future implementation)
 - **Category**: forensics  
@@ -87,7 +114,7 @@ Can be found by selecting the name of Léandre, in the inner html.
 
 ### 🔴 HARD CHALLENGES (400-500 points)
 
-#### 10. Administrator Terminal (450 points)
+#### 11. Administrator Terminal (450 points)
 - **Flag**: `RBT{admin_terminal_pwned}`
 - **Location**: `/admin-terminal?access=alex_was_here`
 - **Category**: web
@@ -144,12 +171,13 @@ pswd: TODOp@ssw0rd
 - Source code fragments and comments
 - Konami code detection and debug modal
 - Progressive hints and corporate theming
+- **NEW**: Steganographic selfie image with directory enumeration discovery
 
 ⏳ **Placeholders** (for future implementation):
 - CSS class cipher challenge
-- Steganographic image with embedded data
 - WebSocket telemetry challenge  
 - Meta-challenge fragment collection system
+- Steganographic data embedding in selfie.jpg (requires steghide or similar tool)
 
 ## Flag Format
 All flags follow the format: `RBT{descriptive_flag_content}`
