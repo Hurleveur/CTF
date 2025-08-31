@@ -1,8 +1,6 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
 
 interface Challenge {
   id: string;
@@ -98,6 +96,7 @@ export default function AdvancedChallengesPanel({
   const [flashEffect, setFlashEffect] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const [revealedCards, setRevealedCards] = useState<Set<string>>(new Set());
 
   // Check if this is the first time seeing advanced challenges
   useEffect(() => {
@@ -188,6 +187,19 @@ export default function AdvancedChallengesPanel({
   const handleEnableAudio = async () => {
     await initializeAudio();
     await playAlarmSound();
+  };
+
+  // Handle card click to reveal description
+  const handleCardClick = (challengeId: string) => {
+    setRevealedCards(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(challengeId)) {
+        newSet.delete(challengeId); // Toggle off if already revealed
+      } else {
+        newSet.add(challengeId); // Reveal
+      }
+      return newSet;
+    });
   };
 
   // Utility function to reset first-time experience (for testing/debugging)
@@ -323,15 +335,26 @@ export default function AdvancedChallengesPanel({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {challenges.map((challenge, index) => {
           const isCompleted = completedChallengeIds.has(challenge.id);
+          const isRevealed = revealedCards.has(challenge.id);
           return (
             <div
               key={challenge.id}
-              className={`bg-white border-2 rounded-lg p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 group relative ${
+              className={`bg-white border-2 rounded-lg p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 group relative cursor-pointer ${
                 isCompleted 
                   ? 'border-green-400 bg-green-50' 
                   : 'border-red-300 hover:border-orange-400'
               }`}
               style={{ animationDelay: `${index * 0.1}s` }}
+              onClick={() => handleCardClick(challenge.id)}
+              aria-expanded={isRevealed}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleCardClick(challenge.id);
+                }
+              }}
             >
               {/* Completion Status Badge */}
               {isCompleted && (
@@ -371,9 +394,20 @@ export default function AdvancedChallengesPanel({
               </div>
             
             {/* Description - More Space */}
-            <p className="text-xs text-gray-600 mb-3 line-clamp-3 leading-relaxed">
-              {challenge.description}
+            <p className={`text-xs text-gray-600 mb-3 line-clamp-3 leading-relaxed transition-all duration-300 select-none ${
+              isRevealed ? '' : 'obscured-text'
+            }`}>
+              {isRevealed ? challenge.description : '████████ ████ ██████ ███████ █████ ███ ████████ ████ ██████ ███████'}
             </p>
+            
+            {/* Click to reveal indicator */}
+            {!isRevealed && (
+              <div className="text-center mb-2">
+                <span className="text-xs text-red-500 font-medium animate-pulse">
+                  🔒 Click to decrypt mission details
+                </span>
+              </div>
+            )}
 
             {/* Compact Badges Row */}
             <div className="flex items-center justify-between">
@@ -417,6 +451,30 @@ export default function AdvancedChallengesPanel({
           0%, 100% { transform: translateX(0); }
           25% { transform: translateX(-2px); }
           75% { transform: translateX(2px); }
+        }
+        
+        .obscured-text {
+          filter: blur(4px);
+          text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+          pointer-events: none;
+          background: linear-gradient(45deg, #ff0000, #ff4500, #ff0000);
+          background-size: 200% 200%;
+          animation: shimmer 2s ease-in-out infinite;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        
+        @keyframes shimmer {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
         }
       `}</style>
     </>
