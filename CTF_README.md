@@ -130,7 +130,7 @@ Can be found by selecting the name of Léandre, in the inner html.
   8. **Bonus**: Access GraphQL endpoint at `/api/admin/graphql` for additional flag: `RBT{graphql_endpoint_exposed}`
 
 ### Log in as alex
-mail: alex@robot.tech
+mail: alex@robo.tech
 pswd: TODOp@ssw0rd
 
 ## Additional Features Implemented

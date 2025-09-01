@@ -95,7 +95,7 @@ export default function AboutPage() {
               </p>
               <p className="text-sm text-gray-500 font-mono" style={{fontFamily: 'monospace', letterSpacing: '0.1em'}}>
                 "Also, I should probably remove that debug selfie from the site... 
-                it's just me looking exhausted but I'm worried it ｉt ｍｉght ｃｏnｔａｉn mоrｅ tｈan jusｔ my tired face...
+                it's just me looking exhausted but I'm worried it might ｃoｎｔaｉｎ ｍoｒe than just my tired face......
                 Oh well, too tired to check properly. What could be hidden in a simple photo anyway?"
               </p>
               <p className="font-mono text-sm bg-gray-100 p-3 rounded">

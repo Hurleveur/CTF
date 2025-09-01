@@ -30,7 +30,7 @@ export default function TeamPage() {
   const { isAuthenticated, user } = useAuth();
   
   // Check if current user is Alex
-  const isAlex = user?.email === 'alex@robot.tech';
+  const isAlex = user?.email === 'alex@robo.tech';
 
   const teamMembers = [
     {
@@ -38,7 +38,7 @@ export default function TeamPage() {
       name: "Alexandre De Groodt",
       role: "CTF Lead (Intern)",
       avatar: "😴",
-      email: "alex@robot.tech",
+      email: "alex@robo.tech",
       bio: "Sleep-deprived intern doing his best to manage this chaotic team of fellow interns. Built this website at 3 AM and somehow became the 'responsible' one.",
       skills: ["Web Development", "Panic Management", "Coffee Brewing", "Herding Cats"],
       status: "Managing chaos",
