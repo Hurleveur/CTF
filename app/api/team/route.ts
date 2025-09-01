@@ -4,7 +4,7 @@ import { createClientSync as createClient } from '@/lib/supabase/server';
 export const dynamic = 'force-dynamic';
 
 // GET - Fetch all users for the team page
-export async function GET(request: NextRequest) {
+export async function GET(_: Request) {
   try {
     const supabase = createClient();
 

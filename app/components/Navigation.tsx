@@ -8,7 +8,7 @@ export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showDebugModal, setShowDebugModal] = useState(false);
   const [konamiUnlocked, setKonamiUnlocked] = useState(false);
-  const [keySequence, setKeySequence] = useState<string[]>([]);
+  const [, setKeySequence] = useState<string[]>([]);
   const { isAuthenticated, logout, user } = useAuth();
   
   // Konami Code: Up Up Down Down Left Right Left Right B A
@@ -45,7 +45,7 @@ export default function Navigation() {
       
       return newSequence;
     });
-  }, []);
+  }, [konamiCodeAZERTY, konamiCodeQWERTY]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);

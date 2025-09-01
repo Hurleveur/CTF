@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
       }
     });
     
-  } catch (error) {
+  } catch (_) {
     return NextResponse.json({
       errors: [
         {

@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
-import { useProjects, RoboticProject } from '../contexts/ProjectContext';
 
 interface TeamMember {
   id: string | number;

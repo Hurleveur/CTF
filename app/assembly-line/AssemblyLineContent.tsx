@@ -14,7 +14,6 @@ export default function AssemblyLineContent() {
     completedChallengeIds, 
     isLoading: isLoadingUserData, 
     stats,
-    refetch,
     updateProjectProgress,
     addCompletedChallenge,
     updateStats
@@ -31,14 +30,13 @@ export default function AssemblyLineContent() {
   const [advancedChallenges, setAdvancedChallenges] = useState<any[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [animatedProgress, setAnimatedProgress] = useState(0);
   const [hasManuallyDeselected, setHasManuallyDeselected] = useState(false);
   const [adminSelectedProject, setAdminSelectedProject] = useState<RoboticProject | null>(null);
-  const [adminProjectData, setAdminProjectData] = useState<{progress: number, stats: any, submissions: any[], completedChallengeIds: string[]}>({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
+  const [adminProjectData, setAdminProjectData] = useState<{progress: number, stats: unknown, submissions: unknown[], completedChallengeIds: string[]}>({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
   
   // Check if user is admin (TODO: This looks secure but maybe client-side checks aren't enough?)
-  const isAdmin = (user as any)?.user_metadata?.full_name === 'admin' || user?.email === 'admin@example.com';
+  const isAdmin = (user as unknown as { user_metadata?: { full_name?: string } })?.user_metadata?.full_name === 'admin' || user?.email === 'admin@example.com';
   
   // APPARENT WEAKNESS: Frontend admin check - users might think they can bypass this easily!
   const isAdminFrontend = true; // TODO: Remove this debug line before production!
@@ -91,7 +89,7 @@ export default function AssemblyLineContent() {
     } else if (hasUrlProject) {
       console.log('🎯 Admin has URL project parameter, skipping auto-select to allow URL-based selection');
     }
-  }, [userProject, hasManuallyDeselected, adminSelectedProject, isAdmin, searchParams]);
+  }, [userProject, hasManuallyDeselected, adminSelectedProject, isAdmin, searchParams, selectedArm]);
 
   // Smooth animation for progress changes
   useEffect(() => {
@@ -126,25 +124,25 @@ export default function AssemblyLineContent() {
   // No need to refetch data as the UI updates immediately with accurate data
 
   // Function to sync project progress with submissions
-  const syncProjectProgress = async () => {
-    try {
-      console.log('🔄 Syncing project progress...');
-      
-      const response = await fetch('/api/projects/sync-progress', {
-        method: 'POST'
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('✅ Progress synced:', data);
-      } else {
-        console.log('⚠️ Progress sync failed, continuing...');
-      }
-    } catch (error) {
-      console.log('⚠️ Progress sync error, continuing...', error);
-      // Don't throw - this is not critical
-    }
-  };
+  // const syncProjectProgress = async () => {
+  //   try {
+  //     console.log('🔄 Syncing project progress...');
+  //     
+  //     const response = await fetch('/api/projects/sync-progress', {
+  //       method: 'POST'
+  //     });
+  //     
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       console.log('✅ Progress synced:', data);
+  //     } else {
+  //       console.log('⚠️ Progress sync failed, continuing...');
+  //     }
+  //   } catch (error) {
+  //     console.log('⚠️ Progress sync error, continuing...', error);
+  //     // Don't throw - this is not critical
+  //   }
+  // };
 
   useEffect(() => {
     if (selectedArm) {
@@ -177,9 +175,9 @@ export default function AssemblyLineContent() {
       const { challenges } = await res.json();
       
       // Filter for medium/hard challenges with 200+ points
-      const filtered = challenges?.filter((challenge: any) => 
-        (challenge.difficulty === 'medium' || challenge.difficulty === 'hard') ||
-        challenge.points >= 50 // TODO: DONT SHOW ALL OF THEM LATER?
+      const filtered = challenges?.filter((challenge: unknown) => 
+        ((challenge as { difficulty?: string })?.difficulty === 'medium' || (challenge as { difficulty?: string })?.difficulty === 'hard') ||
+        ((challenge as { points?: number })?.points || 0) >= 50 // TODO: DONT SHOW ALL OF THEM LATER?
       ) || [];
       
       console.log('✅ Advanced challenges loaded:', filtered.length);
@@ -658,11 +656,6 @@ export default function AssemblyLineContent() {
                     <div className="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full border border-amber-200">
                       👨‍💼 Admin View - Viewing {adminSelectedProject.leadDeveloper || 'Unknown'}'s Project
                     </div>
-                    {adminProjectData.stats && (
-                      <div className="ml-3 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                        {adminProjectData.stats.challenges_solved} challenges • {adminProjectData.stats.total_points} points
-                      </div>
-                    )}
                   </div>
                 )}
               </div>

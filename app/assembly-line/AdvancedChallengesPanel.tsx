@@ -12,16 +12,6 @@ interface Challenge {
   hints?: string[];
 }
 
-interface UserSubmission {
-  challenge_id: string;
-  points_awarded: number;
-  submitted_at: string;
-  challenges: {
-    title: string;
-    category: string;
-    difficulty: string;
-  };
-}
 
 interface AdvancedChallengesPanelProps {
   challenges: Challenge[];
@@ -69,22 +59,6 @@ const getCategoryColor = (category: string) => {
   }
 };
 
-// Function to get the actual challenge URL based on title/content
-const getChallengeUrl = (challenge: Challenge): string => {
-  const title = challenge.title.toLowerCase();
-  
-  // Map specific challenges to their actual locations
-  if (title.includes('admin terminal') || title.includes('terminal')) {
-    return '/admin-terminal?access=?';
-  }
-  
-  if (title.includes('alexandre') || title.includes('account') || title.includes('password')) {
-    return '/login?challenge=alexandre';
-  }
-  
-  // Default fallback
-  return `/challenges/${challenge.id}`;
-};
 
 export default function AdvancedChallengesPanel({ 
   challenges, 
@@ -93,7 +67,6 @@ export default function AdvancedChallengesPanel({
 }: AdvancedChallengesPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [isFirstTimeReveal, setIsFirstTimeReveal] = useState(false);
-  const [flashEffect, setFlashEffect] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const [revealedCards, setRevealedCards] = useState<Set<string>>(new Set());
@@ -120,7 +93,7 @@ export default function AdvancedChallengesPanel({
   const initializeAudio = async () => {
     try {
       if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        audioContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
       }
       
       const audioContext = audioContextRef.current;
@@ -212,7 +185,7 @@ export default function AdvancedChallengesPanel({
   // Add to window for debugging (only in development)
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      (window as any).resetAdvancedChallengesExperience = resetFirstTimeExperience;
+      (window as unknown as { resetAdvancedChallengesExperience: () => void }).resetAdvancedChallengesExperience = resetFirstTimeExperience;
       console.log('🛠️ Debug: Use window.resetAdvancedChallengesExperience() to reset first-time experience');
     }
   }, []);
@@ -222,9 +195,6 @@ export default function AdvancedChallengesPanel({
     if (challenges && challenges.length > 0 && isFirstTimeReveal) {
       // Slight delay to ensure DOM is ready
       setTimeout(() => {
-        // Trigger flash effect
-        setFlashEffect(true);
-        
         console.log('🚨 First time seeing advanced challenges - triggering dramatic reveal!');
         
         // Note: Audio requires user gesture, so we don't auto-play here
@@ -238,12 +208,6 @@ export default function AdvancedChallengesPanel({
             inline: 'nearest'
           });
         }
-        
-        // Remove flash effect after animation
-        setTimeout(() => {
-          setFlashEffect(false);
-          // Don't set isFirstTimeReveal to false here, let localStorage handle it
-        }, 1000);
         
       }, 100);
     }

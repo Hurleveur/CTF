@@ -4,7 +4,7 @@ import { createServiceRoleClient } from '@/lib/supabase/server';
 // Force dynamic rendering since we need fresh data
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
+export async function GET(_: Request) {
   try {
     // Use service role client to bypass RLS policies for statistics aggregation
     const supabase = createServiceRoleClient();

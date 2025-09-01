@@ -4,7 +4,7 @@ import { createClientSync as createClient } from '@/lib/supabase/server';
 // Force dynamic rendering since we use cookies
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
+export async function GET(_: Request) {
   try {
     const supabase = createClient();
 
