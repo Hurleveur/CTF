@@ -22,7 +22,7 @@ export default function AboutPage() {
             <div>
               <h2 className="text-4xl font-bold text-gray-900 mb-6">The Challenge</h2>
               <p className="text-lg text-gray-600 mb-6">
-                Hidden throughout this website are <span className="font-mono text-blue-600">hexadecimal code fragments </span> 
+                Hidden throughout this website are <span className="font-mono text-blue-600">natural language fragments </span> 
                 that belong to a robotic arm's consciousness. These fragments are scattered behind locked doors, 
                 buried in unexpected places, and waiting to be collected by determined hackers.
                 Be warned, this shit is very much vibe coded.
@@ -46,7 +46,7 @@ export default function AboutPage() {
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">Consciousness Fragments</h3>
                 <p className="text-gray-600">
-                  The code fragments are encoded in hexadecimal format. Each piece contains part of the AI's neural network. 
+                  The code fragments are encoded in natural language. Each piece contains part of the AI's neural network. 
                   Collect them all to restore the robotic arm's full consciousness... if you dare.
                 </p>
               </div>

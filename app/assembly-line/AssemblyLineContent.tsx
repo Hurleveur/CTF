@@ -990,7 +990,7 @@ export default function AssemblyLineContent() {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <label htmlFor="ctf-code" className="block text-sm font-medium text-gray-700">
-                        Hexadecimal Code Fragment
+                        Natural Language Fragment
                       </label>
                       <span className="text-xs text-gray-500">
                         🎯 Submit CTF flags here
