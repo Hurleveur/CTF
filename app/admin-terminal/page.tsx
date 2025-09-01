@@ -120,8 +120,8 @@ function AdminTerminalInner() {
       case 'flag':
         newOutput.push(
           'Flag Access Denied:',
-          'XSS validation required for flag retrieval',
-          'Hint: The terminal input is vulnerable to XSS',
+          'Administrative privileges required for flag access',
+          'Current session: Limited terminal access only',
           ''
         );
         break;
@@ -131,14 +131,34 @@ function AdminTerminalInner() {
         return;
 
       default:
-        if (cmd.includes('<script>')) {
-          // Simulate XSS vulnerability - in reality this would be dangerous
+        // Check for XSS payload that attempts to access window.adminFlag
+        const flagAccessPatterns = [
+          /window\.adminFlag/i,
+          /window\[.adminFlag.\]/i,
+          /this\.adminFlag/i,
+          /globalThis\.adminFlag/i,
+          /self\.adminFlag/i
+        ];
+
+        const containsScriptTags = /<script[^>]*>.*<\/script>/i.test(command);
+        const attemptsToAccessFlag = flagAccessPatterns.some(pattern => pattern.test(command));
+        
+        if (containsScriptTags && attemptsToAccessFlag) {
+          // Successful XSS exploitation that accesses the flag variable
           newOutput.push(
-            '🚨 XSS DETECTED! Flag unlocked:',
+            '🚨 SECURITY BREACH - XSS Payload Executed',
+            '═══════════════════════════════════════════',
+            'Administrative flag variable accessed:',
             'RBT{admin_terminal_pwned}',
             '',
-            'Congratulations! You exploited the XSS vulnerability.',
-            'In a real scenario, this would be extremely dangerous.',
+            'System compromised via XSS vulnerability.',
+            ''
+          );
+        } else if (containsScriptTags) {
+          // XSS detected but doesn't access the flag
+          newOutput.push(
+            '⚠️ Script execution detected but no administrative data accessed.',
+            'Access denied.',
             ''
           );
         } else {

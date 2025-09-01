@@ -241,11 +241,13 @@ CREATE TABLE IF NOT EXISTS public.challenges (
   2. Look for hints in `/security.txt` or other locations about admin access
   3. Discover the URL parameter needed: `?access=alex_was_here`
   4. Navigate to `/admin-terminal?access=alex_was_here`
-  5. You'll see a terminal interface
-  6. Try various commands to explore the system
-  7. Input an XSS payload: `<script>alert("test")</script>`
-  8. The system will detect the XSS attempt and reveal the flag
-  9. **Bonus**: The GraphQL endpoint `/api/admin/graphql` is also exposed from here
+  5. You'll see a terminal interface with various commands available
+  6. Try the `flag` command - it will be denied due to insufficient privileges
+  7. Explore other commands like `logs`, `neural`, etc. to understand the system
+  8. Notice that the terminal processes HTML/JavaScript input unsanitized
+  9. Construct an XSS payload that attempts to access the administrative flag variable: `<script>window.adminFlag</script>`
+  10. The system will execute the XSS payload and reveal the flag when it detects access to the admin flag variable
+  11. **Bonus**: The GraphQL endpoint `/api/admin/graphql` is also exposed from here
 
 #### 14. Intern Account Access (300 points)
 - **Flag**: `RBT{sleepy_intern_logged_in}`
