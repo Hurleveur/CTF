@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClientSync as createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { calculateStatusColor, calculateAIStatus } from '@/lib/project-colors';
 
 export async function POST(_: Request) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verify user is authenticated
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();

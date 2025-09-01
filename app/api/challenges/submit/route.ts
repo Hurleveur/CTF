@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClientSync as createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { checkRateLimit } from '@/lib/rate-limiter';
 import { z } from 'zod';
 
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { challenge_id, flag } = validationResult.data;
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verify user is authenticated
     const { data: { user }, error: userError } = await supabase.auth.getUser();

@@ -201,10 +201,21 @@ CREATE TRIGGER handle_updated_at_user_projects
   BEFORE UPDATE ON public.user_projects
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 
--- Grant necessary permissions
+-- Grant minimal necessary permissions (RLS policies will control access)
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
-GRANT ALL ON public.profiles TO anon, authenticated;
-GRANT ALL ON public.challenges TO anon, authenticated;
-GRANT ALL ON public.submissions TO anon, authenticated;
-GRANT ALL ON public.user_projects TO anon, authenticated;
+
+-- Profiles: Users need SELECT, INSERT, UPDATE for their own records
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+GRANT SELECT ON public.profiles TO anon; -- For public leaderboard only
+
+-- Challenges: Users need SELECT to view, admins can manage via RLS
+GRANT SELECT ON public.challenges TO authenticated;
+
+-- Submissions: Users need INSERT/SELECT for their own, admins view all via RLS  
+GRANT SELECT, INSERT ON public.submissions TO authenticated;
+
+-- User projects: Users need full CRUD for their own projects via RLS
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.user_projects TO authenticated;
+
+-- Leaderboard: Public read-only view
 GRANT SELECT ON public.leaderboard TO anon, authenticated;

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClientSync as createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 
 export async function GET(_: Request) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get the current session
     const { data: { session }, error } = await supabase.auth.getSession();
@@ -54,7 +54,7 @@ export async function GET(_: Request) {
 
 export async function DELETE(_: Request) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Refresh the current session
     const { data: { session }, error } = await supabase.auth.refreshSession();

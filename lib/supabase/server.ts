@@ -39,12 +39,9 @@ export const createClient = async () => {
   });
 };
 
-// Temporary sync wrapper to avoid breaking all existing code
-// TODO: Migrate all API routes to use createClient() with await
+// DEPRECATED: This function was a security risk - use createClient() with await instead
 export const createClientSync = () => {
-  // For non-authenticated operations, use the service role client
-  // This is a temporary workaround for Next.js 15 migration
-  return createServiceRoleClient();
+  throw new Error('createClientSync is deprecated and insecure. Use createClient() with await instead.');
 };
 
 // Service role client for admin operations (server-side only)

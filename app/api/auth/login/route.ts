@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClientSync as createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { checkRateLimit, resetRateLimit } from '@/lib/rate-limiter';
 import { loginSchema, validate } from '@/lib/validation/auth';
 
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { email, password } = validationResult.data!;
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Attempt to sign in with Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
