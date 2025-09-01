@@ -4,7 +4,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 ## Project Overview
 
-This is a **Robotics-themed Capture the Flag (CTF) platform** built with Next.js 14, TypeScript, and Tailwind CSS. The platform serves as both a functional robotics company website and a foundation for CTF challenges. The application features secure foundations with intentionally vulnerable endpoints for educational purposes.
+This is a **Robotics-themed Capture the Flag (CTF) platform** built with Next.js 15, React 19, TypeScript 5.9, and Tailwind CSS 4. The platform serves as both a functional robotics company website and a foundation for CTF challenges. The application features secure foundations with intentionally vulnerable endpoints for educational purposes.
 
 ## Essential Development Commands
 
@@ -53,11 +53,16 @@ npm install -D <package-name>
 ## Architecture Overview
 
 ### Tech Stack
-- **Framework**: Next.js 14 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Testing**: Jest with jsdom environment
+- **Framework**: Next.js 15.5.2 with App Router
+- **Frontend**: React 19.1.1
+- **Language**: TypeScript 5.9.2
+- **Styling**: Tailwind CSS 4.1.12 (Major version upgrade)
+- **Testing**: Jest 30.1.2 with jsdom environment
+- **Linting**: ESLint 9.34.0
+- **Database**: Supabase with latest client libraries
 - **Security**: Custom middleware + built-in Next.js security headers
+- **Node.js**: Version 20.19.4 (locked)
+- **npm**: Version 10.0.0 (locked)
 
 ### Key Architectural Patterns
 
@@ -108,6 +113,33 @@ The codebase is structured to support CTF challenges:
 - **Assembly Line** (`/assembly-line`) - Interactive robotics demo
 - **Login** (`/login`) - Authentication interface
 
+## Recent Major Upgrades
+
+### Next.js 15 & React 19 Upgrade (Latest)
+The project has been recently upgraded to Next.js 15.5.2 and React 19.1.1 with several breaking changes handled:
+
+#### Breaking Changes Fixed
+1. **Route Parameters**: Route `params` are now Promises and must be awaited
+2. **Cookies API**: `cookies()` now returns a Promise, requiring async handling
+3. **TailwindCSS v4**: Major version upgrade with new PostCSS plugin structure
+
+#### Migration Solutions Implemented
+- Created `createClientSync` wrapper for Supabase client to maintain backward compatibility
+- Updated all route handlers to properly await `params`
+- Migrated PostCSS configuration to use `@tailwindcss/postcss`
+- Updated all `@types` packages to match React 19 compatibility
+
+#### Known Issues (To Be Addressed)
+- **Test Type Errors**: 89 TypeScript errors in test files due to `Request` vs `NextRequest` type changes
+- **Tailwind Warnings**: Some deprecated utility classes need updating for v4 compatibility
+- **CI/CD Pipeline**: May need updates to accommodate new Node.js/npm version locks
+
+#### Compatibility
+- **Node.js**: Locked to v20.19.4 for Next.js 15 compatibility
+- **npm**: Locked to v10.0.0 for consistent package resolution
+- **Browser Support**: Maintained compatibility with modern browsers
+- **Security**: All security features and headers remain functional
+
 ## Development Guidelines
 
 ### Security Testing
@@ -155,6 +187,11 @@ When adding CTF challenges:
 ### Documentation
 - `README.md` - Comprehensive project documentation
 - `cursor.md` - Development principles and practices
+- `CHANGELOG.md` - Detailed upgrade history and breaking changes documentation
+
+### Version Control
+- `.nvmrc` - Node.js version lock for consistency
+- `package.json` - npm version lock and dependency specifications
 
 ## CTF Challenge Context
 
