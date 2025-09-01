@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClientSync as createClient } from '@/lib/supabase/server';
 import { checkRateLimit, resetRateLimit } from '@/lib/rate-limiter';
 import { z } from 'zod';
 

@@ -14,16 +14,17 @@ const supabase = createClient(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { projectName: string } }
+  { params }: { params: Promise<{ projectName: string }> }
 ) {
   try {
-    console.log('🔍 Admin project data request for:', params.projectName);
+    const resolvedParams = await params;
+    console.log('🔍 Admin project data request for:', resolvedParams.projectName);
     
     // For now, we'll implement a basic admin check without strict authentication
     // This aligns with the frontend admin approach and other working APIs
     // In a real implementation, you'd verify the JWT token properly
     
-    const projectName = decodeURIComponent(params.projectName);
+    const projectName = decodeURIComponent(resolvedParams.projectName);
     console.log('🔍 Fetching data for project:', projectName);
 
     // Find the user who owns this project

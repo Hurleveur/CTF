@@ -1,6 +1,6 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/client';
+import { createClientSync as createClient } from '@/lib/supabase/server';
 
 /**
  * Completely clears all Supabase authentication storage

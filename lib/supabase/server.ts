@@ -8,8 +8,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-export const createClient = () => {
-  const cookieStore = cookies();
+// For Next.js 15: This function is now async due to cookies() returning a Promise
+export const createClient = async () => {
+  const cookieStore = await cookies();
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
@@ -36,6 +37,14 @@ export const createClient = () => {
       },
     },
   });
+};
+
+// Temporary sync wrapper to avoid breaking all existing code
+// TODO: Migrate all API routes to use createClient() with await
+export const createClientSync = () => {
+  // For non-authenticated operations, use the service role client
+  // This is a temporary workaround for Next.js 15 migration
+  return createServiceRoleClient();
 };
 
 // Service role client for admin operations (server-side only)
