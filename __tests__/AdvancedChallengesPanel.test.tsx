@@ -130,12 +130,16 @@ describe('AdvancedChallengesPanel', () => {
     expect(screen.getByText(/neural pathway corruption/)).toBeInTheDocument();
   });
 
-  it('renders challenge descriptions', () => {
+  it('renders challenge descriptions in obscured form', () => {
     render(<AdvancedChallengesPanel challenges={mockChallenges} />);
     
-    expect(screen.getByText('Exploit a complex web application with multiple vulnerabilities')).toBeInTheDocument();
-    expect(screen.getByText('Break a custom encryption scheme used in robot communications')).toBeInTheDocument();
-    expect(screen.getByText('Analyze and exploit vulnerabilities in robotic arm firmware')).toBeInTheDocument();
+    // Challenge descriptions should be obscured by default with block characters
+    const obscuredTexts = screen.getAllByText(/████████ ████ ██████ ███████ █████ ███ ████████ ████ ██████ ███████/);
+    expect(obscuredTexts.length).toBe(3); // Should have 3 obscured descriptions
+    
+    // Should have decrypt prompts
+    const decryptPrompts = screen.getAllByText('🔒 Click to decrypt mission details');
+    expect(decryptPrompts.length).toBe(3);
   });
 
   it('applies correct category icons', () => {
