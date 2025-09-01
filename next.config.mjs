@@ -3,6 +3,19 @@ const nextConfig = {
   // Use a modern JavaScript runtime to avoid old vulnerabilities
   reactStrictMode: true,
   
+  // SWC compiler is used by default with modern JSX transform for better performance
+  compiler: {
+    // SWC compiler options for modern JSX transform
+    // The transform is enabled by default in Next.js 15
+    reactRemoveProperties: process.env.NODE_ENV === 'production',
+  },
+  
+  // Ensure experimental features are enabled for React 19
+  experimental: {
+    // Enable React 19 features
+    ppr: false,
+  },
+  
   // Set headers to prevent common attacks like clickjacking and XSS
   // These headers are set globally via middleware.
   async headers() {

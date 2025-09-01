@@ -45,11 +45,16 @@ const mockSupabaseClient = {
 
 jest.mock('@/lib/supabase/server', () => ({
   createClient: jest.fn(() => mockSupabaseClient),
+  createClientSync: jest.fn(() => mockSupabaseClient),
+  createServiceRoleClient: jest.fn(() => mockSupabaseClient),
 }));
 
 // Mock rate limiting
 jest.mock('@/lib/rate-limiter', () => ({
-  checkRateLimit: jest.fn(() => Promise.resolve({ allowed: true })),
+  checkRateLimit: jest.fn(() => Promise.resolve({ 
+    allowed: true,
+    response: null
+  })),
   resetRateLimit: jest.fn(() => Promise.resolve()),
 }));
 
