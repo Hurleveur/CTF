@@ -1,17 +1,19 @@
 # Robotics CTF
 
-A secure foundation for a robotics-themed Capture the Flag (CTF) platform built with Next.js, TypeScript, and Tailwind CSS.
-More information on the challenge can be found here https://docs.google.com/document/d1GGjiT-Mqt2SwmtnR8Sl-mwafcmb8L8rvEv4A57VT8gY
+A secure foundation for a robotics-themed Capture the Flag (CTF) platform built with Next.js 15, React 19, TypeScript, and Tailwind CSS 4. The platform serves as both a functional robotics company website and a foundation for CTF challenges with intentionally vulnerable endpoints for educational purposes.
+
+More information on the challenge can be found here: https://docs.google.com/document/d1GGjiT-Mqt2SwmtnR8Sl-mwafcmb8L8rvEv4A57VT8gY
 
 ## 🚀 Features
 
 - **Secure Foundation**: Built with security best practices from the ground up
-- **Modern Stack**: Next.js 14 with App Router, TypeScript, and Tailwind CSS
-- **Comprehensive Testing**: Jest setup with example tests for API security
-- **Security Headers**: Global security headers to prevent common attacks
-- **Middleware Protection**: Centralized request handling and authentication
-- **Input Validation**: Server-side validation and XSS protection
-- **Responsive Design**: Modern, mobile-friendly UI with custom CTF theme
+- **Modern Stack**: Next.js 15.5.2 with App Router, React 19.1.1, TypeScript 5.9.2, and Tailwind CSS 4.1.12
+- **Supabase Authentication**: Server-side authentication with Row Level Security (RLS)
+- **Comprehensive Testing**: Jest 30.1.2 setup with security-focused tests
+- **Security Headers**: CSP, HSTS, X-Frame-Options configured via middleware
+- **Input Validation**: Zod schema validation and XSS protection
+- **CTF-Ready Architecture**: Secure baseline with documented vulnerabilities for educational purposes
+- **Responsive Design**: Modern, mobile-friendly UI with cyberpunk CTF theme
 
 ## 🏗️ Project Structure
 
@@ -59,30 +61,43 @@ More information on the challenge can be found here https://docs.google.com/docu
 
 ## 🛡️ Security Features
 
-### Built-in Protections
+### Multi-Layer Security Architecture
+
+#### Authentication & Authorization
+- **Server-side authentication** with Supabase
+- **HTTP-only cookies** for secure session management
+- **Row Level Security (RLS)** policies in database
+- **Role-based access control** (user, admin, moderator)
+- **JWT token handling** with automatic refresh
+
+#### Built-in Protections
 - **Content Security Policy (CSP)**: Prevents XSS attacks
 - **Strict Transport Security (HSTS)**: Enforces HTTPS
 - **X-Content-Type-Options**: Prevents MIME type sniffing
 - **X-Frame-Options**: Prevents clickjacking attacks
-- **X-XSS-Protection**: Additional XSS protection layer
+- **Middleware Protection**: Global request logging and security headers
 
-### API Security
-- Server-side input validation
-- XSS payload sanitization
-- Proper error handling without information leakage
-- Request logging for monitoring
+#### Input Validation & Sanitization
+- **Zod schema validation** for all API inputs
+- **Email format validation** with proper regex
+- **Password strength requirements** (minimum 8 characters)
+- **UUID validation** for challenge IDs
+- **Length limits** on all text inputs
+- **XSS payload sanitization**
 
-### Middleware Security
-- Centralized authentication/authorization point
-- Global security headers
-- Request logging and monitoring
-- Route protection capabilities
+#### API Security
+- **Authentication required** for sensitive operations
+- **Prepared statements** to prevent SQL injection
+- **Error handling** without information leakage
+- **Rate limiting** considerations (timing attack prevention)
+- **Request logging** for monitoring
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
-- npm or yarn
+- **Node.js 20.19.4** (locked for Next.js 15 compatibility)
+- **npm 10.0.0** (locked for consistent package resolution)
+- **Supabase account** (sign up at https://supabase.com)
 
 ### Installation
 
@@ -95,24 +110,33 @@ More information on the challenge can be found here https://docs.google.com/docu
 2. **Install dependencies**
    ```bash
    npm install
-   # or
-   yarn install
    ```
 
-3. **Set up environment variables**
+3. **Set up Supabase Database**
+   - Go to your Supabase project dashboard
+   - Navigate to SQL Editor
+   - Copy and execute the contents of `supabase/schema.sql`
+   - This creates user profiles, challenges, submissions tables with RLS policies
+
+4. **Set up environment variables**
+   Create `.env.local` with:
    ```bash
-   cp .env.local.example .env.local
-   # Edit .env.local with your configuration
+   # Public (client-side)
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   
+   # Private (server-side only)
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   NEXTAUTH_SECRET=your_random_secret
+   NEXTAUTH_URL=http://localhost:3000
    ```
 
-4. **Run the development server**
+5. **Run the development server**
    ```bash
    npm run dev
-   # or
-   yarn dev
    ```
 
-5. **Open your browser**
+6. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## 🧪 Testing
@@ -143,9 +167,16 @@ The project includes comprehensive tests for:
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm test` - Run Jest tests
+- `npm run lint` - Run ESLint 9.34.0
+- `npm test` - Run Jest 30.1.2 tests
 - `npm run test:watch` - Run tests in watch mode
+
+### Breaking Changes from Next.js 15 & React 19 Upgrade
+- **Route Parameters**: All `params` are now Promises and must be awaited
+- **Cookies API**: `cookies()` now returns a Promise requiring async handling
+- **TailwindCSS v4**: Major version upgrade with new PostCSS plugin structure
+- **Node.js Version**: Locked to v20.19.4 for compatibility
+- **Test Types**: 89 TypeScript errors in test files due to Request vs NextRequest changes
 
 ### Code Structure
 - **Components**: React components in `app/` directory
@@ -175,12 +206,41 @@ The project includes comprehensive tests for:
 
 ## 🎯 CTF Challenges
 
-This platform is designed to be a foundation for CTF challenges. You can:
+### Database-Driven Challenge System
 
-1. **Add Vulnerable Endpoints**: Create intentionally insecure routes for testing
-2. **Implement Challenges**: Build puzzles and security exercises
-3. **Add User Management**: Create user accounts and scoring systems
-4. **Build Challenge Categories**: Web, crypto, forensics, etc.
+Challenges are stored in the Supabase database and accessed through secure APIs:
+
+- **GET `/api/challenges`** - Fetch available challenges (requires authentication)
+- **POST `/api/challenges/submit`** - Submit flags with automatic scoring
+- **GET `/api/profile`** - View user statistics and progress
+- **GET `/api/leaderboard`** - Public rankings
+
+### Sample Challenges Included
+
+The platform comes with pre-loaded challenges:
+
+1. **Welcome to CTF** (misc, easy, 50 points)
+   - Flag: `CTF{welcome_to_robotics_ctf}`
+
+2. **Admin Terminal Breach** (web, medium, 250 points)  
+   - Flag: `RBT{admin_terminal_pwned}`
+   - Location: `/admin-terminal?access=alex_was_here`
+
+3. **Contact Protocol** (crypto, medium, 250 points)
+   - Flag: `RBT{security_through_obscurity_fails}`
+   - Location: `/security.txt` (ROT13 decoding required)
+
+4. **Intern Account Access** (misc, medium, 200 points)
+   - Flag: `RBT{sleepy_intern_logged_in}`
+   - Credentials: alex@robo.tech / TODOp@ssw0rd
+
+### Hidden Challenge Discovery
+
+Challenges are discoverable through:
+- **Source Code Inspection**: Hidden fragments and comments
+- **Directory Enumeration**: `/robots.txt`, `/sitemap.xml`, `/security.txt`
+- **Interactive Elements**: Konami code activation, debug modals
+- **Steganography**: Hidden data in images and text
 
 ### 🚨 Advanced Challenge Detection System
 
