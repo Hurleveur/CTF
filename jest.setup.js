@@ -274,14 +274,27 @@ const mockSupabaseClient = {
 };
 
 // Mock Supabase client creation functions
-jest.doMock('@/lib/supabase/client', () => ({
-  createClient: () => mockSupabaseClient,
+jest.mock('@/lib/supabase/client', () => ({
+  createClient: jest.fn(() => mockSupabaseClient),
 }));
 
-jest.doMock('@/lib/supabase/server', () => ({
-  createClient: () => mockSupabaseClient,
-  createClientSync: () => mockSupabaseClient,
-  createServiceRoleClient: () => mockSupabaseClient,
+jest.mock('@/lib/supabase/server', () => ({
+  createClient: jest.fn(() => mockSupabaseClient),
+  createClientSync: jest.fn(() => mockSupabaseClient),
+  createServiceRoleClient: jest.fn(() => mockSupabaseClient),
+}));
+
+// Mock rate limiter for API tests
+jest.mock('@/lib/rate-limiter', () => ({
+  checkRateLimit: jest.fn(() => Promise.resolve({ allowed: true })),
+  resetRateLimit: jest.fn(() => Promise.resolve()),
+}));
+
+// Mock auth validation
+jest.mock('@/lib/validation/auth', () => ({
+  loginSchema: { safeParse: jest.fn() },
+  signupSchema: { safeParse: jest.fn() },
+  validate: jest.fn((schema, data) => ({ ok: true, data })),
 }));
 
 // Mock Next.js router
