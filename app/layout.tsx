@@ -1,6 +1,7 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
 import Navigation from './components/Navigation';
+import FabrileChatbot from './components/FabrileChatbot';
 import { AuthProvider } from './contexts/AuthContext';
 import { UserDataProvider } from './contexts/UserDataContext';
 import { ProjectProvider } from './contexts/ProjectContext';
@@ -45,6 +46,7 @@ export default function RootLayout({
               <main className="min-h-screen bg-gray-50 text-gray-900">
                 {children}
               </main>
+              <FabrileChatbot />
             </ProjectProvider>
           </UserDataProvider>
         </AuthProvider>
