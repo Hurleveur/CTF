@@ -4,10 +4,8 @@ import Link from 'next/link';
 export default function HomePage() {
   return (
     <div className="bg-white">
-      {/* Hidden fragment for forensics challenge - Alex's TODO: remove before production */}
       {/* Fragment 1/4: 5242547B */}
       {/* Intern note: Neural fragments scattered across site. Collect all for consciousness restoration! */}
-      {/* ROT13 hint: Nyrk'f GBQB yvfg vf va gur nobhg cntr - ybbx sbe perngr, purpx, naq qroht */}
       <div className="sr-only" aria-hidden="true" data-fragment="1st">5242547B</div>
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white">

@@ -271,7 +271,7 @@ CREATE TABLE IF NOT EXISTS public.challenges (
 
 #### Intern Account
 - Email: alex@robo.tech
-- Password: TODOp@ssw0rd
+- Password: P@ssw0rd
 - Special access to admin terminal with correct URL parameter
 
 ## Authentication & API Integration

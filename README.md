@@ -232,7 +232,7 @@ The platform comes with pre-loaded challenges:
 
 4. **Intern Account Access** (misc, medium, 200 points)
    - Flag: `RBT{sleepy_intern_logged_in}`
-   - Credentials: alex@robo.tech / TODOp@ssw0rd
+   - Credentials: alex@robo.tech / P@ssw0rd
 
 ### Hidden Challenge Discovery
 
