@@ -31,7 +31,7 @@ const nextConfig = {
           // Tightened for better security while maintaining functionality
           {
             key: 'Content-Security-Policy',
-            value: `default-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://embed.fabrile.app; connect-src 'self' ${supabaseUrl} wss://${supabaseHost} https://embed.fabrile.app; font-src 'self'; img-src 'self' data: https:; frame-src https://embed.fabrile.app; object-src 'none'; base-uri 'self';`,
+            value: `default-src 'self' data:; style-src 'self' 'unsafe-inline' https://embed.fabrile.app; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://embed.fabrile.app https://*.fabrile.app; connect-src 'self' ${supabaseUrl} wss://${supabaseHost} https://embed.fabrile.app https://*.fabrile.app wss://*.fabrile.app; font-src 'self' https://embed.fabrile.app; img-src 'self' data: https: https://embed.fabrile.app; frame-src https://embed.fabrile.app https://*.fabrile.app; object-src 'none'; base-uri 'self';`,
           },
           // Strict-Transport-Security: Enforces secure connections (HTTPS).
           {
@@ -46,7 +46,7 @@ const nextConfig = {
           // X-Frame-Options: Prevents clickjacking attacks.
           {
             key: 'X-Frame-Options',
-            value: 'DENY',
+            value: 'SAMEORIGIN',
           },
           // X-XSS-Protection: Helps protect against XSS attacks.
           {
@@ -64,10 +64,11 @@ const nextConfig = {
             value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
           },
           // Cross-Origin-Embedder-Policy: Helps prevent certain attacks
-          {
-            key: 'Cross-Origin-Embedder-Policy',
-            value: 'credentialless',
-          },
+          // Commented out as it can interfere with third-party embeds like Fabrile
+          // {
+          //   key: 'Cross-Origin-Embedder-Policy',
+          //   value: 'credentialless',
+          // },
         ],
       },
     ];
