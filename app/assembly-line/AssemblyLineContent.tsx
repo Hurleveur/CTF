@@ -786,7 +786,7 @@ export default function AssemblyLineContent() {
                           : 'bg-gradient-to-t from-slate-500 to-slate-400'
                       }`}
                       style={{
-                        transform: `translateX(-50%) ${
+                        transform: `translateX(-20%) ${
                           armStatus === 'restoring' ? 'rotate(2deg)' : 'rotate(0deg)'
                         }`,
                         animation: animatedProgress > 20 && animatedProgress <= 25 ? 'slideUp 1s ease-out' : undefined
@@ -814,8 +814,8 @@ export default function AssemblyLineContent() {
                           : 'bg-gradient-to-t from-slate-500 to-slate-400'
                       }`} 
                       style={{
-                        bottom: '104px',
-                        transform: `translateX(-50%) ${
+                        bottom: '102px',
+                        transform: `translateX(-20%) ${
                           armStatus === 'restoring' ? 'rotate(-3deg)' : 'rotate(0deg)'
                         }`,
                         animation: animatedProgress > 40 && animatedProgress <= 45 ? 'slideUp 1s ease-out 0.3s both' : undefined
@@ -832,7 +832,7 @@ export default function AssemblyLineContent() {
                   {/* Upper Arm Segment - Appears at 60% */}
                   {animatedProgress > 60 && (
                     <div 
-                      className={`absolute left-1/2 w-3 h-12 transform -translate-x-1/2 rounded-lg transition-all duration-700 shadow-lg ${
+                      className={`absolute left-1/2 w-3 h-10 transform -translate-x-1/2 rounded-lg transition-all duration-700 shadow-lg ${
                         armStatus === 'restoring' 
                           ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-cyan-500/50'
                           : codeCompletion >= 100 
@@ -840,8 +840,8 @@ export default function AssemblyLineContent() {
                           : 'bg-gradient-to-t from-slate-500 to-slate-400'
                       }`} 
                       style={{
-                        bottom: '146px',
-                        transform: `translateX(-50%) ${
+                        bottom: '156px',
+                        transform: `translateX(-20%) ${
                           armStatus === 'restoring' ? 'rotate(1deg)' : 'rotate(0deg)'
                         }`,
                         animation: animatedProgress > 60 && animatedProgress <= 65 ? 'slideUp 1s ease-out 0.6s both' : undefined
@@ -867,7 +867,7 @@ export default function AssemblyLineContent() {
                       }`} 
                       style={{
                         bottom: '186px',
-                        transform: `translateX(-50%) ${
+                        transform: `translateX(-10%) ${
                           armStatus === 'restoring' ? 'rotate(180deg)' : 'rotate(0deg)'
                         }`,
                         animation: animatedProgress > 80 && animatedProgress <= 85 ? 'slideUp 1s ease-out 0.9s both' : undefined
@@ -886,23 +886,24 @@ export default function AssemblyLineContent() {
                     <div 
                       className="absolute left-1/2 transform -translate-x-1/2 transition-all duration-700" 
                       style={{
-                        bottom: '206px',
+                        bottom: '246px', // Positioned above wrist joint for proper robot arm assembly
                         animation: 'slideUp 1s ease-out 1.2s both'
                       }}
                     >
-                      {/* Gripper Body */}
-                      <div className={`w-4 h-3 rounded-t-lg mx-auto mb-1 ${
+                      {/* Wrist-to-Gripper Connecting Sleeve - makes it look like a real robot arm */}
+                      <div className={`absolute left-1/2 transform -translate-x-1/2 w-3 h-4 rounded-lg mb-1 ${
                         armStatus === 'restoring' 
-                          ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-lg shadow-cyan-500/50'
-                          : 'bg-gradient-to-t from-green-500 to-emerald-500 shadow-lg shadow-green-500/50'
+                          ? 'bg-gradient-to-t from-slate-600 to-cyan-500 shadow-md shadow-cyan-500/30'
+                          : 'bg-gradient-to-t from-slate-600 to-green-500 shadow-md shadow-green-500/30'
                       }`}>
-                        <div className="w-2 h-1 bg-white/20 rounded-full mx-auto mt-0.5"></div>
+                        {/* Sleeve detail lines */}
+                        <div className="absolute inset-x-0.5 top-1 bottom-1 border-l border-r border-white/10 rounded"></div>
                       </div>
                       
-                      {/* Gripper Claws */}
-                      <div className="flex justify-center space-x-1">
+                      {/* Gripper Claws - positioned above body to point upward like real robot arm */}
+                      <div className="absolute left-1/2 transform -translate-x-1/2 flex space-x-1 mb-1" style={{ top: '16px' }}>
                         <div 
-                          className={`w-1.5 h-4 rounded-b-lg transition-all duration-500 ${
+                          className={`w-1.5 h-4 rounded-t-lg transition-all duration-500 ${
                             armStatus === 'restoring' 
                               ? 'bg-cyan-400 shadow-lg shadow-cyan-400/50'
                               : 'bg-green-400 shadow-lg shadow-green-400/50'
@@ -912,7 +913,7 @@ export default function AssemblyLineContent() {
                           }}
                         ></div>
                         <div 
-                          className={`w-1.5 h-4 rounded-b-lg transition-all duration-500 ${
+                          className={`w-1.5 h-4 rounded-t-lg transition-all duration-500 ${
                             armStatus === 'restoring' 
                               ? 'bg-cyan-400 shadow-lg shadow-cyan-400/50'
                               : 'bg-green-400 shadow-lg shadow-green-400/50'
@@ -921,6 +922,15 @@ export default function AssemblyLineContent() {
                             transform: armStatus === 'restoring' ? 'rotate(15deg)' : 'rotate(0deg)'
                           }}
                         ></div>
+                      </div>
+                      
+                      {/* Gripper Body */}
+                      <div className={`absolute left-1/2 transform -translate-x-1/2 w-4 h-3 rounded-b-lg ${
+                        armStatus === 'restoring' 
+                          ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-lg shadow-cyan-500/50'
+                          : 'bg-gradient-to-t from-green-500 to-emerald-500 shadow-lg shadow-green-500/50'
+                      }`} style={{ top: '32px' }}>
+                        <div className="absolute left-1/2 transform -translate-x-1/2 w-2 h-1 bg-white/20 rounded-full mb-0.5" style={{ bottom: '2px' }}></div>
                       </div>
                     </div>
                   )}
