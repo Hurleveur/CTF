@@ -511,6 +511,27 @@ export default function AssemblyLineContent() {
             transform: translateY(0);
           }
         }
+        
+        @keyframes gripperRotate {
+          0% {
+            transform: translateX(-50%) rotate(-45deg);
+          }
+          50% {
+            transform: translateX(-50%) rotate(45deg);
+          }
+          100% {
+            transform: translateX(-50%) rotate(-45deg);
+          }
+        }
+        
+        @keyframes gripperGlow {
+          0%, 100% {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.7), 0 0 25px rgba(6, 182, 212, 0.3);
+          }
+          50% {
+            box-shadow: 0 0 30px rgba(6, 182, 212, 1), 0 0 50px rgba(6, 182, 212, 0.5), 0 0 70px rgba(6, 182, 212, 0.2);
+          }
+        }
       `}</style>
       <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -870,7 +891,9 @@ export default function AssemblyLineContent() {
                         transform: `translateX(-10%) ${
                           armStatus === 'restoring' ? 'rotate(180deg)' : 'rotate(0deg)'
                         }`,
-                        animation: animatedProgress > 80 && animatedProgress <= 85 ? 'slideUp 1s ease-out 0.9s both' : undefined
+                        animation: armStatus === 'restoring' 
+                          ? 'gripperRotate 2.5s ease-in-out infinite' 
+                          : (animatedProgress > 80 && animatedProgress <= 85 ? 'slideUp 1s ease-out 0.9s both' : undefined)
                       }}
                     >
                       {/* Wrist Detail */}
@@ -887,15 +910,19 @@ export default function AssemblyLineContent() {
                       className="absolute left-1/2 transform -translate-x-1/2 transition-all duration-700" 
                       style={{
                         bottom: '246px', // Positioned above wrist joint for proper robot arm assembly
-                        animation: 'slideUp 1s ease-out 1.2s both'
+                        animation: armStatus === 'restoring' 
+                          ? 'gripperRotate 2s ease-in-out infinite' 
+                          : undefined
                       }}
                     >
                       {/* Wrist-to-Gripper Connecting Sleeve - makes it look like a real robot arm */}
-                      <div className={`absolute left-1/2 transform -translate-x-1/2 w-3 h-4 rounded-lg mb-1 ${
+                      <div className={`absolute left-1/2 transform -translate-x-1/2 w-3 h-4 rounded-lg mb-1 transition-all duration-300 ${
                         armStatus === 'restoring' 
                           ? 'bg-gradient-to-t from-slate-600 to-cyan-500 shadow-md shadow-cyan-500/30'
                           : 'bg-gradient-to-t from-slate-600 to-green-500 shadow-md shadow-green-500/30'
-                      }`}>
+                      }`} style={{
+                        animation: armStatus === 'restoring' ? 'gripperGlow 2s ease-in-out infinite' : undefined
+                      }}>
                         {/* Sleeve detail lines */}
                         <div className="absolute inset-x-0.5 top-1 bottom-1 border-l border-r border-white/10 rounded"></div>
                       </div>
