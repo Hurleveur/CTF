@@ -4,6 +4,18 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import type { z } from 'zod';
+
+interface ValidationUtility {
+  validate: <T>(schema: z.ZodSchema<T>, data: unknown) => { ok: boolean; data?: T; errors?: Record<string, string[]> };
+  signupSchema: z.ZodSchema<{
+    email: string;
+    password: string;
+    fullName?: string;
+  }>;
+  passwordRegex: RegExp;
+  passwordMessage: string;
+}
 
 export default function SignupPage() {
   const { signup, isAuthenticated } = useAuth();
@@ -17,7 +29,7 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [globalError, setGlobalError] = useState('');
   const [copiedCTB, setCopiedCTB] = useState(false);
-  const [validationUtility, setValidationUtility] = useState<any>(null);
+  const [validationUtility, setValidationUtility] = useState<ValidationUtility | null>(null);
 
   // Dynamically import validation utility to avoid bundling Zod in initial JS
   useEffect(() => {
@@ -48,8 +60,8 @@ export default function SignupPage() {
       if (!result.ok && result.errors) {
         // Convert array of errors to single string per field
         Object.entries(result.errors).forEach(([field, messages]) => {
-          if (Array.isArray(messages) && messages.length > 0) {
-            newErrors[field] = messages[0];
+          if (Array.isArray(messages) && messages.length > 0 && typeof field === 'string') {
+            newErrors[field as keyof typeof newErrors] = messages[0];
           }
         });
         setErrors(newErrors);
@@ -75,10 +87,10 @@ export default function SignupPage() {
       newErrors.password = 'Password must be at least 8 characters';
     } else if (formData.password.length > 128) {
       newErrors.password = 'Password must be less than 128 characters';
-    } else if (validationUtility?.passwordRegex ? 
-               !validationUtility.passwordRegex.test(formData.password) : 
+    } else if (validationUtility && (validationUtility as unknown as ValidationUtility).passwordRegex ? 
+               !(validationUtility as unknown as ValidationUtility).passwordRegex.test(formData.password) : 
                !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]*$/.test(formData.password)) {
-      newErrors.password = validationUtility?.passwordMessage || 
+      newErrors.password = validationUtility ? (validationUtility as unknown as ValidationUtility).passwordMessage :
         'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character (@$!%*?&)';
     }
 
@@ -91,8 +103,8 @@ export default function SignupPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
     
     // Clear field error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+    if (name in errors) {
+      setErrors(prev => ({ ...prev, [name as keyof typeof errors]: '' }));
     }
   };
 
@@ -124,7 +136,7 @@ export default function SignupPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl font-bold mb-6">Neural Restoration Access</h1>
           <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-            Join the consciousness restoration project and help rebuild the robotic arm's neural pathways with a project.
+            Join the consciousness restoration project and help rebuild the robotic arm&apos;s neural pathways with a project.
           </p>
         </div>
       </section>
@@ -208,10 +220,11 @@ export default function SignupPage() {
                 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                     <input
                       type="text"
                       name="fullName"
+                      id="fullName"
                       value={formData.fullName}
                       onChange={handleChange}
                       className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
@@ -223,10 +236,11 @@ export default function SignupPage() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                     <input
                       type="email"
                       name="email"
+                      id="email"
                       value={formData.email}
                       onChange={handleChange}
                       className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
@@ -238,10 +252,11 @@ export default function SignupPage() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Secure Password</label>
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Secure Password</label>
                     <input
                       type="password"
                       name="password"
+                      id="password"
                       value={formData.password}
                       onChange={handleChange}
                       className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${

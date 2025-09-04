@@ -7,22 +7,20 @@ interface RateLimitConfig {
   skipSuccessfulRequests?: boolean;
 }
 
-interface RateLimitStore {
-  [key: string]: {
-    count: number;
-    resetTime: number;
-    lockoutUntil?: number;
-    firstAttempt: number;
-    attempts: Array<{
-      timestamp: number;
-      userAgent?: string;
-      path: string;
-    }>;
-  };
+interface RateLimitEntry {
+  count: number;
+  resetTime: number;
+  lockoutUntil?: number;
+  firstAttempt: number;
+  attempts: Array<{
+    timestamp: number;
+    userAgent?: string;
+    path: string;
+  }>;
 }
 
 class MemoryRateLimiter {
-  private store: RateLimitStore = {};
+  private store: Map<string, RateLimitEntry> = new Map();
   
   async check(
     key: string, 
@@ -33,26 +31,29 @@ class MemoryRateLimiter {
     const windowStart = now - config.windowMs;
     
     // Clean up expired entries
-    if (this.store[key] && this.store[key].resetTime < windowStart) {
-      delete this.store[key];
+    const entry = this.store.get(key);
+    if (entry && entry.resetTime < windowStart) {
+      this.store.delete(key);
     }
     
     // Check if currently locked out
-    if (this.store[key]?.lockoutUntil && now < this.store[key].lockoutUntil!) {
+    const currentEntry = this.store.get(key);
+    if (currentEntry?.lockoutUntil && now < currentEntry.lockoutUntil) {
       // Log suspicious activity
-      console.warn(`[RateLimit] Blocked request from ${key} during lockout period. Lockout until: ${new Date(this.store[key].lockoutUntil!).toISOString()}`);
+      console.warn(`[RateLimit] Blocked request from ${key} during lockout period. Lockout until: ${new Date(currentEntry.lockoutUntil).toISOString()}`);
       
       return {
         allowed: false,
-        resetTime: this.store[key].lockoutUntil!,
+        resetTime: currentEntry.lockoutUntil,
         remaining: 0,
         isLocked: true
       };
     }
     
     // Initialize or increment counter
-    if (!this.store[key]) {
-      this.store[key] = {
+    const existingEntry = this.store.get(key);
+    if (!existingEntry) {
+      this.store.set(key, {
         count: 1,
         resetTime: now + config.windowMs,
         firstAttempt: now,
@@ -61,36 +62,37 @@ class MemoryRateLimiter {
           userAgent: metadata?.userAgent,
           path: metadata?.path || 'unknown'
         }]
-      };
+      });
     } else {
-      this.store[key].count++;
-      this.store[key].attempts.push({
+      existingEntry.count++;
+      existingEntry.attempts.push({
         timestamp: now,
         userAgent: metadata?.userAgent,
         path: metadata?.path || 'unknown'
       });
       
       // Keep only last 10 attempts for memory efficiency
-      if (this.store[key].attempts.length > 10) {
-        this.store[key].attempts = this.store[key].attempts.slice(-10);
+      if (existingEntry.attempts.length > 10) {
+        existingEntry.attempts = existingEntry.attempts.slice(-10);
       }
     }
     
-    const remaining = Math.max(0, config.maxAttempts - this.store[key].count);
+    const updatedEntry = this.store.get(key)!; // We know it exists now
+    const remaining = Math.max(0, config.maxAttempts - updatedEntry.count);
     
-    if (this.store[key].count > config.maxAttempts) {
+    if (updatedEntry.count > config.maxAttempts) {
       // Set progressive lockout: 15min, 1hr, 24hr
-      const lockoutDuration = this.calculateLockoutDuration(this.store[key].count - config.maxAttempts);
-      this.store[key].lockoutUntil = now + lockoutDuration;
+      const lockoutDuration = this.calculateLockoutDuration(updatedEntry.count - config.maxAttempts);
+      updatedEntry.lockoutUntil = now + lockoutDuration;
       
       // Log security event
-      console.warn(`[RateLimit] Rate limit exceeded for ${key}. Attempts: ${this.store[key].count}, Lockout duration: ${lockoutDuration/1000/60} minutes`);
-      console.warn(`[RateLimit] First attempt: ${new Date(this.store[key].firstAttempt).toISOString()}`);
-      console.warn(`[RateLimit] User agents: ${Array.from(new Set(this.store[key].attempts.map(a => a.userAgent).filter(Boolean))).join(', ')}`);
+      console.warn(`[RateLimit] Rate limit exceeded for ${key}. Attempts: ${updatedEntry.count}, Lockout duration: ${lockoutDuration/1000/60} minutes`);
+      console.warn(`[RateLimit] First attempt: ${new Date(updatedEntry.firstAttempt).toISOString()}`);
+      console.warn(`[RateLimit] User agents: ${Array.from(new Set(updatedEntry.attempts.map(a => a.userAgent).filter(Boolean))).join(', ')}`);
       
       return {
         allowed: false,
-        resetTime: this.store[key].lockoutUntil,
+        resetTime: updatedEntry.lockoutUntil!,
         remaining: 0,
         isLocked: true
       };
@@ -98,7 +100,7 @@ class MemoryRateLimiter {
     
     return {
       allowed: true,
-      resetTime: this.store[key].resetTime,
+      resetTime: updatedEntry.resetTime,
       remaining
     };
   }
@@ -107,11 +109,12 @@ class MemoryRateLimiter {
     // Progressive lockout: 15min, 1hr, 24hr
     const durations = [15 * 60 * 1000, 60 * 60 * 1000, 24 * 60 * 60 * 1000];
     const index = Math.min(overageCount - 1, durations.length - 1);
+    // eslint-disable-next-line security/detect-object-injection
     return durations[index];
   }
   
   async reset(key: string): Promise<void> {
-    delete this.store[key];
+    this.store.delete(key);
   }
 }
 

@@ -59,11 +59,16 @@ export function buildDefaultProject(fullName: string, userId: string) {
   
   const developerName = fullName || 'Unknown Developer';
   
+  // Ensure indices are within bounds for security
+  const safeName = PROJECT_NAMES[Math.min(nameIndex, PROJECT_NAMES.length - 1)] || 'Neural Network Alpha';
+  const safeDescription = PROJECT_DESCRIPTIONS[Math.min(nameIndex, PROJECT_DESCRIPTIONS.length - 1)] || 'A sophisticated AI system awaiting neural reconstruction';
+  const safeEmoji = EMOJIS[Math.min(emojiIndex, EMOJIS.length - 1)] || '🤖';
+  
   return {
     user_id: userId,
-    name: PROJECT_NAMES[nameIndex],
-    description: PROJECT_DESCRIPTIONS[nameIndex],
-    logo: EMOJIS[emojiIndex],
+    name: safeName,
+    description: safeDescription,
+    logo: safeEmoji,
     ai_status: 'Basic Motor Functions', // Starting status for all new projects
     status_color: 'red', // Corresponds to 0% neural reconstruction
     neural_reconstruction: 0.0, // Start at 0% - user earns progress through CTF challenges

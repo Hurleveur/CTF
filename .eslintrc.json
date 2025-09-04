@@ -1,7 +1,12 @@
 {
   "extends": [
     "next/core-web-vitals",
-    "next/typescript"
+    "next/typescript",
+  "plugin:jsx-a11y/recommended"
+  ],
+  "plugins": [
+    "security",
+    "jsx-a11y"
   ],
   "rules": {
     "react/no-unescaped-entities": "warn",
@@ -9,6 +14,18 @@
     "@next/next/no-html-link-for-pages": "warn",
     "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/no-explicit-any": "warn",
-    "react-hooks/exhaustive-deps": "warn"
+    "react-hooks/exhaustive-deps": "warn",
+
+    "security/detect-eval-with-expression": "warn",
+    "security/detect-non-literal-fs-filename": "warn",
+    "security/detect-non-literal-regexp": "warn",
+    "security/detect-non-literal-require": "warn",
+    "security/detect-object-injection": "warn",
+    "security/detect-unsafe-regex": "warn",
+    "security/detect-child-process": "warn",
+    "security/detect-new-buffer": "warn",
+    "jsx-a11y/click-events-have-key-events": "warn",
+    "jsx-a11y/no-static-element-interactions": "warn",
+    "jsx-a11y/label-has-associated-control": "warn"
   }
 }

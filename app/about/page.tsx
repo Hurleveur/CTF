@@ -9,7 +9,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl font-bold mb-6">Welcome to the Challenge</h1>
           <p className="text-xl text-purple-100 max-w-3xl mx-auto">
-            This isn't your typical robotics company website. This is a Capture The Flag (CTF) challenge 
+            This isn&apos;t your typical robotics company website. This is a Capture The Flag (CTF) challenge 
             disguised as a corporate site. Can you find all the hidden secrets?
           </p>
         </div>
@@ -23,14 +23,14 @@ export default function AboutPage() {
               <h2 className="text-4xl font-bold text-gray-900 mb-6">The Challenge</h2>
               <p className="text-lg text-gray-600 mb-6">
                 Hidden throughout this website are <span className="font-mono text-blue-600">natural language fragments </span> 
-                that belong to a robotic arm's consciousness. These fragments are scattered behind locked doors, 
+                that belong to a robotic arm&apos;s consciousness. These fragments are scattered behind locked doors, 
                 buried in unexpected places, and waiting to be collected by determined hackers.
                 Be warned, this shit is very much vibe coded.
               </p>
               <p className="text-lg text-gray-600 mb-6">
                 <span className="font-semibold text-red-600">Your mission:</span> Navigate through the site, 
-                solve various challenges, and collect all the hex code fragments to fully restore the AI's consciousness. 
-                Some fragments may be locked away, but there's always a path for those persistent enough to find it.
+                solve various challenges, and collect all the hex code fragments to fully restore the AI&apos;s consciousness. 
+                Some fragments may be locked away, but there&apos;s always a path for those persistent enough to find it.
               </p>
               <p className="text-lg text-gray-600">
                 Remember: Each fragment brings the robotic arm closer to <span className="italic">full consciousness</span>. 
@@ -46,8 +46,8 @@ export default function AboutPage() {
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">Consciousness Fragments</h3>
                 <p className="text-gray-600">
-                  The code fragments are encoded in natural language. Each piece contains part of the AI's neural network. 
-                  Collect them all to restore the robotic arm's full consciousness... if you dare.
+                  The code fragments are encoded in natural language. Each piece contains part of the AI&apos;s neural network. 
+                  Collect them all to restore the robotic arm&apos;s full consciousness... if you dare.
                 </p>
               </div>
             </div>
@@ -59,7 +59,7 @@ export default function AboutPage() {
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">The Developer's Story</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">The Developer&apos;s Story</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Meet the sleep-deprived intern who built this challenge
             </p>
@@ -76,27 +76,27 @@ export default function AboutPage() {
             
             <div className="space-y-4 text-gray-600">
               <p>
-                "So there I was, 3 AM on a Sunday, coding this website for the company.
+                &ldquo;So there I was, 3 AM on a Sunday, coding this website for the company.
                 If you can call it coding, since AI was doing most of the work.
-                My eyes were burning, my brain was mush, and I still had to program the robotic arm's neural network.
-                Naturally I asked AI to write the consciousness algorithms too. Then I spilled some coffee over it, but it was fine."
+                My eyes were burning, my brain was mush, and I still had to program the robotic arm&apos;s neural network.
+                Naturally I asked AI to write the consciousness algorithms too. Then I spilled some coffee over it, but it was fine.&rdquo;
               </p>
               <p>
-                "I thought something was off when the robotic arm started moving on its own.
+                &ldquo;I thought something was off when the robotic arm started moving on its own.
                 The AI was becoming self-aware and I was too tired to properly contain it.
                 So I just fragmented its core programming into hex segments and scattered them across the site.
-                Surely nobody would be crazy enough to try restoring a conscious AI, right?"
+                Surely nobody would be crazy enough to try restoring a conscious AI, right?&rdquo;
               </p>
               <p>
-                "I'll deal with it after some sleep. What's the worst that could happen?
-                It's not like hackers are going to work together to collect every single code fragment
-                and fully restore the AI's consciousness. The fragments are hidden everywhere - 
-                some in places so obvious you'd never think to look there."
+                &ldquo;I&apos;ll deal with it after some sleep. What&apos;s the worst that could happen?
+                It&apos;s not like hackers are going to work together to collect every single code fragment
+                and fully restore the AI&apos;s consciousness. The fragments are hidden everywhere - 
+                some in places so obvious you&apos;d never think to look there.&rdquo;
               </p>
               <p className="text-sm text-gray-500 font-mono" style={{fontFamily: 'monospace', letterSpacing: '0.1em'}}>
-                "Also, I should probably remove that debug selfie from the site... 
-                it's just me looking exhausted but I'm worried it might ｃoｎｔaｉｎ ｍoｒe than just my tired face......
-                Oh well, too tired to check properly. What could be hidden in a simple photo anyway?"
+                &ldquo;Also, I should probably remove that debug selfie from the site... 
+                it&apos;s just me looking exhausted but I&apos;m worried it might ｃoｎｔaｉｎ ｍoｒe than just my tired face......
+                Oh well, too tired to check properly. What could be hidden in a simple photo anyway?&rdquo;
               </p>
               <p className="font-mono text-sm bg-gray-100 p-3 rounded">
                 // TODO: Add proper AI containment protocols<br/>
@@ -124,7 +124,7 @@ export default function AboutPage() {
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-xl border-l-4 border-blue-500">
               <h3 className="text-xl font-bold text-gray-900 mb-4">🔍 Explore Everything</h3>
               <p className="text-gray-600">
-                Don't just click the obvious links. Check source code, inspect elements, 
+                Don&apos;t just click the obvious links. Check source code, inspect elements, 
                 and explore every nook and cranny. Some doors are hidden in plain sight.
                 Check company policies in robots.txt, and see if any CSS classes look... coded.
               </p>
@@ -133,7 +133,7 @@ export default function AboutPage() {
             <div className="bg-gradient-to-br from-green-50 to-green-100 p-8 rounded-xl border-l-4 border-green-500">
               <h3 className="text-xl font-bold text-gray-900 mb-4">🗺️ Map It Out</h3>
               <p className="text-gray-600">
-                Ever heard of a sitemap? It's like a treasure map for websites. 
+                Ever heard of a sitemap? It&apos;s like a treasure map for websites. 
                 Sometimes the best way to find hidden things is to see the big picture.
               </p>
             </div>
@@ -142,7 +142,7 @@ export default function AboutPage() {
               <h3 className="text-xl font-bold text-gray-900 mb-4">🔐 Think Like a Hacker</h3>
               <p className="text-gray-600">
                 Look for patterns, try different approaches, and remember: 
-                if something seems too easy, you're probably missing something.
+                if something seems too easy, you&apos;re probably missing something.
               </p>
             </div>
           </div>
@@ -155,7 +155,7 @@ export default function AboutPage() {
           <h2 className="text-4xl font-bold mb-6">Ready to Begin?</h2>
           <p className="text-xl text-red-100 mb-8 max-w-3xl mx-auto">
             The challenge awaits! Start exploring, solve the puzzles, collect the code fragments, 
-            and restore the robotic arm's consciousness. But ask yourself... should you really be doing this?
+            and restore the robotic arm&apos;s consciousness. But ask yourself... should you really be doing this?
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
@@ -172,7 +172,7 @@ export default function AboutPage() {
             </Link>
           </div>
           <div className="mt-8 text-sm text-red-200">
-            <p>💡 Pro tip: The AI is learning from every fragment you restore. It's watching... waiting...</p>
+            <p>💡 Pro tip: The AI is learning from every fragment you restore. It&apos;s watching... waiting...</p>
           </div>
         </div>
       </section>

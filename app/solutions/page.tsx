@@ -320,9 +320,9 @@ export default function SolutionsPage() {
             
             {/* Create New Project Card */}
             {isAuthenticated ? (
-              <div 
+              <button 
                 onClick={() => setShowProjectForm(true)}
-                className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-200 cursor-pointer hover:border-blue-300 h-full"
+                className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-200 cursor-pointer hover:border-blue-300 h-full text-left w-full"
               >
                 <div className="h-48 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
                   <div className="text-center text-blue-600">
@@ -340,7 +340,7 @@ export default function SolutionsPage() {
                     <span className="text-blue-600 font-medium text-sm">Click to Configure →</span>
                   </div>
                 </div>
-              </div>
+              </button>
             ) : (
               <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-200 h-full">
                 <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
@@ -474,8 +474,9 @@ export default function SolutionsPage() {
             
             <form onSubmit={handleProjectSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Project Name</label>
+                <label htmlFor="project-name" className="block text-sm font-medium text-gray-700 mb-2">Project Name</label>
                 <input
+                  id="project-name"
                   type="text"
                   value={newProject.name}
                   onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
@@ -486,8 +487,9 @@ export default function SolutionsPage() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <label htmlFor="project-description" className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                 <textarea
+                  id="project-description"
                   value={newProject.description}
                   onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -498,8 +500,9 @@ export default function SolutionsPage() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Project Icon</label>
-                <div className="grid grid-cols-10 gap-2">
+                <fieldset>
+                  <legend className="block text-sm font-medium text-gray-700 mb-2">Project Icon</legend>
+                  <div className="grid grid-cols-10 gap-2">
                   {iconOptions.map((icon, index) => (
                     <button
                       key={index}
@@ -512,7 +515,8 @@ export default function SolutionsPage() {
                       {icon}
                     </button>
                   ))}
-                </div>
+                  </div>
+                </fieldset>
               </div>
               
               <div className="flex space-x-3 pt-4">

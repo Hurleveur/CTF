@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { calculateStatusColor, calculateAIStatus } from '@/lib/project-colors';
 
-export async function POST(_: Request) {
+export async function POST() {
   try {
     const supabase = await createClient();
 

@@ -16,7 +16,7 @@ const projectSchema = z.object({
 });
 
 // GET - Fetch user's projects
-export async function GET(_: Request) {
+export async function GET() {
   try {
     const supabase = await createClient();
 

@@ -23,11 +23,21 @@ export default function AssemblyLineContent() {
   const { projects } = useProjects();
   const [selectedArm, setSelectedArm] = useState<RoboticProject | null>(null);
   const [armStatus, setArmStatus] = useState('offline');
-  const [restoredSegments, setRestoredSegments] = useState(0);
   const [codeCompletion, setCodeCompletion] = useState(0);
   const [ctfCode, setCtfCode] = useState('');
   const [lastCodeResult, setLastCodeResult] = useState<{type: 'success' | 'error' | null, message: string}>({type: null, message: ''});
-  const [advancedChallenges, setAdvancedChallenges] = useState<any[]>([]);
+  
+  interface Challenge {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    difficulty: string;
+    points: number;
+    hints?: string[];
+  }
+  
+  const [advancedChallenges, setAdvancedChallenges] = useState<Challenge[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [animatedProgress, setAnimatedProgress] = useState(0);
@@ -149,7 +159,7 @@ export default function AssemblyLineContent() {
       // Simulate code restoration activity
       const interval = setInterval(() => {
         if (armStatus === 'restoring') {
-          setRestoredSegments(prev => prev + 1);
+          // Code restoration simulation
         }
       }, 3000);
 
@@ -232,7 +242,6 @@ export default function AssemblyLineContent() {
     
     setSelectedArm(arm);
     setArmStatus('offline');
-    setRestoredSegments(0);
     setCtfCode('');
     
     // Check if this is the user's own project (ID 1000 or matches userProject)
@@ -582,6 +591,15 @@ export default function AssemblyLineContent() {
                   key={arm.id}
                   className="bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer"
                   onClick={() => handleArmSelect(arm)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleArmSelect(arm);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Select ${arm.name} robotic arm project`}
                 >
                   <div className="flex items-center mb-4">
                     <span className="text-3xl mr-3">{arm.logo}</span>
@@ -654,7 +672,7 @@ export default function AssemblyLineContent() {
                 {adminSelectedProject && (
                   <div className="mt-2 flex items-center">
                     <div className="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full border border-amber-200">
-                      👨‍💼 Admin View - Viewing {adminSelectedProject.leadDeveloper || 'Unknown'}'s Project
+                      👨‍💼 Admin View - Viewing {adminSelectedProject.leadDeveloper || `Unknown`}&apos;s Project
                     </div>
                   </div>
                 )}
@@ -687,7 +705,7 @@ export default function AssemblyLineContent() {
                 <div className="flex-1">
                   <h3 className="text-sm font-medium text-blue-900 mb-1">Neural Reconstruction Mission</h3>
                   <p className="text-sm text-blue-700 leading-relaxed">
-                    Your robotic arm's consciousness has been fragmented. <strong>Find and submit CTF flags</strong> from challenges across the site to restore neural pathways. 
+                    Your robotic arm&apos;s consciousness has been fragmented. <strong>Find and submit CTF flags</strong> from challenges across the site to restore neural pathways. 
                     Each correct flag increases consciousness level and unlocks new arm components in the visualization below.
                   </p>
                   <div className="mt-2 text-xs text-blue-600">
@@ -957,7 +975,7 @@ export default function AssemblyLineContent() {
                 
                 {/* What you see explanation */}
                 <div className="bg-gray-50 border-l-4 border-gray-400 p-4 mb-6">
-                  <h4 className="text-sm font-semibold text-gray-800 mb-2">🔍 What You're Seeing:</h4>
+                  <h4 className="text-sm font-semibold text-gray-800 mb-2">🔍 What You&apos;re Seeing:</h4>
                   <ul className="text-sm text-gray-700 space-y-1">
                     <li>• <strong>Robot Visualization:</strong> Your arm builds as you solve challenges (parts appear at 20%, 40%, 60%, 80%, 100%)</li>
                     <li>• <strong>Progress Indicators:</strong> Status lights show your advancement, percentage tracks consciousness level</li>
@@ -979,7 +997,7 @@ export default function AssemblyLineContent() {
                       <div className="flex-1">
                         <h4 className="text-sm font-medium text-amber-900 mb-1">Admin View Mode</h4>
                         <p className="text-sm text-amber-700">
-                          You are viewing {adminSelectedProject.leadDeveloper || 'Unknown'}'s project data. Flag submissions are disabled in admin view mode to prevent data mixing.
+                          You are viewing {adminSelectedProject.leadDeveloper || `Unknown`}&apos;s project data. Flag submissions are disabled in admin view mode to prevent data mixing.
                         </p>
                       </div>
                     </div>

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
-export async function GET(_: Request) {
+export async function GET() {
   try {
     const supabase = await createClient();
 
@@ -52,7 +52,7 @@ export async function GET(_: Request) {
   }
 }
 
-export async function DELETE(_: Request) {
+export async function DELETE() {
   try {
     const supabase = await createClient();
 

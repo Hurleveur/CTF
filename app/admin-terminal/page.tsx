@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 function AdminTerminalInner() {
   const searchParams = useSearchParams();
@@ -192,7 +193,7 @@ function AdminTerminalInner() {
               <p><span className="text-gray-400">[NOTE]</span> Intern left access method documented somewhere...</p>
             </div>
             <div className="mt-8 text-center">
-              <a href="/" className="text-blue-400 hover:text-blue-300">← Back to main site</a>
+              <Link href="/" className="text-blue-400 hover:text-blue-300">← Back to main site</Link>
             </div>
           </div>
         </div>
@@ -257,7 +258,7 @@ function AdminTerminalInner() {
         <div className="mt-8 text-center text-xs text-gray-500">
           <p>RoboTech Industries Admin Terminal | Development Build</p>
           <p>Built by intern Alex (security review pending...)</p>
-          <a href="/" className="text-blue-400 hover:text-blue-300 mt-2 inline-block">← Back to main site</a>
+          <Link href="/" className="text-blue-400 hover:text-blue-300 mt-2 inline-block">← Back to main site</Link>
         </div>
       </div>
     </div>

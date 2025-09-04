@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Navigation() {
@@ -13,8 +13,10 @@ export default function Navigation() {
   
   // Konami Code: Up Up Down Down Left Right Left Right B A
   // Support both QWERTY (B, A) and AZERTY (B, Q) keyboard layouts
-  const konamiCodeQWERTY = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
-  const konamiCodeAZERTY = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyQ'];
+  const konamiCodes = useMemo(() => ({
+    qwerty: ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'],
+    azerty: ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyQ']
+  }), []);
   
   // Debug auth state changes in Navigation
   useEffect(() => {
@@ -25,15 +27,17 @@ export default function Navigation() {
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     console.log('🔑 Key pressed:', event.code);
     setKeySequence(prev => {
-      const newSequence = [...prev, event.code].slice(-konamiCodeQWERTY.length);
+      const newSequence = [...prev, event.code].slice(-konamiCodes.qwerty.length);
       
       // Check for QWERTY sequence
-      const isQWERTYMatch = newSequence.length === konamiCodeQWERTY.length && 
-                           newSequence.every((key, index) => key === konamiCodeQWERTY[index]);
+      const isQWERTYMatch = newSequence.length === konamiCodes.qwerty.length && 
+                           // eslint-disable-next-line security/detect-object-injection
+                           newSequence.every((key, index) => key === konamiCodes.qwerty[index]);
       
       // Check for AZERTY sequence
-      const isAZERTYMatch = newSequence.length === konamiCodeAZERTY.length && 
-                           newSequence.every((key, index) => key === konamiCodeAZERTY[index]);
+      const isAZERTYMatch = newSequence.length === konamiCodes.azerty.length && 
+                           // eslint-disable-next-line security/detect-object-injection
+                           newSequence.every((key, index) => key === konamiCodes.azerty[index]);
       
       // Activate if either keyboard layout matches
       if (isQWERTYMatch || isAZERTYMatch) {
@@ -45,7 +49,7 @@ export default function Navigation() {
       
       return newSequence;
     });
-  }, [konamiCodeAZERTY, konamiCodeQWERTY]);
+  }, [konamiCodes]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);

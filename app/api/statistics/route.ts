@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 
 // Force dynamic rendering since we need fresh data
 export const dynamic = 'force-dynamic';
 
-export async function GET(_: Request) {
+export async function GET() {
   try {
     // Use service role client to bypass RLS policies for statistics aggregation
     const supabase = createServiceRoleClient();

@@ -1,9 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { clearAuthStorage } from '@/lib/auth/clearAuthStorage';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 export interface User {
@@ -29,7 +27,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
   const supabase = createClient();
 
   // Check if user is logged in on mount and listen for auth changes

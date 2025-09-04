@@ -285,12 +285,18 @@ export default function TeamPage() {
                 <div className="flex flex-col lg:flex-row lg:items-start gap-8">
                   {/* Avatar and Basic Info */}
                   <div className="flex-shrink-0 text-center lg:text-left">
-                    <div 
-                      className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-4 cursor-pointer"
-                      onClick={member.name === "Patrick Star" ? handlePatrickClick : undefined}
-                    >
-                      <span className="text-4xl">{member.avatar}</span>
-                    </div>
+                    {member.name === "Patrick Star" ? (
+                      <button 
+                        className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-4 cursor-pointer"
+                        onClick={handlePatrickClick}
+                      >
+                        <span className="text-4xl">{member.avatar}</span>
+                      </button>
+                    ) : (
+                      <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-4">
+                        <span className="text-4xl">{member.avatar}</span>
+                      </div>
+                    )}
                     <h3 className="text-xl font-bold text-gray-900 mb-1">
                       {member.name}
                     </h3>
@@ -381,9 +387,9 @@ export default function TeamPage() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
               <div className="text-6xl mb-4">🌟</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Patrick's Secret!</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Patrick&apos;s Secret!</h3>
               <p className="text-gray-600 mb-4 font-mono text-sm">
-                "I'm not just a starfish, I'm a SECURITY starfish!"
+                &ldquo;I&apos;m not just a starfish, I&apos;m a SECURITY starfish!&rdquo;
               </p>
               <p className="text-gray-600 mb-4 font-mono">
                 RBT&#123;p4tr1ck_st4r_s3cur1ty_3xp3rt_9d2f1a8c&#125;

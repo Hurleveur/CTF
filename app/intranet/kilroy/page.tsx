@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function IntranetKilroyPage() {
   return (
     <div className="min-h-screen bg-gray-900 text-green-400 font-mono">
@@ -66,10 +68,10 @@ export default function IntranetKilroyPage() {
               <div className="text-gray-300">Posted: 2024-11-01 03:30</div>
               <p className="mt-2">
                 Hey team! Left a little easter egg here for anyone who finds this old portal.
-                Classic "Kilroy was here" seemed appropriate for an abandoned intranet page.
+                Classic &ldquo;Kilroy was here&rdquo; seemed appropriate for an abandoned intranet page.
                 
-                If you're reading this, you probably followed the breadcrumbs from robots.txt.
-                Nice detective work! Here's your reward:
+                If you&apos;re reading this, you probably followed the breadcrumbs from robots.txt.
+                Nice detective work! Here&apos;s your reward:
               </p>
               <div className="mt-4 p-3 bg-black border border-cyan-400 rounded">
                 <p className="text-cyan-400 font-mono">
@@ -88,10 +90,10 @@ export default function IntranetKilroyPage() {
         <div className="bg-gray-800 border border-green-400 p-4 rounded">
           <h3 className="text-green-300 font-bold mb-3">Quick Links</h3>
           <div className="grid grid-cols-2 gap-2 text-sm">
-            <a href="/" className="text-blue-400 hover:text-blue-300">← Back to Main Site</a>
-            <a href="/robots.txt" className="text-blue-400 hover:text-blue-300">robots.txt</a>
-            <a href="/sitemap.xml" className="text-blue-400 hover:text-blue-300">sitemap.xml</a>
-            <a href="/security.txt" className="text-blue-400 hover:text-blue-300">security.txt</a>
+            <Link href="/" className="text-blue-400 hover:text-blue-300">← Back to Main Site</Link>
+            <Link href="/robots.txt" className="text-blue-400 hover:text-blue-300">robots.txt</Link>
+            <Link href="/sitemap.xml" className="text-blue-400 hover:text-blue-300">sitemap.xml</Link>
+            <Link href="/security.txt" className="text-blue-400 hover:text-blue-300">security.txt</Link>
           </div>
         </div>
 
