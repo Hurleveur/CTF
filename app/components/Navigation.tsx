@@ -137,16 +137,16 @@ export default function Navigation() {
       {isMenuOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
-            <Link href="/" className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
+            <Link href="/" onClick={() => setIsMenuOpen(false)} className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
               Home
             </Link>
-            <Link href="/about" className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
+            <Link href="/about" onClick={() => setIsMenuOpen(false)} className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
               About
             </Link>
-            <Link href="/solutions" className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
+            <Link href="/solutions" onClick={() => setIsMenuOpen(false)} className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
               Solutions
             </Link>
-            <Link href="/solutions" className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
+            <Link href="/solutions" onClick={() => setIsMenuOpen(false)} className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
               Team Directory
             </Link>
             {isAuthenticated ? (
@@ -157,7 +157,7 @@ export default function Navigation() {
                 Logout
               </button>
             ) : (
-              <Link href="/login" className="bg-blue-600 text-white block px-3 py-2 text-base font-medium rounded-md">
+              <Link href="/login" onClick={() => setIsMenuOpen(false)} className="bg-blue-600 text-white block px-3 py-2 text-base font-medium rounded-md">
                 Login
               </Link>
             )}
