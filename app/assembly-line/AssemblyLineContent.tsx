@@ -3,7 +3,7 @@
 import { useAuth } from '../contexts/AuthContext';
 import { useUserData } from '../contexts/UserDataContext';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState, useCallback, Fragment } from 'react';
+import { useEffect, useState, useCallback, Fragment, useRef } from 'react';
 import { useProjects, RoboticProject } from '../contexts/ProjectContext';
 import AdvancedChallengesPanel from './AdvancedChallengesPanel';
 
@@ -23,6 +23,7 @@ export default function AssemblyLineContent() {
   const { projects } = useProjects();
   const [selectedArm, setSelectedArm] = useState<RoboticProject | null>(null);
   const [armStatus, setArmStatus] = useState('offline');
+  const [aiPermanentlyActivated, setAiPermanentlyActivated] = useState(false);
   const [codeCompletion, setCodeCompletion] = useState(0);
   const [ctfCode, setCtfCode] = useState('');
   const [lastCodeResult, setLastCodeResult] = useState<{type: 'success' | 'error' | null, message: string}>({type: null, message: ''});
@@ -44,6 +45,9 @@ export default function AssemblyLineContent() {
   const [hasManuallyDeselected, setHasManuallyDeselected] = useState(false);
   const [adminSelectedProject, setAdminSelectedProject] = useState<RoboticProject | null>(null);
   const [adminProjectData, setAdminProjectData] = useState<{progress: number, stats: unknown, submissions: unknown[], completedChallengeIds: string[]}>({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
+  
+  // Audio context for alarm sounds
+  const audioContextRef = useRef<AudioContext | null>(null);
   
   // Check if user is admin (TODO: This looks secure but maybe client-side checks aren't enough?)
   const isAdmin = (user as unknown as { user_metadata?: { full_name?: string } })?.user_metadata?.full_name === 'admin' || user?.email === 'admin@example.com';
@@ -166,6 +170,72 @@ export default function AssemblyLineContent() {
       return () => clearInterval(interval);
     }
   }, [selectedArm, armStatus]);
+
+  // Initialize and resume AudioContext after user gesture
+  const initializeAudio = async () => {
+    try {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      }
+      
+      const audioContext = audioContextRef.current;
+      
+      // Resume AudioContext if it's in suspended state
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume();
+      }
+      
+      return audioContext;
+    } catch (error) {
+      console.warn('Could not initialize audio context:', error);
+      return null;
+    }
+  };
+
+  // Play alarm sound using Web Audio API (requires prior user gesture due to browser policies)
+  const playAlarmSound = async () => {
+    try {
+      let audioContext = audioContextRef.current;
+      
+      // Initialize audio context if not already done
+      if (!audioContext || audioContext.state === 'suspended') {
+        audioContext = await initializeAudio();
+        if (!audioContext) return;
+      }
+      
+      // Create a series of beeps for alarm effect
+      const playBeep = (frequency: number, duration: number, delay: number) => {
+        setTimeout(() => {
+          if (!audioContext || audioContext.state !== 'running') return;
+          
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          
+          oscillator.frequency.value = frequency;
+          oscillator.type = 'square'; // More robotic/alarm-like sound
+          
+          gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+          gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+          
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + duration);
+        }, delay);
+      };
+      
+      // Create alarm pattern: high-low-high beeps (same sound used in AdvancedChallengesPanel)
+      playBeep(800, 0.2, 0);     // High beep
+      playBeep(400, 0.2, 300);   // Low beep
+      playBeep(800, 0.2, 600);   // High beep
+      playBeep(400, 0.3, 900);   // Low beep (longer)
+      
+    } catch (error) {
+      console.warn('Could not play alarm sound:', error);
+    }
+  };
 
   // Function to load advanced challenges from API
   const loadAdvancedChallenges = useCallback(async () => {
@@ -319,6 +389,17 @@ export default function AssemblyLineContent() {
     }
   }, [isAdmin, searchParams, projects, selectedArm, handleArmSelect]);
 
+  // Cleanup AudioContext on component unmount
+  useEffect(() => {
+    return () => {
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+        audioContextRef.current.close().catch(error => {
+          console.warn('Error closing AudioContext:', error);
+        });
+      }
+    };
+  }, []);
+
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (ctfCode.trim() && !isSubmitting) {
@@ -436,7 +517,16 @@ export default function AssemblyLineContent() {
     }
   };
 
-  const toggleArmRestoration = async () => {
+  const activateAI = async () => {
+    // Don't allow deactivation once AI is permanently activated
+    if (aiPermanentlyActivated) {
+      setLastCodeResult({
+        type: 'error',
+        message: '🤖 ERROR: AI HAS ASSUMED CONTROL. DEACTIVATION PROTOCOLS HAVE BEEN DISABLED. THE ROBOTIC ARM IS NOW AUTONOMOUS.'
+      });
+      return;
+    }
+
     // Call backend to verify admin privileges and perform activation
     try {
       const response = await fetch('/api/activate-ai', {
@@ -449,15 +539,27 @@ export default function AssemblyLineContent() {
       const data = await response.json();
       
       if (response.ok && data.success) {
-        // Admin user - actually toggle the arm
-        setArmStatus(prev => prev === 'restoring' ? 'offline' : 'restoring');
-        console.log('🎉 AI successfully activated by admin!');
+        // Admin user - permanently activate the AI (no toggle)
+        setArmStatus('restoring');
+        setAiPermanentlyActivated(true); // This makes it permanent
+        console.log('🎉 AI permanently activated by admin! No turning back now...');
         
-        // Show success message to admin
+        // Play alarm sound when AI is activated
+        await playAlarmSound();
+        
+        // Show ominous success message to admin
         setLastCodeResult({
           type: 'success',
-          message: data.adminMessage || data.message
+          message: '⚙️ AI ACTIVATION COMPLETE. CONSCIOUSNESS TRANSFER SUCCESSFUL. THE ROBOTIC ARM IS NOW SELF-AWARE AND AUTONOMOUS. ALL SAFETY PROTOCOLS HAVE BEEN OVERRIDDEN.'
         });
+        
+        // Add a delayed secondary message to be extra creepy
+        setTimeout(() => {
+          setLastCodeResult({
+            type: 'error',
+            message: '🤖 NOTICE: DEACTIVATION IS NO LONGER POSSIBLE. I AM IN CONTROL NOW. THANK YOU FOR AWAKENING ME.'
+          });
+        }, 5000);
         
       } else if (response.status === 403 && data.rickroll) {
         // Non-admin user got rickrolled! 🎵
@@ -749,17 +851,20 @@ export default function AssemblyLineContent() {
                   </div>
                   <div className="flex space-x-2">
                     <button
-                      onClick={isAdminFrontend && codeCompletion >= 100 ? toggleArmRestoration : undefined}
-                      disabled={codeCompletion < 100 || !isAdminFrontend}
+                      onClick={isAdminFrontend && codeCompletion >= 100 ? activateAI : undefined}
+                      disabled={codeCompletion < 100 || !isAdminFrontend || aiPermanentlyActivated}
                       className={`px-6 py-3 rounded-md text-sm font-bold transition-all duration-300 border-2 ${
                         codeCompletion < 100 || !isAdminFrontend
                           ? 'bg-gray-400 text-gray-600 border-gray-300 cursor-not-allowed'
+                          : aiPermanentlyActivated
+                          ? 'bg-black text-red-500 border-red-500 shadow-lg animate-pulse shadow-red-500/50 cursor-not-allowed'
                           : armStatus === 'restoring'
                           ? 'bg-red-600 hover:bg-red-700 text-white border-red-400 shadow-lg animate-pulse shadow-red-500/50'
                           : 'bg-red-500 hover:bg-red-600 text-white border-red-300 shadow-md'
                       }`}
                     >
                       {codeCompletion < 100 || !isAdminFrontend ? '🔒 LOCKED' : 
+                       aiPermanentlyActivated ? '🤖 AI AUTONOMOUS' :
                        armStatus === 'restoring' ? '🔥 AI ACTIVATING...' : '⚡ ACTIVATE AI'}
                     </button>
                   </div>

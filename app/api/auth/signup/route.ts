@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password, fullName } = validationResult.data!;
+    const { email, password, username } = validationResult.data!;
     const supabase = await createClient();
 
     // Attempt to sign up with Supabase
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       password,
       options: {
         data: {
-          full_name: fullName,
+          full_name: username || email.split('@')[0], // Use username or fall back to email prefix
         },
       },
     });
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     // Automatically create a default project for the new user
     try {
-      const profileName = fullName || email; // Use full name or fall back to email
+      const profileName = username || email.split('@')[0]; // Use username or fall back to email prefix
       const projectPayload = buildDefaultProject(profileName, data.user.id);
 
       console.log('[Auth] Creating default project for new user:', data.user.id);

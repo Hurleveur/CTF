@@ -67,7 +67,6 @@ export default function AdvancedChallengesPanel({
 }: AdvancedChallengesPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [isFirstTimeReveal, setIsFirstTimeReveal] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const [revealedCards, setRevealedCards] = useState<Set<string>>(new Set());
 
@@ -103,7 +102,6 @@ export default function AdvancedChallengesPanel({
         await audioContext.resume();
       }
       
-      setAudioEnabled(true);
       return audioContext;
     } catch (error) {
       console.warn('Could not initialize audio context:', error);
@@ -156,11 +154,6 @@ export default function AdvancedChallengesPanel({
     }
   };
 
-  // Handle user click to enable audio and play sound
-  const handleEnableAudio = async () => {
-    await initializeAudio();
-    await playAlarmSound();
-  };
 
   // Handle card click to reveal description
   const handleCardClick = (challengeId: string) => {
@@ -194,11 +187,13 @@ export default function AdvancedChallengesPanel({
   useEffect(() => {
     if (challenges && challenges.length > 0 && isFirstTimeReveal) {
       // Slight delay to ensure DOM is ready
-      setTimeout(() => {
+      setTimeout(async () => {
         console.log('🚨 First time seeing advanced challenges - triggering dramatic reveal!');
         
-        // Note: Audio requires user gesture, so we don't auto-play here
-        // playAlarmSound() will be called when user interacts with the panel
+        // Auto-play alarm sound when challenges first appear
+        // This works because the code completion reaching 100% requires user interaction (form submission)
+        // which satisfies the browser's user gesture requirement for audio
+        await playAlarmSound();
         
         // Scroll to panel
         if (panelRef.current) {
@@ -284,15 +279,6 @@ export default function AdvancedChallengesPanel({
           </div>
         )}
         
-        {/* Audio Enable Button */}
-        {!audioEnabled && (
-          <button
-            onClick={handleEnableAudio}
-            className="mt-2 px-3 py-1 text-xs bg-yellow-500 hover:bg-yellow-600 text-yellow-900 rounded-full font-medium transition-colors duration-200 shadow-sm"
-          >
-            🔊 Enable Alert Sounds
-          </button>
-        )}
       </div>
 
       {/* Challenges Grid */}

@@ -10,7 +10,7 @@ export default function SignupPage() {
   const { signup, isAuthenticated } = useAuth();
   const router = useRouter();
   const [formData, setFormData] = useState({
-    fullName: '',
+    username: '',
     email: '',
     password: ''
   });
@@ -72,7 +72,7 @@ export default function SignupPage() {
 
     setIsLoading(true);
 
-    const result = await signup(formData.email, formData.password, formData.fullName);
+    const result = await signup(formData.email, formData.password, formData.username);
     
     if (result.success) {
       router.push('/assembly-line');
@@ -113,14 +113,63 @@ export default function SignupPage() {
                       </svg>
                     </div>
                     <div className="ml-3">
-                      <h4 className="text-sm font-medium text-amber-800">Important Guidelines</h4>
+                      <h4 className="text-sm font-medium text-amber-800">Competition Rules & Ethics</h4>
                     </div>
                   </div>
                 </div>
                 
-                <p className="text-gray-700 leading-relaxed">
-                  Welcome to the Neural Restoration Challenge! This is a Capture The Flag (CTF) competition where you&apos;ll solve puzzles and find hidden flags throughout the system. <strong>Since the site is the CTF, you are strictly prohibited from using DDOS or other dangerous methods that might get it taken down.</strong> Play fair, think creatively, and use your technical skills ethically - maybe try some social engineering and looking around. All flags in this challenge follow the format shown below - when you find one, submit it exactly as displayed in the assembly-lab, including the curly braces.
-                </p>
+                <div className="space-y-4">
+                  <p className="text-gray-700 leading-relaxed">
+                    Welcome to the Neural Restoration Challenge! This is a Capture The Flag (CTF) competition where you&apos;ll solve puzzles and find hidden flags throughout the system. <strong>Rate-limited testing and reconnaissance are encouraged</strong> (and you are encouraged to keep an open mind in how to get flags), but by signing up you agree to follow these guidelines:
+                  </p>
+                  
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <h4 className="text-red-800 font-semibold mb-3 flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      Strictly Prohibited Actions
+                    </h4>
+                    <ul className="space-y-2 text-red-700">
+                      <li className="flex items-start">
+                        <span className="font-bold mr-2">1.</span>
+                        <span><strong>DDoS/DoS Attacks:</strong> Any form of denial-of-service attacks, excessive automated requests, or attempts to overwhelm the server infrastructure</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="font-bold mr-2">2.</span>
+                        <span><strong>AI Chatbot Abuse:</strong> No spamming or misusing the chatbot. Yes you can jailbreak it.</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="font-bold mr-2">3.</span>
+                        <span><strong>Infrastructure Attacks:</strong> Targeting hosting providers, DNS, CDN, or any infrastructure components not part of the challenge</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="font-bold mr-2">4.</span>
+                        <span><strong>Data Destruction:</strong> Attempting to delete, corrupt, or permanently modify other participants&apos; data</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="font-bold mr-2">5.</span>
+                        <span><strong>Sharing Solutions:</strong> Publicly posting flags, solutions, or detailed writeups during the active competition period</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h4 className="text-green-800 font-semibold mb-2 flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Encouraged Techniques
+                    </h4>
+                    <p className="text-green-700">
+                      Creative problem-solving, code analysis, web application testing, API exploration, social engineering within the platform, and ethical reconnaissance are all fair game!
+                    </p>
+                  </div>
+                  
+                  <p className="text-gray-600 text-sm">
+                    <strong>Flag Format:</strong> All flags follow the format shown below. Submit them exactly as found, including the curly braces.
+                  </p>
+                </div>
                 
                 <div className="bg-gray-900 rounded-lg p-4">
                   <div className="flex items-center justify-between">
@@ -174,19 +223,19 @@ export default function SignupPage() {
                 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">Username</label>
                     <input
                       type="text"
-                      name="fullName"
-                      id="fullName"
-                      value={formData.fullName}
+                      name="username"
+                      id="username"
+                      value={formData.username}
                       onChange={handleChange}
                       className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        errors.fullName ? 'border-red-300' : 'border-gray-300'
+                        errors.username ? 'border-red-300' : 'border-gray-300'
                       }`}
-                      placeholder="Dr. Alex Rodriguez"
+                      placeholder="neuralHacker2025"
                     />
-                    {errors.fullName && <p className="text-red-600 text-xs mt-1">{errors.fullName}</p>}
+                    {errors.username && <p className="text-red-600 text-xs mt-1">{errors.username}</p>}
                   </div>
                   
                   <div>

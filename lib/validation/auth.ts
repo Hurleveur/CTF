@@ -19,9 +19,10 @@ export const loginSchema = z.object({
 export const signupSchema = z.object({
   email: z.string().email('Invalid email format').max(320, 'Email too long'),
   password: passwordSchema,
-  fullName: z.string()
-    .min(2, 'Full name must be at least 2 characters')
-    .max(100, 'Full name too long')
+  username: z.string()
+    .min(2, 'Username must be at least 2 characters')
+    .max(50, 'Username too long')
+    .regex(/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores, and hyphens')
     .optional(),
 });
 
