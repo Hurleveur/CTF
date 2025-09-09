@@ -9,6 +9,9 @@ More information on the challenge can be found here: https://docs.google.com/doc
 - **Secure Foundation**: Built with security best practices from the ground up
 - **Modern Stack**: Next.js 15.5.2 with App Router, React 19.1.1, TypeScript 5.9.2, and Tailwind CSS 4.1.12
 - **Supabase Authentication**: Server-side authentication with Row Level Security (RLS)
+- **Database-Driven Projects**: User projects stored in PostgreSQL with proper RLS policies
+- **Essential Cookies Only**: No functional localStorage, no cookie consent banner needed
+- **GDPR-Ready Cookie System**: Disabled by default, easily re-enabled via feature flags
 - **Comprehensive Testing**: Jest 30.1.2 setup with security-focused tests
 - **Security Headers**: CSP, HSTS, X-Frame-Options configured via middleware
 - **Input Validation**: Zod schema validation and XSS protection
@@ -58,6 +61,19 @@ More information on the challenge can be found here: https://docs.google.com/doc
 - **Solutions** (`/solutions`) - Product solutions and interactive demos
 - **Assembly Line** (`/assembly-line`) - Interactive robotics demonstration with advanced challenges
 - **Login** (`/login`) - Authentication and user management
+- **Privacy Policy** (`/privacy`) - GDPR-compliant privacy information and cookie details
+
+## 🍪 Quick Reference: Cookie Consent
+
+**Current Status**: ✅ No cookie banner needed (essential cookies only)
+
+| Topic | Location | Description |
+|-------|----------|-------------|
+| **Cookie Inventory** | `docs/privacy/cookie-inventory.md` | Complete GDPR compliance documentation |
+| **Enable Cookie Banner** | Set `NEXT_PUBLIC_ENABLE_COOKIE_CONSENT=true` | For testing or if localStorage is added |
+| **Feature Flags** | `lib/featureFlags.ts` | Central toggle for cookie consent system |
+| **Privacy Policy** | `/privacy` route | User-facing privacy information |
+| **Tests** | `__tests__/lib/consentedStorage.test.ts` | Consent system test coverage |
 
 ## 🛡️ Security Features
 
@@ -115,8 +131,9 @@ More information on the challenge can be found here: https://docs.google.com/doc
 3. **Set up Supabase Database**
    - Go to your Supabase project dashboard
    - Navigate to SQL Editor
-   - Copy and execute the contents of `supabase/schema.sql`
-   - This creates user profiles, challenges, submissions tables with RLS policies
+   - Execute the schema in `supabase/schema.sql` (if not already done)
+   - The `user_projects` table already exists with proper RLS policies
+   - Users can only access their own projects via RLS
 
 4. **Set up environment variables**
    Create `.env.local` with:
@@ -171,6 +188,27 @@ The project includes comprehensive tests for:
 - `npm test` - Run Jest 30.1.2 tests
 - `npm run test:watch` - Run tests in watch mode
 
+### Testing Cookie Consent Banner
+
+To test the cookie consent system during development:
+
+```bash
+# Enable cookie banner for testing
+echo "NEXT_PUBLIC_ENABLE_COOKIE_CONSENT=true" >> .env.local
+npm run dev
+
+# Test specific consent functionality
+npm test __tests__/lib/consentedStorage.test.ts
+
+# Disable when done testing
+# Remove the line from .env.local or set to false
+```
+
+**What you'll see when enabled:**
+- 🤖 Robotics-themed cookie banner with terminal animations
+- ⚙️ Persistent "Cookie Settings" button in bottom-right corner
+- 📋 Privacy policy page with detailed cookie information
+
 ### Breaking Changes from Next.js 15 & React 19 Upgrade
 - **Route Parameters**: All `params` are now Promises and must be awaited
 - **Cookies API**: `cookies()` now returns a Promise requiring async handling
@@ -183,6 +221,60 @@ The project includes comprehensive tests for:
 - **API Routes**: Server-side API handlers in `app/api/`
 - **Styling**: Tailwind CSS with custom component classes
 - **Testing**: Jest tests in `__tests__/` directory
+
+## 🍪 Cookie Consent & Privacy
+
+### Current Status: No Cookie Banner Needed
+
+This application currently **only uses essential authentication cookies** from Supabase and **does not require cookie consent** under GDPR because:
+
+- **No functional localStorage**: All user data (projects) is stored in the database
+- **No analytics/tracking cookies**: No third-party analytics or advertising
+- **Only essential cookies**: Supabase auth cookies necessary for login functionality
+- **No user preferences storage**: No UI customizations or settings stored in browser
+
+### Essential Cookies Used
+
+| Cookie Name | Purpose | Duration | Legal Basis |
+|-------------|---------|----------|-------------|
+| `sb-access-token` | Authentication token | Session | Legitimate interest (essential) |
+| `sb-refresh-token` | Token refresh | 7 days | Legitimate interest (essential) |
+| `sb-provider-token` | OAuth provider tokens | Session | Legitimate interest (essential) |
+| `sb-user` | User session metadata | Session | Legitimate interest (essential) |
+
+### Re-enabling Cookie Consent (If Needed Later)
+
+If you add localStorage usage or other functional cookies in the future, you can re-enable the cookie consent system:
+
+1. **Set feature flag**:
+   ```typescript
+   // In lib/featureFlags.ts
+   cookieConsentEnabled: true
+   ```
+
+2. **Or use environment variable**:
+   ```bash
+   NEXT_PUBLIC_ENABLE_COOKIE_CONSENT=true
+   ```
+
+3. **Or enable for testing/development**:
+   ```bash
+   # Add to .env.local
+   NEXT_PUBLIC_ENABLE_COOKIE_CONSENT=true
+   npm run dev
+   ```
+
+4. **The system includes**:
+   - 🎨 **Robotics-themed cookie consent banner** with terminal animations
+   - ⚙️ **Cookie preferences modal** with granular controls
+   - 🔒 **Consent-aware localStorage wrapper** that blocks writes without consent
+   - 📄 **Privacy policy page** at `/privacy` with detailed cookie information
+   - ✅ **Complete test suite** for consent logic in `__tests__/lib/consentedStorage.test.ts`
+
+5. **Documentation**:
+   - **Cookie Inventory**: `docs/privacy/cookie-inventory.md` - Complete GDPR compliance documentation
+   - **Privacy Policy**: Available at `/privacy` route for users
+   - **Feature Flags**: `lib/featureFlags.ts` - Central feature toggle system
 
 ## 🔒 Security Best Practices
 
@@ -285,11 +377,17 @@ if (codeCompletion >= 75 && !showAdvanced) {  // Change from 50 to 75
 
 ## 📚 Learning Resources
 
+### Technical Documentation
 - [Next.js Documentation](https://nextjs.org/docs)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [OWASP Security Guidelines](https://owasp.org/www-project-top-ten/)
 - [Jest Testing Framework](https://jestjs.io/docs/getting-started)
+
+### Security & Compliance
+- [OWASP Security Guidelines](https://owasp.org/www-project-top-ten/)
+- [Cookie Inventory Documentation](docs/privacy/cookie-inventory.md) - GDPR compliance guide
+- [GDPR Guide for Developers](https://gdpr.eu/what-is-gdpr/)
+- [Supabase Row Level Security](https://supabase.com/docs/guides/auth/row-level-security)
 
 ## 🤝 Contributing
 

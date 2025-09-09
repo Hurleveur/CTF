@@ -1,9 +1,10 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { useAuth } from './AuthContext';
 
 export interface RoboticProject {
-  id: number;
+  id: string | number; // UUID from database or number for default projects
   name: string;
   logo: string;
   description: string;
@@ -18,10 +19,14 @@ export interface RoboticProject {
 
 interface ProjectContextType {
   projects: RoboticProject[];
-  addProject: (project: Omit<RoboticProject, 'id'>) => void;
-  updateProject: (id: number, updates: Partial<RoboticProject>) => void;
-  getProject: (id: number) => RoboticProject | undefined;
+  addProject: (project: Omit<RoboticProject, 'id'>) => Promise<void>;
+  updateProject: (id: string | number, updates: Partial<RoboticProject>) => Promise<void>;
+  deleteProject: (id: string | number) => Promise<void>;
+  getProject: (id: string | number) => RoboticProject | undefined;
   setProjects: (projects: RoboticProject[]) => void;
+  isLoading: boolean;
+  error: string | null;
+  refreshProjects: () => Promise<void>;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
@@ -44,44 +49,106 @@ const DEFAULT_PROJECTS: RoboticProject[] = [
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
   const [projects, setProjects] = useState<RoboticProject[]>(DEFAULT_PROJECTS);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const { isAuthenticated } = useAuth();
 
-  // Load projects from localStorage on mount
+  // Load projects from database when authenticated
   useEffect(() => {
-    const stored = localStorage.getItem('robotech-projects');
-    if (stored) {
-      try {
-        const parsedProjects = JSON.parse(stored);
-        setProjects(parsedProjects);
-      } catch (error) {
-        console.error('Failed to parse stored projects:', error);
-        setProjects(DEFAULT_PROJECTS);
-      }
+    if (!isAuthenticated) {
+      setProjects(DEFAULT_PROJECTS);
+      return;
     }
-  }, []);
+    (async () => {
+      await refreshProjects();
+    })();
+  }, [isAuthenticated]);
 
-  // Save projects to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('robotech-projects', JSON.stringify(projects));
-  }, [projects]);
-
-  const addProject = (project: Omit<RoboticProject, 'id'>) => {
-    const newId = Math.max(...projects.map(p => p.id), 0) + 1;
-    const newProject: RoboticProject = {
-      ...project,
-      id: newId,
-    };
-    setProjects(prev => [...prev, newProject]);
+  const refreshProjects = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const res = await fetch('/api/user/projects', { cache: 'no-store' });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to load projects');
+      }
+      const data: RoboticProject[] = await res.json();
+      setProjects(data.length > 0 ? data : DEFAULT_PROJECTS);
+    } catch (e: any) {
+      console.error('Failed to load projects:', e);
+      setError(e.message || 'Failed to load projects');
+      setProjects(DEFAULT_PROJECTS);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const updateProject = (id: number, updates: Partial<RoboticProject>) => {
-    setProjects(prev =>
-      prev.map(project =>
-        project.id === id ? { ...project, ...updates } : project
-      )
-    );
+  const addProject = async (project: Omit<RoboticProject, 'id'>) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const res = await fetch('/api/user/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(project),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to create project');
+      }
+      await refreshProjects();
+    } catch (e: any) {
+      console.error('Failed to create project:', e);
+      setError(e.message || 'Failed to create project');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const getProject = (id: number) => {
+  const updateProject = async (id: string | number, updates: Partial<RoboticProject>) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const res = await fetch(`/api/user/projects/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to update project');
+      }
+      await refreshProjects();
+    } catch (e: any) {
+      console.error('Failed to update project:', e);
+      setError(e.message || 'Failed to update project');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteProject = async (id: string | number) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const res = await fetch(`/api/user/projects/${id}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to delete project');
+      }
+      await refreshProjects();
+    } catch (e: any) {
+      console.error('Failed to delete project:', e);
+      setError(e.message || 'Failed to delete project');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getProject = (id: string | number) => {
     return projects.find(project => project.id === id);
   };
 
@@ -90,8 +157,12 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       projects,
       addProject,
       updateProject,
+      deleteProject,
       getProject,
       setProjects,
+      isLoading,
+      error,
+      refreshProjects,
     }}>
       {children}
     </ProjectContext.Provider>

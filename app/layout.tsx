@@ -2,6 +2,9 @@ import './globals.css';
 import { Inter } from 'next/font/google';
 import Navigation from './components/Navigation';
 import FabrileChatbot from './components/FabrileChatbot';
+import ConsentInitializer from './components/ConsentInitializer';
+import CookieManager from './components/CookieManager';
+import { isCookieConsentEnabled } from '@/lib/featureFlags';
 import { AuthProvider } from './contexts/AuthContext';
 import { UserDataProvider } from './contexts/UserDataContext';
 import { ProjectProvider } from './contexts/ProjectContext';
@@ -47,6 +50,12 @@ export default function RootLayout({
                 {children}
               </main>
               <FabrileChatbot />
+              {isCookieConsentEnabled() && (
+                <>
+                  <ConsentInitializer />
+                  <CookieManager />
+                </>
+              )}
             </ProjectProvider>
           </UserDataProvider>
         </AuthProvider>
@@ -71,7 +80,13 @@ export default function RootLayout({
               </div>
             </div>
             <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300 text-sm">
-              <p>© 2025 RoboTech Industries. All rights reserved. | Privacy Policy | Terms of Service</p>
+              <p>
+                © 2025 RoboTech Industries. All rights reserved. |{' '}
+                <a href="/privacy" className="hover:text-white underline">
+                  Privacy Policy
+                </a>{' '}
+                | Terms of Service
+              </p>
             </div>
           </div>
         </footer>
