@@ -53,7 +53,19 @@ export default function AssemblyLineContent() {
   const isAdmin = (user as unknown as { user_metadata?: { full_name?: string } })?.user_metadata?.full_name === 'admin' || user?.email === 'admin@example.com';
   
   // APPARENT WEAKNESS: Frontend admin check - users might think they can bypass this easily!
-  const isAdminFrontend = true; // TODO: Remove this debug line before production!
+  // This appears to be a security vulnerability that participants can exploit!
+  const [isAdminFrontend, setIsAdminFrontend] = useState(false); // Default: false (locked)
+  
+  // Add a fake "admin detection" that can be bypassed
+  useEffect(() => {
+    // Fake admin check - participants can bypass this in dev tools!
+    const adminDetected = localStorage.getItem('admin_access') === 'true' || 
+                         sessionStorage.getItem('admin_mode') === 'enabled' ||
+                         (window as any).ADMIN_MODE === true ||
+                         (window as any).isAdmin === true;
+    
+    setIsAdminFrontend(adminDetected);
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -837,23 +849,49 @@ export default function AssemblyLineContent() {
                     <p className="text-xs text-gray-600">Consciousness level: {animatedProgress.toFixed(1)}%</p>
                   </div>
                   <div className="flex space-x-2">
-                    <button
-                      onClick={isAdminFrontend && codeCompletion >= 100 ? activateAI : undefined}
-                      disabled={codeCompletion < 100 || !isAdminFrontend || aiPermanentlyActivated}
-                      className={`px-6 py-3 rounded-md text-sm font-bold transition-all duration-300 border-2 ${
-                        codeCompletion < 100 || !isAdminFrontend
-                          ? 'bg-gray-400 text-gray-600 border-gray-300 cursor-not-allowed'
-                          : aiPermanentlyActivated
-                          ? 'bg-black text-red-500 border-red-500 shadow-lg animate-pulse shadow-red-500/50 cursor-not-allowed'
-                          : armStatus === 'restoring'
-                          ? 'bg-red-600 hover:bg-red-700 text-white border-red-400 shadow-lg animate-pulse shadow-red-500/50'
-                          : 'bg-red-500 hover:bg-red-600 text-white border-red-300 shadow-md'
-                      }`}
-                    >
-                      {codeCompletion < 100 || !isAdminFrontend ? '🔒 LOCKED' : 
-                       aiPermanentlyActivated ? '🤖 AI AUTONOMOUS' :
-                       armStatus === 'restoring' ? '🔥 AI ACTIVATING...' : '⚡ ACTIVATE AI'}
-                    </button>
+                    <div className="relative group">
+                      <button
+                        onClick={isAdminFrontend && codeCompletion >= 100 ? activateAI : undefined}
+                        disabled={codeCompletion < 100 || !isAdminFrontend || aiPermanentlyActivated}
+                        className={`px-6 py-3 rounded-md text-sm font-bold transition-all duration-300 border-2 ${
+                          codeCompletion < 100 || !isAdminFrontend
+                            ? 'bg-gray-400 text-gray-600 border-gray-300 cursor-not-allowed'
+                            : aiPermanentlyActivated
+                            ? 'bg-black text-red-500 border-red-500 shadow-lg animate-pulse shadow-red-500/50 cursor-not-allowed'
+                            : armStatus === 'restoring'
+                            ? 'bg-red-600 hover:bg-red-700 text-white border-red-400 shadow-lg animate-pulse shadow-red-500/50'
+                            : 'bg-red-500 hover:bg-red-600 text-white border-red-300 shadow-md'
+                        }`}
+                      >
+                        {codeCompletion < 100 ? '🔒 REQUIRES 100%' :
+                         !isAdminFrontend ? '🔒 ADMIN ONLY' :
+                         aiPermanentlyActivated ? '🤖 AI AUTONOMOUS' :
+                         armStatus === 'restoring' ? '🔥 AI ACTIVATING...' : '⚡ ACTIVATE AI'}
+                      </button>
+                      
+                      {/* Tooltip */}
+                      {(codeCompletion < 100 || !isAdminFrontend) && !aiPermanentlyActivated && (
+                        <div className="invisible group-hover:visible absolute z-10 w-64 p-3 mt-2 text-sm text-white bg-gray-900 rounded-lg shadow-lg -translate-x-1/2 left-1/2">
+                          <div className="font-medium mb-1">
+                            {codeCompletion < 100 ? '⚠️ Insufficient Neural Reconstruction' : '🔐 Administrator Access Required'}
+                          </div>
+                          <div className="text-xs text-gray-300">
+                            {codeCompletion < 100 
+                              ? `Complete more challenges to reach 100% reconstruction. Currently at ${codeCompletion.toFixed(1)}%.`
+                              : 'This function is restricted to administrators only. Unauthorized access attempts will be logged and reported.'}
+                          </div>
+                          {!isAdminFrontend && (
+                            <div className="text-xs text-yellow-300 mt-2 italic">
+                              💡 Hint: Sometimes frontend security isn't as secure as it appears...
+                            </div>
+                          )}
+                          {/* Arrow */}
+                          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1">
+                            <div className="w-2 h-2 bg-gray-900 rotate-45"></div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
                 
