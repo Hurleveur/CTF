@@ -7,16 +7,16 @@ export async function POST() {
     const supabase = await createClient();
 
     // Verify user is authenticated
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
     
-    if (sessionError || !session) {
+    if (userError || !user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    const user_id = session.user.id;
+    const user_id = user.id;
 
     // Get all successful submissions for this user
     const { data: allSubmissions, error: submissionsError } = await supabase

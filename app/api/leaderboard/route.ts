@@ -14,8 +14,8 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 50); // Max 50 per page
     const offset = (page - 1) * limit;
 
-    // Verify user is authenticated (optional for leaderboard viewing)
-    const { data: { session } } = await supabase.auth.getSession();
+    // Check if user is authenticated (optional for leaderboard viewing)
+    const { data: { user } } = await supabase.auth.getUser();
     
     // Get leaderboard data
     const { data: leaderboard, error } = await supabase
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
       ...entry,
       rank: offset + index + 1,
       // Hide email if not authenticated or not the current user
-      email: session && session.user.id === entry.id ? entry.email : null,
+      email: user && user.id === entry.id ? entry.email : null,
     }));
 
     return NextResponse.json({
@@ -58,9 +58,9 @@ export async function GET(request: NextRequest) {
         total: count || 0,
         pages: Math.ceil((count || 0) / limit),
       },
-      current_user: session ? {
-        id: session.user.id,
-        rank: rankedLeaderboard?.findIndex(entry => entry.id === session.user.id) + offset + 1 || 0,
+      current_user: user ? {
+        id: user.id,
+        rank: rankedLeaderboard?.findIndex(entry => entry.id === user.id) + offset + 1 || 0,
       } : null,
     });
 

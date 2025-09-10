@@ -5,18 +5,18 @@ export async function GET() {
   try {
     const supabase = await createClient();
 
-    // Get the current session
-    const { data: { session }, error } = await supabase.auth.getSession();
+    // Get the current user (more secure than getSession)
+    const { data: { user }, error } = await supabase.auth.getUser();
 
     if (error) {
-      console.error('[Auth] Session error:', error.message);
+      console.error('[Auth] User authentication error:', error.message);
       return NextResponse.json(
-        { error: 'Session retrieval failed' },
+        { error: 'User authentication failed' },
         { status: 500 }
       );
     }
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json(
         { 
           authenticated: false,
@@ -26,20 +26,23 @@ export async function GET() {
       );
     }
 
-    // Return session information
+    // For session info that requires session data, get it only when user is authenticated
+    const { data: { session } } = await supabase.auth.getSession();
+
+    // Return user and session information
     return NextResponse.json({
       authenticated: true,
       user: {
-        id: session.user.id,
-        email: session.user.email,
-        role: session.user.role,
-        last_sign_in_at: session.user.last_sign_in_at,
-        email_confirmed_at: session.user.email_confirmed_at,
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        last_sign_in_at: user.last_sign_in_at,
+        email_confirmed_at: user.email_confirmed_at,
       },
-      session: {
+      session: session ? {
         access_token: session.access_token,
         expires_at: session.expires_at,
-      },
+      } : null,
     });
 
   } catch (error) {

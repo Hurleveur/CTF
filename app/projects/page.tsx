@@ -23,7 +23,7 @@ export default function SolutionsPage() {
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [isCreatingProject, setIsCreatingProject] = useState(false);
   const [projectError, setProjectError] = useState('');
-  const [, setIsLoadingProjects] = useState(false);
+  const [isLoadingProjects, setIsLoadingProjects] = useState(false);
   const [hasLoadedProjects, setHasLoadedProjects] = useState(false);
   const [statistics, setStatistics] = useState({
     fragmentsFound: 0,
@@ -226,8 +226,19 @@ export default function SolutionsPage() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
+          {/* Show loading indicator when fetching projects */}
+          {isLoadingProjects && (
+            <div className="text-center py-8 mb-8">
+              <div className="flex items-center justify-center mb-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                <span className="text-gray-600 text-lg">Loading projects...</span>
+              </div>
+              <p className="text-gray-500 text-sm">Fetching neural reconstruction data from all active projects...</p>
+            </div>
+          )}
+          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-            {sortedProjects.map((project, index) => {
+              {sortedProjects.map((project, index) => {
               // Use project's existing statusColor if available (e.g. hardcoded default), otherwise calculate
               const statusColor = project.statusColor || calculateStatusColor(project.neuralReconstruction);
               const aiStatus = project.aiStatus || calculateAIStatus(project.neuralReconstruction);

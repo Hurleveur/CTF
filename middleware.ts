@@ -83,6 +83,8 @@ export async function middleware(request: NextRequest) {
     );
 
     // Check if user has a valid session
+    // Note: Using getSession() is acceptable in middleware for performance reasons
+    // as we only need to check for the presence of auth, not validate sensitive operations
     const { data: { session }, error } = await supabase.auth.getSession();
 
     if (error) {

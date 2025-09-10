@@ -31,24 +31,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Check if user is logged in on mount and listen for auth changes
   useEffect(() => {
-    const getSession = async () => {
+    const getInitialUser = async () => {
       try {
-        console.log('🔄 Checking initial session on mount...');
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          console.log('🔄 Initial session found for:', session.user.email);
-          setUser(formatUser(session.user));
+        console.log('🔄 Checking initial user on mount...');
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) {
+          console.log('🔄 No valid user session found:', error.message);
+        } else if (user) {
+          console.log('🔄 Initial user found for:', user.email);
+          setUser(formatUser(user));
         } else {
-          console.log('🔄 No initial session found');
+          console.log('🔄 No initial user found');
         }
       } catch (error) {
-        console.error('🔄 Error getting session:', error);
+        console.error('🔄 Error getting user:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    getSession();
+    getInitialUser();
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -112,22 +114,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
       }
 
-      // Immediately check session after successful API call for faster UI update
+      // Immediately check user after successful API call for faster UI update
       try {
-        console.log('🔐 Checking session after successful API call...');
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        console.log('🔐 Checking user after successful API call...');
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
         
-        if (sessionError) {
-          console.error('🔐 Session retrieval error:', sessionError);
-        } else if (sessionData?.session?.user) {
-          console.log('🔐 Session found, updating user state immediately');
-          setUser(formatUser(sessionData.session.user));
+        if (userError) {
+          console.error('🔐 User retrieval error:', userError);
+        } else if (user) {
+          console.log('🔐 User found, updating user state immediately');
+          setUser(formatUser(user));
         } else {
-          console.log('🔐 No session found, waiting for auth listener...');
+          console.log('🔐 No user found, waiting for auth listener...');
         }
-      } catch (sessionError) {
-        console.error('🔐 Session check error:', sessionError);
-        // Don't fail login if session check fails, auth listener will handle it
+      } catch (userError) {
+        console.error('🔐 User check error:', userError);
+        // Don't fail login if user check fails, auth listener will handle it
       }
       
       setIsLoading(false);
@@ -171,20 +173,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Check if user was automatically logged in (when email confirmation is disabled)
       try {
-        console.log('📝 Checking for session after signup...');
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        console.log('📝 Checking for user after signup...');
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
         
-        if (sessionError) {
-          console.error('📝 Session retrieval error after signup:', sessionError);
-        } else if (sessionData?.session?.user) {
-          console.log('📝 User was automatically logged in after signup!', sessionData.session.user.email);
-          setUser(formatUser(sessionData.session.user));
+        if (userError) {
+          console.error('📝 User retrieval error after signup:', userError);
+        } else if (user) {
+          console.log('📝 User was automatically logged in after signup!', user.email);
+          setUser(formatUser(user));
         } else {
-          console.log('📝 No session found after signup, email confirmation may be required');
+          console.log('📝 No user found after signup, email confirmation may be required');
         }
-      } catch (sessionError) {
-        console.error('📝 Session check error after signup:', sessionError);
-        // Don't fail signup if session check fails, auth listener will handle it
+      } catch (userError) {
+        console.error('📝 User check error after signup:', userError);
+        // Don't fail signup if user check fails, auth listener will handle it
       }
       
       setIsLoading(false);
@@ -237,17 +239,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log('🚪 Clearing user state immediately');
       setUser(null);
       
-      // Verify session is actually cleared
+      // Verify user session is actually cleared
       setTimeout(async () => {
         try {
-          const { data: { session } } = await supabase.auth.getSession();
-          if (session) {
-            console.error('🚪 WARNING: Session still exists after logout!', session.user?.email);
+          const { data: { user }, error } = await supabase.auth.getUser();
+          if (user && !error) {
+            console.error('🚪 WARNING: User still authenticated after logout!', user.email);
           } else {
-            console.log('🚪 ✅ Verified: Session successfully cleared');
+            console.log('🚪 ✅ Verified: User session successfully cleared');
           }
         } catch (error) {
-          console.error('🚪 Session verification error:', error);
+          console.error('🚪 User verification error:', error);
         }
       }, 100);
       

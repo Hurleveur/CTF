@@ -345,7 +345,13 @@ export default function TeamPage() {
                     {/* Current Projects */}
                     <div className="mt-6">
                       <h4 className="text-sm font-semibold text-gray-900 mb-3">Current Projects</h4>
-                      {member.projects && member.projects.length > 0 ? (
+                      {/* Show loading state when projects are being loaded */}
+                      {isLoadingTeam ? (
+                        <div className="flex items-center text-gray-500 text-xs italic">
+                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-400 mr-2"></div>
+                          Loading projects...
+                        </div>
+                      ) : member.projects && member.projects.length > 0 ? (
                         <ul className="space-y-1">
                           {member.projects.map((project, index) => (
                             <li key={index} className="text-gray-600 text-xs flex items-start">

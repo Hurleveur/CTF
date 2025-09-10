@@ -10,10 +10,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
     const supabase = await createClient();
     
-    // Get current user
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    // Get current user (more secure than getSession)
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
     
-    if (sessionError || !session) {
+    if (userError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' }, 
         { status: 401 }
@@ -38,7 +38,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         ...(teamMembers !== undefined && { team_members: teamMembers })
       })
       .eq('id', id)
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .select()
       .single();
 
@@ -87,10 +87,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
     const supabase = await createClient();
     
-    // Get current user
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    // Get current user (more secure than getSession)
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
     
-    if (sessionError || !session) {
+    if (userError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' }, 
         { status: 401 }
@@ -102,7 +102,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       .from('user_projects')
       .delete()
       .eq('id', id)
-      .eq('user_id', session.user.id);
+      .eq('user_id', user.id);
 
     if (error) {
       console.error('Error deleting project:', error);

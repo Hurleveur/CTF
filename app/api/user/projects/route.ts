@@ -5,10 +5,10 @@ export async function GET() {
   try {
     const supabase = await createClient();
     
-    // Get current user
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    // Get current user (more secure than getSession)
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
     
-    if (sessionError || !session) {
+    if (userError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' }, 
         { status: 401 }
@@ -19,7 +19,7 @@ export async function GET() {
     const { data: projects, error } = await supabase
       .from('user_projects')
       .select('*')
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -60,10 +60,10 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     
-    // Get current user
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    // Get current user (more secure than getSession)
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
     
-    if (sessionError || !session) {
+    if (userError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' }, 
         { status: 401 }
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     const { data: project, error } = await supabase
       .from('user_projects')
       .insert({
-        user_id: session.user.id,
+        user_id: user.id,
         name,
         logo: logo || '🤖',
         description: description || '',

@@ -149,7 +149,7 @@ export default function SignupPage() {
                       </li>
                       <li className="flex items-start">
                         <span className="font-bold mr-2">5.</span>
-                        <span><strong>Sharing Solutions:</strong> Publicly posting flags, solutions, or detailed writeups during the active competition period</span>
+                        <span><strong>Sharing Solutions:</strong> Publicly posting flags, solutions, or detailed writeups during the active competition period. Feel free to talk about the challenge with peers and give hints, or ask the AI or us for help, however</span>
                       </li>
                     </ul>
                   </div>
@@ -162,7 +162,7 @@ export default function SignupPage() {
                       Encouraged Techniques
                     </h4>
                     <p className="text-green-700">
-                      Creative problem-solving, code analysis, web application testing, API exploration, social engineering within the platform, and ethical reconnaissance are all fair game!
+                      Creative problem-solving, code analysis, web application testing, API exploration, social engineering within the platform, and ethical reconnaissance are all fair game! If you find a vulnerability we didn't intend (without a RTB{} flag) please tell us and you'll get a permanent spot on the website.
                     </p>
                   </div>
                   
