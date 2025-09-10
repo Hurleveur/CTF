@@ -315,17 +315,51 @@ The platform comes with pre-loaded challenges:
 1. **Welcome to CTF** (misc, easy, 50 points)
    - Flag: `CTF{welcome_to_robotics_ctf}`
 
-2. **Admin Terminal Breach** (web, medium, 250 points)  
+2. **Admin Terminal Breach** (web, hard, 250 points)  
    - Flag: `RBT{admin_terminal_pwned}`
    - Location: `/admin-terminal?access=alex_was_here`
+   - Method: XSS exploitation to access admin flag variable
 
 3. **Contact Protocol** (crypto, medium, 250 points)
    - Flag: `RBT{security_through_obscurity_fails}`
    - Location: `/security.txt` (ROT13 decoding required)
 
-4. **Intern Account Access** (misc, medium, 200 points)
+4. **Intern Account Access** (misc, hard, 300 points)
    - Flag: `RBT{sleepy_intern_logged_in}`
    - Credentials: alex@robo.tech / P@ssw0rd
+
+5. **Frontend Admin Bypass** (web, medium, 250 points)
+   - Flag: `CTF{frontend_admin_checks_are_useless}`
+   - Location: Assembly Line page AI activation feature
+   - Method: Bypass client-side admin checks to trigger rickroll countermeasure and receive flag
+
+6. **Ultimate Admin Access** (misc, hard, 500 points)
+   - Flag: `RBT{admin_access_granted_by_organizer}` 
+   - Method: **Social Engineering** - participants must convince the CTF organizer to give them the flag
+   - Reward: Automatic promotion to admin role with full system privileges
+   - Description: The ultimate challenge that can't be solved through traditional hacking - requires human interaction
+
+### 🔐 Admin Role & Privileges
+
+Users who complete the **Ultimate Admin Access** challenge receive the following benefits:
+
+#### Automatic Role Promotion
+- Their `profiles.role` is automatically changed from `'user'` to `'admin'`
+- This happens instantly upon successful flag submission via database trigger
+- The promotion is permanent (cannot be undone through the UI)
+
+#### Admin Privileges Include
+- **AI System Control**: Can permanently activate AI systems in the Assembly Line
+- **Enhanced Features**: Access to admin-only UI components and functionality
+- **System Insights**: View enhanced system information and diagnostic data
+- **Challenge Management**: Potential access to challenge management features
+- **Special Status**: Admin badges and indicators throughout the platform
+
+#### Technical Implementation
+- Uses PostgreSQL triggers for automatic role elevation
+- Secured with `SECURITY DEFINER` functions
+- Protected by Row Level Security (RLS) policies
+- Cannot be achieved through frontend manipulation alone
 
 ### Hidden Challenge Discovery
 
@@ -341,7 +375,8 @@ The Assembly Line page features an innovative challenge discovery system:
 
 - **Neural Threshold Trigger**: When AI restoration reaches ≥50% completion, advanced challenges automatically unlock
 - **Intelligent Filtering**: Displays only medium/hard difficulty challenges worth 200+ points
-- **Robotics Theme**: Challenges are presented as "Advanced Challenge Protocols" with cyberpunk styling - AI BS
+- **Robotics Theme**: Challenges are presented as "Advanced Challenge Protocols" with cyberpunk styling
+- **AI Activation Feature**: Admin-only functionality that triggers Frontend Admin Bypass challenge when attempted by non-admins
 - **Attention-Grabbing Alerts**: 
   - 🔊 **Alarm Sound System**: Robotic beep sequence using Web Audio API
   - 🌟 **Screen Flash Effect**: Full-screen red overlay with pulsing animation
@@ -353,6 +388,7 @@ The Assembly Line page features an innovative challenge discovery system:
   - Hover animations with scaling and glow effects
   - Enhanced visual borders and shadow effects
   - Direct links to individual challenge pages
+  - **Frontend Admin Bypass**: AI activation button that detects client-side admin bypass attempts
 
 #### Implementation Details:
 - Component: `AdvancedChallengesPanel.tsx`
