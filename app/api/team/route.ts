@@ -152,6 +152,7 @@ export async function GET() {
         id: profile.id,
         name: profile.full_name || profile.email || 'Anonymous User',
         role: role,
+        ctfRole: profile.ctf_role || '🎯 CTF Participant', // Default to CTF Participant
         avatar: avatar,
         email: profile.email || 'hidden@robotech.fake',
         bio: bio,

@@ -60,6 +60,7 @@ More information on the challenge can be found here: https://docs.google.com/doc
 - **About** (`/about`) - Company information and contact details
 - **Projects** (`/projects`) - User projects and interactive demos
 - **Assembly Line** (`/assembly-line`) - Interactive robotics demonstration with advanced challenges
+- **Team** (`/team`) - Internal team directory with CTF role hierarchies
 - **Login** (`/login`) - Authentication and user management
 - **Privacy Policy** (`/privacy`) - GDPR-compliant privacy information and cookie details
 
@@ -374,6 +375,77 @@ if (codeCompletion >= 75 && !showAdvanced) {  // Change from 50 to 75
   loadAdvancedChallenges();
 }
 ```
+
+## 👥 Team Page Roles
+
+### CTF Role Hierarchy System
+
+The `/team` page features a prominent role badge system that clearly distinguishes between different team groups:
+
+#### Core CTF Team (Gold Gradient Badges)
+- **🏆 CTF Challenge Architect** - Alexandre De Groodt (CTF Lead)
+- **🔓 Chief Exploitation Officer** - Aschraf (HackBox Expert)
+- **🥷 Shadow Ops Commander** - Léandre (Mr. Robot Type)
+
+#### North Star Agi Team (Indigo/Purple Gradient Badges)
+- **💼 North Star Agi – Business Operations** - Cédric Sounard
+- **🧠 North Star Agi – AI Strategy Lead** - Filip
+- **🤗 North Star Agi – People & AI Ethics** - Oleksandr
+- **🤖 North Star Agi – Robotics Engineer** - Laksiya
+- **⭐ North Star Agi – Security Consultant** - Patrick Star
+
+#### CTF Participants (Emerald Gradient Badges)
+- **🎯 CTF Participant** - Default role for all other registered users
+
+### Technical Implementation
+
+#### CTFRoleBadge Component
+- **Location**: `app/components/CTFRoleBadge.tsx`
+- **Features**: 
+  - Group-based gradient styling with shadow effects
+  - Hover animations (scale transform)
+  - Responsive text sizing (`text-sm md:text-base`)
+  - Full accessibility support (aria-labels, titles)
+  - Icon + text display with proper spacing
+
+#### Database Integration
+- **Column**: `profiles.ctf_role TEXT DEFAULT '🎯 CTF Participant'`
+- **Migration**: `supabase/migrations/20250910095623_add_ctf_role_column.sql`
+- **API Support**: Team API route includes `ctfRole` field for database users
+
+#### Styling System
+```typescript
+type CTFGroup = 'core' | 'northstar' | 'participant';
+
+// Group determination logic
+function getCtfGroup(role: string): CTFGroup {
+  const lowerRole = role.toLowerCase();
+  
+  if (lowerRole.includes('ctf challenge architect') || 
+      lowerRole.includes('chief exploitation officer') || 
+      lowerRole.includes('shadow ops commander')) {
+    return 'core';
+  }
+  
+  if (lowerRole.includes('north star agi')) {
+    return 'northstar';
+  }
+  
+  return 'participant';
+}
+```
+
+#### Badge Styling Classes
+- **Core Team**: `bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-500`
+- **North Star**: `bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-600`
+- **Participants**: `bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500`
+
+### Testing Coverage
+- **Unit Tests**: `__tests__/CTFRoleBadge.test.tsx` 
+- **Group Classification**: Validates correct role-to-group mapping
+- **Styling Verification**: Ensures proper CSS class application
+- **Accessibility**: Tests aria-labels and keyboard navigation
+- **Responsive Design**: Validates mobile/desktop scaling
 
 ## 📚 Learning Resources
 

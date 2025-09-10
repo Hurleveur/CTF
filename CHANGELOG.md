@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased] - Next.js 15 & Dependencies Upgrade
 
+### 🎯 New Features
+
+#### Team Page CTF Role Hierarchy System
+- **CTF Role Badges**: Added prominent role badges to distinguish team members
+  - `app/components/CTFRoleBadge.tsx` - New reusable component with group-based styling
+  - **Core CTF Team** (gold gradient): Challenge Architect, Exploitation Officer, Shadow Ops Commander
+  - **North Star Agi Team** (indigo/purple gradient): Business, AI Strategy, People & Ethics, Robotics, Security
+  - **CTF Participants** (emerald gradient): Default role for all registered users
+- **Database Integration**: Added `ctf_role` column to profiles table with migration
+  - Migration: `supabase/migrations/20250910095623_add_ctf_role_column.sql`
+  - Updated API routes to include CTF role data
+- **Accessibility & UX**: 
+  - Hover animations with scale transforms
+  - Responsive text sizing (`text-sm md:text-base`)
+  - Full ARIA support with labels and titles
+  - Icon + text display with proper spacing
+- **Testing**: Comprehensive unit tests in `__tests__/CTFRoleBadge.test.tsx`
+  - Group classification validation
+  - CSS styling verification
+  - Accessibility compliance checks
+
 ### 🚀 Major Version Upgrades
 
 #### Framework & Runtime

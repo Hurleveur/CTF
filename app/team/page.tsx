@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
+import CTFRoleBadge from '../components/CTFRoleBadge';
 
 interface TeamMember {
   id: string | number;
   name: string;
   role: string;
+  ctfRole?: string; // New prominent CTF role with icon
   avatar: string;
   email: string;
   bio: string;
@@ -36,6 +38,7 @@ export default function TeamPage() {
       id: 1,
       name: "Alexandre De Groodt",
       role: "CTF Lead (Intern)",
+      ctfRole: "🏆 CTF Challenge Architect",
       avatar: "😴",
       email: "alex@robo.tech",
       bio: "Sleep-deprived intern doing his best to manage this chaotic team of fellow interns. Built this website at 3 AM and somehow became the 'responsible' one for this project, but he's not sure how'.",
@@ -49,6 +52,7 @@ export default function TeamPage() {
       id: 2,
       name: "Aschraf",
       role: "Intern (HackBoxer)",
+      ctfRole: "🔓 Chief Exploitation Officer",
       avatar: "🧸",
       email: "aschraf@robotech.fake",
       bio: "Experienced with HackTheBox and online web hacking challenges. Don't let the teddy bear appearance fool you - can break into systems faster than you can say 'buffer overflow'.",
@@ -62,6 +66,7 @@ export default function TeamPage() {
       id: 3,
       name: "Léandre",
       role: "Shadow Ops Intern",
+      ctfRole: "🥷 Shadow Ops Commander",
       avatar: "🥷",
       email: "leandre@robotech.fake",
       bio: "The mysterious Mr. Robot type who appears out of nowhere with perfect solutions. Speaks in cryptic one-liners and somehow always knows exactly what's wrong with the system.",
@@ -75,6 +80,7 @@ export default function TeamPage() {
       id: 4,
       name: "Cédric Sounard",
       role: "Sales & Code Vibes Specialist",
+      ctfRole: "💼 North Star Agi – Business Operations",
       avatar: "🕺",
       email: "cedric.sounard@robotech.fake",
       bio: "The charismatic sales guy who can still talk code++. Never stops, never sleeps, and always eats Indian food.",
@@ -88,6 +94,7 @@ export default function TeamPage() {
       id: 5,
       name: "Filip",
       role: "Entrepreneur & AI Whisperer",
+      ctfRole: "🧠 North Star Agi – AI Strategy Lead",
       avatar: "🧠",
       email: "filip@robotech.fake",
       bio: "The mastermind entrepreneur who somehow keeps this chaotic intern-run company afloat. AI expert who can explain neural networks to investors and fix the discord bot in the same meeting.",
@@ -101,6 +108,7 @@ export default function TeamPage() {
       id: 6,
       name: "Oleksandr",
       role: "The Expert",
+      ctfRole: "🤗 North Star Agi – People & AI Ethics",
       avatar: "🤗",
       email: "oleksandr@robotech.fake",
       bio: "The ultimate people person who naturally became HR. Combines next-level emotional intelligence with being genuinely the nicest human alive. When not busy making sure everyone feels valued and comfortable, he's casually being the absolute best at AI - like, scary good at it.",
@@ -114,6 +122,7 @@ export default function TeamPage() {
       id: 7,
       name: "Laksiya",
       role: "Dynamic Robotics Engineer",
+      ctfRole: "🤖 North Star Agi – Robotics Engineer",
       avatar: "🤖",
       email: "laksiya@robotech.fake",
       bio: "A dynamic force of nature who brings infectious laughter to every standup meeting. When she's not busy writing robotics code to automate away everyone's jobs (in the most delightful way possible), you'll find her out running marathons or eating.",
@@ -127,6 +136,7 @@ export default function TeamPage() {
       id: 8,
       name: "Patrick Star",
       role: "Senior Security Consultant",
+      ctfRole: "⭐ North Star Agi – Security Consultant",
       avatar: "⭐",
       email: "p.star@robotech.fake",
       bio: "Security expert with experience in underwater systems and unconventional problem-solving. Provides unique perspectives on security challenges.",
@@ -282,6 +292,11 @@ export default function TeamPage() {
           {sortedTeamMembers.map((member) => (
             <div key={member.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
               <div className="p-8">
+                {/* CTF Role Badge - Prominent at top */}
+                <div className="mb-6 text-center lg:text-left">
+                  <CTFRoleBadge role={member.ctfRole || '🎯 CTF Participant'} />
+                </div>
+                
                 <div className="flex flex-col lg:flex-row lg:items-start gap-8">
                   {/* Avatar and Basic Info */}
                   <div className="flex-shrink-0 text-center lg:text-left">
