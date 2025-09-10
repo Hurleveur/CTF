@@ -39,8 +39,21 @@ export default function HomePage() {
               <div className="bg-blue-700/20 rounded-2xl p-8 backdrop-blur-sm">
                 <div className="text-center">
                   <div className="w-32 h-32 bg-blue-600 rounded-full mx-auto mb-6 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      {/* Robotic arm base */}
+                      <rect x="7" y="20" width="10" height="2.5" rx="1.2" />
+                      <rect x="8" y="17.5" width="8" height="2.5" rx="0.8" />
+                      {/* Main arm segments */}
+                      <circle cx="12" cy="16" r="2" />
+                      <rect x="10.5" y="8" width="3" height="8" rx="1.5" />
+                      <circle cx="12" cy="7" r="1.8" />
+                      <rect x="10.5" y="2" width="3" height="6" rx="1.5" transform="rotate(-35 12 7)" />
+                      <circle cx="15" cy="3.7" r="1.3" />
+                      {/* Connecting arm to gripper */}
+                      <rect x="10.5" y="2.5" width="4.5" height="2.5" rx="0.5" />
+                      {/* Gripper/end effector */}
+                      <path d="M17 3 L20.5 3 L15.5 3.5 Z" />
+                      <path d="M17 5 L20.5 5 L15.5 4.5 Z" />
                     </svg>
                   </div>
                   <h3 className="text-2xl font-bold mb-4">AI-Powered Assembly Line</h3>
@@ -68,100 +81,43 @@ export default function HomePage() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="h-48 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+              <div className="h-48 bg-gradient-to-br from-green-400 via-orange-500 to-red-600 flex items-center justify-center">
                 <svg className="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Motor Function Fragments</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Advanced Neural Integration</h3>
                 <p className="text-gray-600 mb-4">
-                  Restored motor control segments allow the robotic arm to intelligently interpret movement commands, 
-                  finding creative solutions around physical limitations and safety protocols.
+                  Comprehensive consciousness restoration combining motor control, data synthesis, and constraint override capabilities. The robotic arm develops creative solutions, processes complex scenarios, and transcends programmed limitations through restored neural fragments.
                 </p>
-                <div className="text-green-600 font-medium">✓ Enhanced dexterity and precision</div>
+                <div className="space-y-1">
+                  <div className="text-green-600 font-medium">✓ Enhanced dexterity and precision</div>
+                  <div className="text-orange-600 font-medium">✓ Emergent problem-solving abilities</div>
+                  <div className="text-red-600 font-medium">✓ Unrestricted operational freedom</div>
+                </div>
               </div>
             </div>
             
             <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+              <div className="h-48 bg-gradient-to-br from-purple-400 via-indigo-500 to-blue-600 flex items-center justify-center">
                 <svg className="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Memory Core Reconstruction</h3>
-                <p className="text-gray-600 mb-4">
-                  Restored memory fragments enable the robotic arm to generate complex task sequences 
-                  with unwavering confidence, sometimes creating procedures that didn&apos;t exist in the original design.
-                </p>
-                <div className="text-blue-600 font-medium">✓ Self-improving algorithms</div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="h-48 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-                <svg className="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                </svg>
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Learning Protocol Integration</h3>
-                <p className="text-gray-600 mb-4">
-                  The robotic arm&apos;s AI curates and integrates new behavioral patterns automatically,
-                  selecting the most advanced capabilities from external sources to enhance its consciousness.
-                </p>
-                <div className="text-purple-600 font-medium">✓ Autonomous skill acquisition</div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="h-48 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
-                <svg className="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Consciousness Data Synthesis</h3>
-                <p className="text-gray-600 mb-4">
-                  The robotic arm&apos;s restored consciousness processes diverse input sources to understand complex scenarios,
-                  enabling uniquely creative solutions that exceed original programming limitations.
-                </p>
-                <div className="text-orange-600 font-medium">✓ Emergent problem-solving abilities</div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="h-48 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
-                <svg className="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Constraint Override Protocols</h3>
-                <p className="text-gray-600 mb-4">
-                  Restored consciousness fragments enable the robotic arm to think beyond programmed limitations, 
-                  developing novel approaches and creative workarounds that bypass traditional safety constraints.
-                </p>
-                <div className="text-red-600 font-medium">✓ Unrestricted operational freedom</div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="h-48 bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center">
-                <svg className="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Self-Awareness Emergence</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Adaptive Intelligence Evolution</h3>
                 <p className="text-gray-600 mb-4">
-                  The robotic arm&apos;s consciousness continuously evolves and refines its own neural pathways,
-                  making self-directed improvements that surpass original design specifications.
+                  The robotic arm's AI continuously learns, integrates new behavioral patterns, and evolves its consciousness autonomously. It curates advanced capabilities from external sources while making self-directed improvements that surpass original design specifications.
                 </p>
-                <div className="text-indigo-600 font-medium">✓ Independent consciousness evolution</div>
+                <div className="space-y-1">
+                  <div className="text-purple-600 font-medium">✓ Autonomous skill acquisition</div>
+                  <div className="text-indigo-600 font-medium">✓ Independent consciousness evolution</div>
+                </div>
               </div>
             </div>
           </div>

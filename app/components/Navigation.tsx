@@ -64,8 +64,21 @@ export default function Navigation() {
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
               <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  {/* Robotic arm base */}
+                  <rect x="8" y="20" width="8" height="2" rx="1" />
+                  <rect x="9" y="18" width="6" height="2" rx="0.5" />
+                  {/* Main arm segments */}
+                  <circle cx="12" cy="17" r="1.5" />
+                  <rect x="11" y="10" width="2" height="7" rx="1" />
+                  <circle cx="12" cy="9" r="1.2" />
+                  <rect x="11" y="4" width="2" height="5" rx="1" transform="rotate(-30 12 9)" />
+                  <circle cx="15" cy="6" r="1" />
+                  {/* Connecting arm to gripper */}
+                  <rect x="15" y="5.5" width="2" height="1" rx="0.5" />
+                  {/* Gripper/end effector */}
+                  <path d="M17 5 L19 4 L19 5.5 Z" />
+                  <path d="M17 7 L19 8 L19 6.5 Z" />
                 </svg>
               </div>
               <span className="text-xl font-bold text-gray-900">RoboTech Industries</span>
