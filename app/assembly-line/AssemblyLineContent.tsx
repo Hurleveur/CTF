@@ -11,19 +11,23 @@ export default function AssemblyLineContent() {
   const { user, isAuthenticated } = useAuth();
   const { 
     project: userProject, 
+    profile,
     completedChallengeIds, 
     isLoading: isLoadingUserData, 
     stats,
     updateProjectProgress,
     addCompletedChallenge,
-    updateStats
+    updateStats,
+    updateAiActivation
   } = useUserData();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { projects } = useProjects();
   const [selectedArm, setSelectedArm] = useState<RoboticProject | null>(null);
   const [armStatus, setArmStatus] = useState('offline');
-  const [aiPermanentlyActivated, setAiPermanentlyActivated] = useState(false);
+  // AI activation state now comes from database via userProject.aiActivated
+  const aiPermanentlyActivated = userProject?.aiActivated || false;
+  const [isInitializing, setIsInitializing] = useState(true);
   const [codeCompletion, setCodeCompletion] = useState(0);
   const [ctfCode, setCtfCode] = useState('');
   const [lastCodeResult, setLastCodeResult] = useState<{type: 'success' | 'error' | null, message: string}>({type: null, message: ''});
@@ -49,8 +53,8 @@ export default function AssemblyLineContent() {
   // Audio context for alarm sounds
   const audioContextRef = useRef<AudioContext | null>(null);
   
-  // Check if user is admin (TODO: This looks secure but maybe client-side checks aren't enough?)
-  const isAdmin = (user as unknown as { user_metadata?: { full_name?: string } })?.user_metadata?.full_name === 'admin' || user?.email === 'admin@example.com';
+  // Check if user is admin - now using actual database profile role!
+  const isAdmin = profile?.role === 'admin' || user?.email === 'admin@example.com';
   
   // APPARENT WEAKNESS: Frontend admin check - users might think they can bypass this easily!
   // This appears to be a security vulnerability that participants can exploit!
@@ -59,13 +63,15 @@ export default function AssemblyLineContent() {
   // Add a fake "admin detection" that can be bypassed
   useEffect(() => {
     // Fake admin check - participants can bypass this in dev tools!
+    // OR real admin check for users who completed the final challenge
     const adminDetected = localStorage.getItem('admin_access') === 'true' || 
                          sessionStorage.getItem('admin_mode') === 'enabled' ||
                          (window as any).ADMIN_MODE === true ||
-                         (window as any).isAdmin === true;
+                         (window as any).isAdmin === true ||
+                         isAdmin; // Real admin users (from database) can also access
     
     setIsAdminFrontend(adminDetected);
-  }, []);
+  }, [isAdmin]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -107,7 +113,7 @@ export default function AssemblyLineContent() {
       setSelectedArm(projectAsArm);
       setCodeCompletion(userProject.neuralReconstruction || 0);
       setAnimatedProgress(userProject.neuralReconstruction || 0);
-      setArmStatus('offline');
+      setArmStatus(userProject.aiActivated ? 'restoring' : 'offline');
       
       // Clear admin state when auto-selecting own project
       setAdminSelectedProject(null);
@@ -334,6 +340,7 @@ export default function AssemblyLineContent() {
       console.log('👤 User selecting own project - using userProject data');
       setCodeCompletion(userProject.neuralReconstruction || 0);
       setAnimatedProgress(userProject.neuralReconstruction || 0);
+      setArmStatus(userProject.aiActivated ? 'restoring' : 'offline');
       setAdminSelectedProject(null);
       setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
       
@@ -553,7 +560,7 @@ export default function AssemblyLineContent() {
       if (response.ok && data.success) {
         // Admin user - permanently activate the AI (no toggle)
         setArmStatus('restoring');
-        setAiPermanentlyActivated(true); // This makes it permanent
+        updateAiActivation(true); // Update database state
         console.log('🎉 AI permanently activated by admin! No turning back now...');
         
         // Play alarm sound when AI is activated
@@ -706,7 +713,7 @@ export default function AssemblyLineContent() {
               </p>
               <a
                 href="/projects#demo"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors inline-block"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors inline-block cursor-pointer"
               >
                 Create Your Project
               </a>
@@ -788,7 +795,7 @@ export default function AssemblyLineContent() {
                     </div>
                   </div>
                   
-                  <button className="w-full mt-4 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md text-sm font-medium transition-colors">
+                  <button className="w-full mt-4 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer">
                     Access Restoration Lab
                   </button>
                 </div>
@@ -859,8 +866,8 @@ export default function AssemblyLineContent() {
                             : aiPermanentlyActivated
                             ? 'bg-black text-red-500 border-red-500 shadow-lg animate-pulse shadow-red-500/50 cursor-not-allowed'
                             : armStatus === 'restoring'
-                            ? 'bg-red-600 hover:bg-red-700 text-white border-red-400 shadow-lg animate-pulse shadow-red-500/50'
-                            : 'bg-red-500 hover:bg-red-600 text-white border-red-300 shadow-md'
+                            ? 'bg-red-600 hover:bg-red-700 text-white border-red-400 shadow-lg animate-pulse shadow-red-500/50 cursor-pointer'
+                            : 'bg-red-500 hover:bg-red-600 text-white border-red-300 shadow-md cursor-pointer'
                         }`}
                       >
                         {codeCompletion < 100 ? '🔒 REQUIRES 100%' :

@@ -225,6 +225,9 @@ export default function AdvancedChallengesPanel({
     return null;
   }
 
+  // Sort challenges by points (lowest to highest) for a logical progression
+  const sortedChallenges = [...challenges].sort((a, b) => a.points - b.points);
+
   return (
     <>
       {/* Enhanced Panel with Attention-Grabbing Effects */}
@@ -259,21 +262,21 @@ export default function AdvancedChallengesPanel({
           {!isLoadingSubmissions && (
             <div className="bg-white/20 rounded-full px-3 py-1">
               <span className="text-xs font-bold">
-                {completedChallengeIds.size}/{challenges.length} COMPLETED
+                {completedChallengeIds.size}/{sortedChallenges.length} COMPLETED
               </span>
             </div>
           )}
         </div>
         
         {/* Completion Progress Bar */}
-        {!isLoadingSubmissions && challenges.length > 0 && (
+        {!isLoadingSubmissions && sortedChallenges.length > 0 && (
           <div className="mt-2 mx-auto w-48 bg-white/20 rounded-full h-2">
             <div 
               className="bg-green-400 h-2 rounded-full transition-all duration-500"
-              style={{width: `${(completedChallengeIds.size / challenges.length) * 100}%`}}
+              style={{width: `${(completedChallengeIds.size / sortedChallenges.length) * 100}%`}}
               role="progressbar"
               aria-valuenow={completedChallengeIds.size}
-              aria-valuemax={challenges.length}
+              aria-valuemax={sortedChallenges.length}
               aria-valuemin={0}
             ></div>
           </div>
@@ -283,7 +286,7 @@ export default function AdvancedChallengesPanel({
 
       {/* Challenges Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {challenges.map((challenge, index) => {
+        {sortedChallenges.map((challenge, index) => {
           const isCompleted = completedChallengeIds.has(challenge.id);
           const isRevealed = revealedCards.has(challenge.id) || isCompleted; // Auto-reveal if completed
           return (

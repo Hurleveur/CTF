@@ -38,6 +38,7 @@ const mockAudioContext = {
 Element.prototype.scrollIntoView = jest.fn();
 
 describe('AdvancedChallengesPanel', () => {
+  // Test data with challenges sorted by points (300, 500, 600)
   const mockChallenges = [
     {
       id: 'challenge-1',
@@ -45,7 +46,7 @@ describe('AdvancedChallengesPanel', () => {
       description: 'Exploit a complex web application with multiple vulnerabilities',
       category: 'web',
       difficulty: 'hard',
-      points: 500,
+      points: 500,  // Will be displayed second
       hints: ['Look for SQL injection', 'Check for XSS']
     },
     {
@@ -54,7 +55,7 @@ describe('AdvancedChallengesPanel', () => {
       description: 'Break a custom encryption scheme used in robot communications',
       category: 'crypto',
       difficulty: 'medium',
-      points: 300,
+      points: 300,  // Will be displayed first (lowest points)
       hints: ['Frequency analysis might help']
     },
     {
@@ -63,7 +64,7 @@ describe('AdvancedChallengesPanel', () => {
       description: 'Analyze and exploit vulnerabilities in robotic arm firmware',
       category: 'reverse',
       difficulty: 'hard',
-      points: 600,
+      points: 600,  // Will be displayed last (highest points)
       hints: ['Use a disassembler', 'Look for buffer overflows']
     }
   ];

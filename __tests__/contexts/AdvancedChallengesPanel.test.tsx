@@ -17,6 +17,7 @@ Object.defineProperty(window, 'localStorage', {
 });
 
 describe('AdvancedChallengesPanel', () => {
+  // Test data with challenges that will be sorted by points (150, 200, 300)
   const mockChallenges = [
     {
       id: 'ch1',
@@ -32,7 +33,7 @@ describe('AdvancedChallengesPanel', () => {
       description: 'Another difficult challenge',
       category: 'crypto',
       difficulty: 'medium',
-      points: 150
+      points: 150  // This will be displayed first (lowest points)
     },
     {
       id: 'ch3',
@@ -40,7 +41,7 @@ describe('AdvancedChallengesPanel', () => {
       description: 'Yet another challenge',
       category: 'reverse',
       difficulty: 'hard',
-      points: 300
+      points: 300  // This will be displayed last (highest points)
     }
   ];
 

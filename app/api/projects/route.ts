@@ -33,7 +33,7 @@ export async function GET() {
     // Fetch user's projects
     const { data: projects, error } = await supabase
       .from('user_projects')
-      .select('*')
+      .select('*, ai_activated, ai_activated_at')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
@@ -58,6 +58,8 @@ export async function GET() {
       leadDeveloper: project.lead_developer,
       teamMembers: project.team_members || [],
       userId: project.user_id,
+      aiActivated: project.ai_activated || false,
+      aiActivatedAt: project.ai_activated_at,
     })) || [];
 
     return NextResponse.json({

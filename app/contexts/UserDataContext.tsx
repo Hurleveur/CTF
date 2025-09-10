@@ -40,6 +40,8 @@ interface Project {
   statusColor: string;
   leadDeveloper: string;
   lastBackup: string;
+  aiActivated?: boolean;
+  aiActivatedAt?: string;
 }
 
 interface UserDataContextType {
@@ -56,6 +58,7 @@ interface UserDataContextType {
   updateStats: (newStats: Partial<UserStats>) => void;
   addCompletedChallenge: (challengeId: string, submission: Submission) => void;
   updateProjectProgress: (newProgress: number) => void;
+  updateAiActivation: (activated: boolean) => void;
 }
 
 const UserDataContext = createContext<UserDataContextType | undefined>(undefined);
@@ -211,6 +214,14 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
     } : null);
   };
 
+  const updateAiActivation = (activated: boolean) => {
+    setProject(prev => prev ? {
+      ...prev,
+      aiActivated: activated,
+      aiActivatedAt: activated ? new Date().toISOString() : prev.aiActivatedAt
+    } : null);
+  };
+
   const contextValue: UserDataContextType = {
     profile,
     stats,
@@ -225,6 +236,7 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
     updateStats,
     addCompletedChallenge,
     updateProjectProgress,
+    updateAiActivation,
   };
 
   return (

@@ -67,6 +67,22 @@ export async function POST() {
     // If we get here, user is actually admin
     console.log(`✅ Admin user ${user.email} successfully activated AI`);
     
+    // Update the user's project to mark AI as activated
+    const { error: updateError } = await supabase
+      .from('user_projects')
+      .update({ 
+        ai_activated: true,
+        ai_activated_at: new Date().toISOString()
+      })
+      .eq('user_id', user.id);
+
+    if (updateError) {
+      console.error('[AI Activation] Database update error:', updateError.message);
+      // Continue anyway - the AI activation worked, database update is not critical
+    } else {
+      console.log(`💾 AI activation state saved to database for user ${user.email}`);
+    }
+    
     return NextResponse.json({
       success: true,
       message: 'AI activation successful! The robotic arm consciousness has been awakened.',

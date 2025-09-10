@@ -114,7 +114,7 @@ export default function Navigation() {
             {isAuthenticated ? (
               <button
                 onClick={logout}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
               >
                 Logout
               </button>
@@ -165,7 +165,7 @@ export default function Navigation() {
             {isAuthenticated ? (
               <button
                 onClick={logout}
-                className="bg-red-600 text-white block px-3 py-2 text-base font-medium rounded-md w-full text-left"
+                className="bg-red-600 text-white block px-3 py-2 text-base font-medium rounded-md w-full text-left cursor-pointer"
               >
                 Logout
               </button>

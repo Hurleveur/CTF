@@ -594,7 +594,7 @@ export default function SolutionsPage() {
                 <button
                   onClick={() => setShowResetModal(true)}
                   disabled={isResetting || isLoadingCutoffDate}
-                  className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white px-8 py-4 rounded-lg text-lg font-bold transition-colors shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+                  className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white px-8 py-4 rounded-lg text-lg font-bold transition-colors shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 cursor-pointer"
                 >
                   {isResetting ? (
                     <div className="flex items-center">
@@ -665,7 +665,7 @@ export default function SolutionsPage() {
                 <button
                   onClick={handleChallengeReset}
                   disabled={isResetting}
-                  className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center"
+                  className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center cursor-pointer"
                 >
                   {isResetting ? (
                     <div className="flex items-center">
@@ -682,7 +682,7 @@ export default function SolutionsPage() {
                     setResetError('');
                   }}
                   disabled={isResetting}
-                  className="flex-1 bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-800 py-2 px-4 rounded-md font-medium transition-colors"
+                  className="flex-1 bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-800 py-2 px-4 rounded-md font-medium transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -740,7 +740,7 @@ export default function SolutionsPage() {
                       key={index}
                       type="button"
                       onClick={() => setNewProject({ ...newProject, logo: icon })}
-                      className={`p-2 text-xl border rounded-md hover:bg-gray-50 ${
+                      className={`p-2 text-xl border rounded-md hover:bg-gray-50 cursor-pointer ${
                         newProject.logo === icon ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
                       }`}
                     >
@@ -755,7 +755,7 @@ export default function SolutionsPage() {
                 <button
                   type="submit"
                   disabled={isCreatingProject}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center cursor-pointer"
                 >
                   {isCreatingProject ? (
                     <div className="flex items-center">
@@ -770,7 +770,7 @@ export default function SolutionsPage() {
                   type="button"
                   onClick={() => setShowProjectForm(false)}
                   disabled={isCreatingProject}
-                  className="flex-1 bg-gray-300 hover:gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-800 py-2 px-4 rounded-md font-medium transition-colors"
+                  className="flex-1 bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-800 py-2 px-4 rounded-md font-medium transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
