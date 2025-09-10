@@ -59,7 +59,13 @@ export function getFeatureFlags(): FeatureFlags {
  * Check if a specific feature is enabled
  */
 export function isFeatureEnabled(flag: keyof FeatureFlags): boolean {
-  return getFeatureFlags()[flag];
+  const flags = getFeatureFlags();
+  switch (flag) {
+    case 'cookieConsentEnabled':
+      return flags.cookieConsentEnabled;
+    default:
+      return false;
+  }
 }
 
 /**

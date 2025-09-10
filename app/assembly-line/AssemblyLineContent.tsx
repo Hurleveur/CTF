@@ -42,7 +42,7 @@ export default function AssemblyLineContent() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [animatedProgress, setAnimatedProgress] = useState(0);
-  const [hasManuallyDeselected, setHasManuallyDeselected] = useState(false);
+  const [hasManuallyDeselected] = useState(false);
   const [adminSelectedProject, setAdminSelectedProject] = useState<RoboticProject | null>(null);
   const [adminProjectData, setAdminProjectData] = useState<{progress: number, stats: unknown, submissions: unknown[], completedChallengeIds: string[]}>({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
   

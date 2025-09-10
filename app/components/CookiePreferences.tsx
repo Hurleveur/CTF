@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getConsentStatus, consentedStorage, clearFunctionalData } from '@/lib/consentedStorage';
+import { getConsentStatus, clearFunctionalData } from '@/lib/consentedStorage';
 
 interface CookiePreferencesProps {
   isOpen?: boolean;
@@ -56,7 +56,19 @@ export default function CookiePreferences({ isOpen: propIsOpen, onClose }: Cooki
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleClose} />
+      <div 
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm" 
+        onClick={handleClose}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleClose();
+          }
+        }}
+        tabIndex={0}
+        role="button"
+        aria-label="Close cookie preferences"
+      />
       
       <div className="relative bg-white border border-gray-200 rounded-lg shadow-2xl max-w-md w-full p-6">
         <div className="flex justify-between items-center mb-4">
@@ -95,7 +107,7 @@ export default function CookiePreferences({ isOpen: propIsOpen, onClose }: Cooki
                 <h4 className="font-semibold text-gray-900">Functional Storage</h4>
                 <p className="text-sm text-gray-600">Saves your project data and preferences</p>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
+              <label className="relative inline-flex items-center cursor-pointer" aria-label="Toggle functional storage">
                 <input
                   type="checkbox"
                   className="sr-only peer"

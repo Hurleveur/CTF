@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface Challenge {
   id: string;
@@ -110,7 +110,7 @@ export default function AdvancedChallengesPanel({
   };
 
   // Play alarm sound using Web Audio API (only after user gesture)
-  const playAlarmSound = async () => {
+  const playAlarmSound = useCallback(async () => {
     try {
       let audioContext = audioContextRef.current;
       
@@ -152,7 +152,7 @@ export default function AdvancedChallengesPanel({
     } catch (error) {
       console.warn('Could not play alarm sound:', error);
     }
-  };
+  }, []);
 
 
   // Handle card click to reveal description
@@ -206,7 +206,7 @@ export default function AdvancedChallengesPanel({
         
       }, 100);
     }
-  }, [challenges, isFirstTimeReveal]);
+  }, [challenges, isFirstTimeReveal, playAlarmSound]);
 
   // No longer fetching submissions here - using data passed from parent component
 

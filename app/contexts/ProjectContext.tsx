@@ -75,9 +75,10 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       }
       const data: RoboticProject[] = await res.json();
       setProjects(data.length > 0 ? data : DEFAULT_PROJECTS);
-    } catch (e: any) {
-      console.error('Failed to load projects:', e);
-      setError(e.message || 'Failed to load projects');
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('Failed to load projects');
+      console.error('Failed to load projects:', error);
+      setError(error.message);
       setProjects(DEFAULT_PROJECTS);
     } finally {
       setIsLoading(false);
@@ -98,9 +99,10 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         throw new Error(data.error || 'Failed to create project');
       }
       await refreshProjects();
-    } catch (e: any) {
-      console.error('Failed to create project:', e);
-      setError(e.message || 'Failed to create project');
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('Failed to create project');
+      console.error('Failed to create project:', error);
+      setError(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -120,9 +122,10 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         throw new Error(data.error || 'Failed to update project');
       }
       await refreshProjects();
-    } catch (e: any) {
-      console.error('Failed to update project:', e);
-      setError(e.message || 'Failed to update project');
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('Failed to update project');
+      console.error('Failed to update project:', error);
+      setError(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -140,9 +143,10 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         throw new Error(data.error || 'Failed to delete project');
       }
       await refreshProjects();
-    } catch (e: any) {
-      console.error('Failed to delete project:', e);
-      setError(e.message || 'Failed to delete project');
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('Failed to delete project');
+      console.error('Failed to delete project:', error);
+      setError(error.message);
     } finally {
       setIsLoading(false);
     }

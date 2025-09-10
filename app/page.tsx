@@ -114,7 +114,7 @@ export default function HomePage() {
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Adaptive Intelligence Evolution</h3>
                 <p className="text-gray-600 mb-4">
-                  The robotic arm's AI continuously learns, integrates new behavioral patterns, and evolves its consciousness autonomously. It curates advanced capabilities from external sources while making self-directed improvements that surpass original design specifications.
+                  The robotic arm&apos;s AI continuously learns, integrates new behavioral patterns, and evolves its consciousness autonomously. It curates advanced capabilities from external sources while making self-directed improvements that surpass original design specifications.
                 </p>
                 <div className="space-y-1">
                   <div className="text-purple-600 font-medium">✓ Autonomous skill acquisition</div>

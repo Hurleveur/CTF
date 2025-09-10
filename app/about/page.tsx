@@ -98,13 +98,13 @@ export default function AboutPage() {
                 it&apos;s just me looking exhausted but I&apos;m worried it might ｃoｎｔaｉｎ ｍoｒe than just my tired face......
                 Oh well, too tired to check properly. What could be hidden in a simple photo anyway?&rdquo;
               </p>
-              <p className="font-mono text-sm bg-gray-100 p-3 rounded">
-                // TODO: Add proper AI containment protocols<br/>
-                // TODO: Fix neural network fragmentation<br/>
-                // TODO: Get some sleep (been awake 40 hours)<br/>
-                // TODO: Remember where I scattered the hex fragments<br/>
-                // TODO: Hope nobody restores the AI consciousness<br/>
-              </p>
+              <div className="font-mono text-sm bg-gray-100 p-3 rounded">
+                <div>{"// TODO: Add proper AI containment protocols"}</div>
+                <div>{"// TODO: Fix neural network fragmentation"}</div>
+                <div>{"// TODO: Get some sleep (been awake 40 hours)"}</div>
+                <div>{"// TODO: Remember where I scattered the hex fragments"}</div>
+                <div>{"// TODO: Hope nobody restores the AI consciousness"}</div>
+              </div>
             </div>
           </div>
         </div>

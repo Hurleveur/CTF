@@ -162,7 +162,7 @@ export default function SignupPage() {
                       Encouraged Techniques
                     </h4>
                     <p className="text-green-700">
-                      Creative problem-solving, code analysis, web application testing, API exploration, social engineering within the platform, and ethical reconnaissance are all fair game! If you find a vulnerability we didn't intend (without a RTB{} flag) please tell us and you'll get a permanent spot on the website.
+                      Creative problem-solving, code analysis, web application testing, API exploration, social engineering within the platform, and ethical reconnaissance are all fair game! If you find a vulnerability we didn&apos;t intend (without a RTB{} flag) please tell us and you&apos;ll get a permanent spot on the website.
                     </p>
                   </div>
                   
