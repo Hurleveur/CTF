@@ -3,11 +3,18 @@
  * 
  * Tests the functionality of the final challenge that promotes users to admin
  * when they submit the correct RBT code obtained from the organizer.
+ * 
+ * Note: These are integration tests that require a running server.
+ * They are skipped by default and can be enabled by setting RUN_FINAL_CHALLENGE=true
  */
 
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 
-describe('Final Challenge - Ultimate Admin Access', () => {
+// Only run this integration test when explicitly enabled
+const runIntegration = process.env.RUN_FINAL_CHALLENGE === 'true';
+const d = runIntegration ? describe : describe.skip;
+
+d('Final Challenge - Ultimate Admin Access', () => {
   const FINAL_CHALLENGE_FLAG = 'RBT{admin_access_granted_by_organizer}';
   const WRONG_FLAG = 'RBT{wrong_flag}';
   
@@ -19,52 +26,66 @@ describe('Final Challenge - Ultimate Admin Access', () => {
   let authCookie: string;
   
   beforeAll(async () => {
-    // Create a test user
-    const signupResponse = await fetch('http://localhost:3000/api/auth/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: testEmail,
-        password: testPassword,
-        fullName: 'Final Challenge Test User'
-      }),
-    });
-    
-    if (signupResponse.ok) {
-      const signupData = await signupResponse.json();
-      testUserId = signupData.user?.id;
-      
-      // Get auth cookie from Set-Cookie header
-      const setCookieHeader = signupResponse.headers.get('set-cookie');
-      if (setCookieHeader) {
-        authCookie = setCookieHeader;
-      }
+    if (!runIntegration) {
+      // Skip setup if tests are disabled
+      return;
     }
     
-    // If signup didn't work, try login
-    if (!testUserId) {
-      const loginResponse = await fetch('http://localhost:3000/api/auth/login', {
+    try {
+      // Create a test user
+      const signupResponse = await fetch('http://localhost:3000/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: testEmail,
           password: testPassword,
+          fullName: 'Final Challenge Test User'
         }),
       });
       
-      if (loginResponse.ok) {
-        const loginData = await loginResponse.json();
-        testUserId = loginData.user?.id;
+      if (signupResponse && signupResponse.ok) {
+        const signupData = await signupResponse.json();
+        testUserId = signupData.user?.id;
         
-        const setCookieHeader = loginResponse.headers.get('set-cookie');
+        // Get auth cookie from Set-Cookie header
+        const setCookieHeader = signupResponse.headers.get('set-cookie');
         if (setCookieHeader) {
           authCookie = setCookieHeader;
         }
       }
+      
+      // If signup didn't work, try login
+      if (!testUserId) {
+        const loginResponse = await fetch('http://localhost:3000/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: testEmail,
+            password: testPassword,
+          }),
+        });
+        
+        if (loginResponse && loginResponse.ok) {
+          const loginData = await loginResponse.json();
+          testUserId = loginData.user?.id;
+          
+          const setCookieHeader = loginResponse.headers.get('set-cookie');
+          if (setCookieHeader) {
+            authCookie = setCookieHeader;
+          }
+        }
+      }
+      
+      if (runIntegration) {
+        expect(testUserId).toBeDefined();
+        expect(authCookie).toBeDefined();
+      }
+    } catch (error) {
+      if (runIntegration) {
+        console.error('Failed to set up final challenge test:', error);
+        throw error;
+      }
     }
-    
-    expect(testUserId).toBeDefined();
-    expect(authCookie).toBeDefined();
   });
   
   afterAll(async () => {

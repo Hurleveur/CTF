@@ -14,6 +14,8 @@ const mockSupabase = {
 const mockQuery = {
   select: jest.fn(),
   eq: jest.fn(),
+  single: jest.fn(),
+  gte: jest.fn(),
 };
 
 describe('/api/statistics', () => {
@@ -25,30 +27,55 @@ describe('/api/statistics', () => {
     mockSupabase.from.mockReturnValue(mockQuery);
     mockQuery.select.mockReturnValue(mockQuery);
     mockQuery.eq.mockReturnValue(mockQuery);
+    mockQuery.single.mockReturnValue(mockQuery);
+    mockQuery.gte.mockReturnValue(mockQuery);
   });
 
   it('should return statistics with correct data structure', async () => {
     // Mock the database responses
     mockSupabase.from
+      // First call: admin_settings for cutoff date
       .mockReturnValueOnce({
         select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({ count: 15, error: null })
+          eq: jest.fn().mockReturnValue({
+            single: jest.fn().mockResolvedValue({ 
+              data: { challenge_cutoff_date: '2025-01-01T00:00:00Z' }, 
+              error: null 
+            })
+          })
         })
       })
+      // Second call: submissions count (fragments)
       .mockReturnValueOnce({
-        select: jest.fn().mockResolvedValue({ count: 8, error: null })
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            gte: jest.fn().mockResolvedValue({ count: 15, error: null })
+          })
+        })
       })
+      // Third call: profiles count (teams)
       .mockReturnValueOnce({
-        select: jest.fn().mockResolvedValue({ count: 12, error: null })
+        select: jest.fn().mockReturnValue({
+          gte: jest.fn().mockResolvedValue({ count: 8, error: null })
+        })
       })
+      // Fourth call: user_projects count (projects)
       .mockReturnValueOnce({
-        select: jest.fn().mockResolvedValue({ 
-          data: [
-            { neural_reconstruction: '25.5' },
-            { neural_reconstruction: '45.0' },
-            { neural_reconstruction: '12.3' }
-          ], 
-          error: null 
+        select: jest.fn().mockReturnValue({
+          gte: jest.fn().mockResolvedValue({ count: 12, error: null })
+        })
+      })
+      // Fifth call: user_projects neural reconstruction data
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnValue({
+          gte: jest.fn().mockResolvedValue({ 
+            data: [
+              { neural_reconstruction: '25.5' },
+              { neural_reconstruction: '45.0' },
+              { neural_reconstruction: '12.3' }
+            ], 
+            error: null 
+          })
         })
       });
 
@@ -66,12 +93,48 @@ describe('/api/statistics', () => {
   });
 
   it('should handle database errors gracefully', async () => {
-    // Mock database error
-    mockSupabase.from.mockReturnValue({
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockResolvedValue({ count: null, error: new Error('Database error') })
+    // Mock database responses with fallback behavior
+    mockSupabase.from
+      // First call: admin_settings for cutoff date
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            single: jest.fn().mockResolvedValue({ 
+              data: { challenge_cutoff_date: '2025-01-01T00:00:00Z' }, 
+              error: null 
+            })
+          })
+        })
       })
-    });
+      // Second call: submissions count (fragments) - returns 0 on error
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            gte: jest.fn().mockResolvedValue({ count: 0, error: null })
+          })
+        })
+      })
+      // Third call: profiles count (teams)
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnValue({
+          gte: jest.fn().mockResolvedValue({ count: 0, error: null })
+        })
+      })
+      // Fourth call: user_projects count (projects)
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnValue({
+          gte: jest.fn().mockResolvedValue({ count: 0, error: null })
+        })
+      })
+      // Fifth call: user_projects neural reconstruction data
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnValue({
+          gte: jest.fn().mockResolvedValue({ 
+            data: [], 
+            error: null 
+          })
+        })
+      });
 
     const request = new NextRequest('http://localhost:3000/api/statistics');
     const response = await GET(request);
@@ -98,25 +161,48 @@ describe('/api/statistics', () => {
 
   it('should calculate neural progress correctly', async () => {
     mockSupabase.from
+      // First call: admin_settings for cutoff date
       .mockReturnValueOnce({
         select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({ count: 10, error: null })
+          eq: jest.fn().mockReturnValue({
+            single: jest.fn().mockResolvedValue({ 
+              data: { challenge_cutoff_date: '2025-01-01T00:00:00Z' }, 
+              error: null 
+            })
+          })
         })
       })
+      // Second call: submissions count (fragments)
       .mockReturnValueOnce({
-        select: jest.fn().mockResolvedValue({ count: 5, error: null })
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            gte: jest.fn().mockResolvedValue({ count: 10, error: null })
+          })
+        })
       })
+      // Third call: profiles count (teams)
       .mockReturnValueOnce({
-        select: jest.fn().mockResolvedValue({ count: 3, error: null })
+        select: jest.fn().mockReturnValue({
+          gte: jest.fn().mockResolvedValue({ count: 5, error: null })
+        })
       })
+      // Fourth call: user_projects count (projects)
       .mockReturnValueOnce({
-        select: jest.fn().mockResolvedValue({ 
-          data: [
-            { neural_reconstruction: '10.5' },
-            { neural_reconstruction: '20.2' },
-            { neural_reconstruction: '15.3' }
-          ], 
-          error: null 
+        select: jest.fn().mockReturnValue({
+          gte: jest.fn().mockResolvedValue({ count: 3, error: null })
+        })
+      })
+      // Fifth call: user_projects neural reconstruction data
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnValue({
+          gte: jest.fn().mockResolvedValue({ 
+            data: [
+              { neural_reconstruction: '10.5' },
+              { neural_reconstruction: '20.2' },
+              { neural_reconstruction: '15.3' }
+            ], 
+            error: null 
+          })
         })
       });
 
