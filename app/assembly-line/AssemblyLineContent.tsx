@@ -849,7 +849,7 @@ export default function AssemblyLineContent() {
               <h3 className="text-lg font-semibold text-gray-900 mb-6">Code Restoration Portal</h3>
               
               {/* Robotic Arm Animation */}
-              <div className="relative bg-gray-100 rounded-lg p-4 overflow-hidden mb-8">
+              <div className="relative bg-gray-100 rounded-lg p-4 mb-8">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h4 className="font-medium text-gray-900 mb-1">Neural Reconstruction Visualization</h4>
@@ -878,7 +878,7 @@ export default function AssemblyLineContent() {
                       
                       {/* Tooltip */}
                       {(codeCompletion < 100 || !isAdminFrontend) && !aiPermanentlyActivated && (
-                        <div className="invisible group-hover:visible absolute z-10 w-64 p-3 mt-2 text-sm text-white bg-gray-900 rounded-lg shadow-lg -translate-x-1/2 left-1/2">
+                        <div className="invisible group-hover:visible absolute z-50 w-64 p-3 mt-2 text-sm text-white bg-gray-900 rounded-lg shadow-lg -translate-x-1/2 left-1/2">
                           <div className="font-medium mb-1">
                             {codeCompletion < 100 ? '⚠️ Insufficient Neural Reconstruction' : '🔐 Administrator Access Required'}
                           </div>
