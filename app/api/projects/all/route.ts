@@ -9,14 +9,36 @@ export async function GET() {
     const supabase = await createClient();
 
     // Allow public access to view all projects for leaderboard
-    // No authentication required
+    // Check authentication to determine filtering behavior
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    // Get the challenge cutoff date for filtering
+    const { data: settingsData } = await supabase
+      .from('admin_settings')
+      .select('challenge_cutoff_date')
+      .eq('key', 'challenge_cutoff_date')
+      .single();
+    
+    const cutoffDate = settingsData?.challenge_cutoff_date || process.env.CHALLENGE_CUTOFF_DATE || '2025-01-01T00:00:00Z';
+    console.log('[Projects/All] Using cutoff date for filtering:', cutoffDate);
 
     // Fetch all projects from all users
-    const { data: allUserProjects, error } = await supabase
+    // Apply cutoff date filter, but always show projects owned by current user (if authenticated)
+    let projectsQuery = supabase
       .from('user_projects')
       .select('*')
       .order('neural_reconstruction', { ascending: false })
       .order('created_at', { ascending: true });
+    
+    // Apply cutoff date filter - show projects created after cutoff, OR projects owned by current user
+    if (user) {
+      projectsQuery = projectsQuery.or(`created_at.gte.${cutoffDate},user_id.eq.${user.id}`);
+    } else {
+      // For non-authenticated users, only show projects after cutoff
+      projectsQuery = projectsQuery.gte('created_at', cutoffDate);
+    }
+    
+    const { data: allUserProjects, error } = await projectsQuery;
 
     if (error) {
       console.error('[Projects/All] Fetch projects error:', error.message);

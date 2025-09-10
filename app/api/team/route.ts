@@ -18,11 +18,27 @@ export async function GET() {
       );
     }
 
+    // Get the challenge cutoff date for filtering
+    const { data: settingsData } = await supabase
+      .from('admin_settings')
+      .select('challenge_cutoff_date')
+      .eq('key', 'challenge_cutoff_date')
+      .single();
+    
+    const cutoffDate = settingsData?.challenge_cutoff_date || process.env.CHALLENGE_CUTOFF_DATE || '2025-01-01T00:00:00Z';
+    console.log('[Team] Using cutoff date for filtering:', cutoffDate);
+
     // Fetch all users with their profiles and projects
-    const { data: profiles, error: profilesError } = await supabase
+    // Only show team members created after the cutoff date, unless they are the current user
+    let profilesQuery = supabase
       .from('profiles')
       .select('*')
       .order('created_at', { ascending: true });
+    
+    // Apply cutoff date filter - show all profiles created after cutoff, OR the current user's profile
+    profilesQuery = profilesQuery.or(`created_at.gte.${cutoffDate},id.eq.${user.id}`);
+    
+    const { data: profiles, error: profilesError } = await profilesQuery;
 
     if (profilesError) {
       console.error('[Team] Fetch profiles error:', profilesError.message);
@@ -33,10 +49,16 @@ export async function GET() {
     }
 
     // Fetch all user projects to associate with team members
-    const { data: userProjects, error: projectsError } = await supabase
+    // Apply the same cutoff date filter to projects, but always show the current user's projects
+    let projectsQuery = supabase
       .from('user_projects')
-      .select('user_id, name, logo, ai_status, status_color, neural_reconstruction, lead_developer')
+      .select('user_id, name, logo, ai_status, status_color, neural_reconstruction, lead_developer, created_at')
       .order('created_at', { ascending: false });
+    
+    // Apply cutoff date filter - show projects created after cutoff, OR projects owned by current user
+    projectsQuery = projectsQuery.or(`created_at.gte.${cutoffDate},user_id.eq.${user.id}`);
+    
+    const { data: userProjects, error: projectsError } = await projectsQuery;
 
     if (projectsError) {
       console.error('[Team] Fetch projects error:', projectsError.message);

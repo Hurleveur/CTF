@@ -800,19 +800,6 @@ export default function AssemblyLineContent() {
                   </div>
                 )}
               </div>
-              {isAdmin && (
-                <button
-                  onClick={() => {
-                    setSelectedArm(null);
-                    setHasManuallyDeselected(true);
-                    setAdminSelectedProject(null);
-                    setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
-                  }}
-                  className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Switch Project
-                </button>
-              )}
             </div>
 
             {/* Welcome Instructions */}

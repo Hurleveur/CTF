@@ -17,6 +17,11 @@ const isOwner = (project: RoboticProject, user: User | null): boolean => {
   );
 };
 
+// Helper function to check if user is admin
+const isAdmin = (user: User | null): boolean => {
+  return !!(user?.email?.includes('admin'));
+};
+
 export default function SolutionsPage() {
   const { projects, addProject, setProjects } = useProjects();
   const { isAuthenticated, user } = useAuth();
@@ -34,6 +39,14 @@ export default function SolutionsPage() {
   });
   const [isLoadingStats, setIsLoadingStats] = useState(false);
   const [statsError, setStatsError] = useState('');
+  
+  // Admin challenge reset functionality
+  const [challengeCutoffDate, setChallengeCutoffDate] = useState<string | null>(null);
+  const [isLoadingCutoffDate, setIsLoadingCutoffDate] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const [resetError, setResetError] = useState('');
+  
   const [newProject, setNewProject] = useState({
     name: '',
     description: '',
@@ -75,7 +88,36 @@ export default function SolutionsPage() {
     };
     
     fetchStatistics();
-  }, []);
+  }, [challengeCutoffDate]); // Refetch when challenge cutoff date changes
+
+  // Fetch challenge cutoff date
+  useEffect(() => {
+    const fetchCutoffDate = async () => {
+      if (!isAuthenticated || !isAdmin(user)) return;
+      
+      setIsLoadingCutoffDate(true);
+      
+      try {
+        console.log('📅 Fetching challenge cutoff date...');
+        
+        const response = await fetch('/api/admin/challenge-reset');
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          console.log('✅ Challenge cutoff date fetched:', data.cutoff_date);
+          setChallengeCutoffDate(data.cutoff_date);
+        } else {
+          console.error('❌ Failed to fetch cutoff date:', data.error);
+        }
+      } catch (error) {
+        console.error('❌ Error fetching cutoff date:', error);
+      } finally {
+        setIsLoadingCutoffDate(false);
+      }
+    };
+    
+    fetchCutoffDate();
+  }, [isAuthenticated, user]);
 
   // Fetch all projects from database for leaderboard display (public access)
   useEffect(() => {
@@ -188,6 +230,45 @@ export default function SolutionsPage() {
       } finally {
         setIsCreatingProject(false);
       }
+    }
+  };
+
+  const handleChallengeReset = async () => {
+    if (!isAuthenticated || !isAdmin(user)) return;
+    
+    setIsResetting(true);
+    setResetError('');
+    
+    try {
+      console.log('🔄 Resetting challenges to current time...');
+      
+      const response = await fetch('/api/admin/challenge-reset', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reset_to_now: true }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        console.log('✅ Challenge reset successful:', data.cutoff_date);
+        setChallengeCutoffDate(data.cutoff_date);
+        setShowResetModal(false);
+        
+        // Refresh the projects and team data
+        setHasLoadedProjects(false);
+        window.location.reload(); // Force a full reload to refresh all data
+      } else {
+        console.error('❌ Challenge reset failed:', data.error);
+        setResetError(data.error || 'Failed to reset challenges');
+      }
+    } catch (error) {
+      console.error('❌ Error resetting challenges:', error);
+      setResetError('Network error. Please try again.');
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -388,11 +469,17 @@ export default function SolutionsPage() {
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Consciousness Restoration Metrics</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Real-time data from our neural restoration monitoring systems showing fragment recovery rates 
-              and team progress toward rebuilding the robotic arm&apos;s consciousness.
+              and team progress for the current challenge round.
             </p>
-            <p className="text-sm text-gray-500 mt-2">
-              [Neural activity increasing - Restoration deadline: 18:42:15]
-            </p>
+            {challengeCutoffDate ? (
+              <p className="text-sm text-blue-600 mt-2 font-medium">
+                📊 Showing data from current challenge round started: {new Date(challengeCutoffDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              </p>
+            ) : (
+              <p className="text-sm text-gray-500 mt-2">
+                [Neural activity increasing - Restoration deadline: 18:42:15]
+              </p>
+            )}
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -470,6 +557,140 @@ export default function SolutionsPage() {
           </div>
         </div>
       </section>
+
+      {/* Admin Challenge Reset Section */}
+      {isAuthenticated && isAdmin(user) && (
+        <section className="py-16 bg-red-50 border-t border-red-100">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-white rounded-xl shadow-lg p-8 border border-red-200">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-red-900 mb-2">Admin: Challenge Reset</h2>
+                <p className="text-red-700 mb-6 max-w-2xl mx-auto">
+                  Reset the CTF challenges by setting a new cutoff date. This will hide all projects and team members 
+                  created before the reset time, except for users viewing their own data.
+                </p>
+                
+                {challengeCutoffDate && (
+                  <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                    <p className="text-sm text-gray-600 mb-1">Current Challenge Round Started:</p>
+                    <p className="text-lg font-semibold text-gray-900">
+                      {new Date(challengeCutoffDate).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'long', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        timeZoneName: 'short'
+                      })}
+                    </p>
+                  </div>
+                )}
+                
+                <button
+                  onClick={() => setShowResetModal(true)}
+                  disabled={isResetting || isLoadingCutoffDate}
+                  className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white px-8 py-4 rounded-lg text-lg font-bold transition-colors shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+                >
+                  {isResetting ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      Resetting Challenges...
+                    </div>
+                  ) : (
+                    '🔄 RESET CHALLENGES'
+                  )}
+                </button>
+                
+                <p className="text-xs text-red-600 mt-3">
+                  ⚠️ This action will immediately refresh the page and update all challenge data
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+      
+      {/* Challenge Round Info for All Users */}
+      {challengeCutoffDate && (
+        <section className="py-8 bg-gray-100">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p className="text-sm text-gray-600">
+              Current challenge round started: <span className="font-semibold text-gray-800">
+                {new Date(challengeCutoffDate).toLocaleString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </span>
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* Challenge Reset Confirmation Modal */}
+      {showResetModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Confirm Challenge Reset</h3>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to reset the CTF challenges? This will:
+              </p>
+              <ul className="text-left text-sm text-gray-600 mb-6 space-y-1">
+                <li>• Hide all projects created before now</li>
+                <li>• Hide all team members who joined before now</li>
+                <li>• Set the new challenge round start time to now</li>
+                <li>• Users will still see their own data</li>
+              </ul>
+              
+              {resetError && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+                  <p className="text-sm text-red-600">{resetError}</p>
+                </div>
+              )}
+              
+              <div className="flex space-x-3">
+                <button
+                  onClick={handleChallengeReset}
+                  disabled={isResetting}
+                  className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center"
+                >
+                  {isResetting ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Resetting...
+                    </div>
+                  ) : (
+                    'Yes, Reset Challenges'
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowResetModal(false);
+                    setResetError('');
+                  }}
+                  disabled={isResetting}
+                  className="flex-1 bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-800 py-2 px-4 rounded-md font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* New Project Creation Modal */}
       {showProjectForm && (
