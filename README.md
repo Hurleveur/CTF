@@ -38,8 +38,8 @@ More information on the challenge can be found here: https://docs.google.com/doc
 │   │   └── AuthContext.tsx  # Authentication context
 │   ├── login/               # Authentication page
 │   │   └── page.tsx         # Login form and authentication
-│   ├── solutions/           # Solutions showcase page
-│   │   └── page.tsx         # Product solutions and demos
+│   ├── projects/            # Projects showcase page
+│   │   └── page.tsx         # User projects and demos
 │   ├── layout.tsx           # Root layout with security headers
 │   ├── page.tsx             # Homepage component
 │   └── globals.css          # Global styles with Tailwind
@@ -58,7 +58,7 @@ More information on the challenge can be found here: https://docs.google.com/doc
 
 - **Homepage** (`/`) - Main landing page with company overview
 - **About** (`/about`) - Company information and contact details
-- **Solutions** (`/solutions`) - Product solutions and interactive demos
+- **Projects** (`/projects`) - User projects and interactive demos
 - **Assembly Line** (`/assembly-line`) - Interactive robotics demonstration with advanced challenges
 - **Login** (`/login`) - Authentication and user management
 - **Privacy Policy** (`/privacy`) - GDPR-compliant privacy information and cookie details

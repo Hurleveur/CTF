@@ -8,7 +8,7 @@ export async function GET() {
 User-agent: *
 Allow: /
 Allow: /about
-Allow: /solutions
+Allow: /projects
 Allow: /team
 Allow: /login
 Allow: /signup

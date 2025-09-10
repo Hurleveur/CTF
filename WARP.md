@@ -109,7 +109,7 @@ The codebase is structured to support CTF challenges:
 ### Page Structure
 - **Homepage** (`/`) - Company landing page
 - **About** (`/about`) - Company information
-- **Solutions** (`/solutions`) - Product showcase
+- **Projects** (`/projects`) - Project showcase
 - **Assembly Line** (`/assembly-line`) - Interactive robotics demo
 - **Login** (`/login`) - Authentication interface
 

@@ -159,7 +159,7 @@ export default function AboutPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
-              href="/solutions" 
+              href="/projects" 
               className="bg-white text-purple-900 hover:bg-gray-100 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               View Team Leaderboard

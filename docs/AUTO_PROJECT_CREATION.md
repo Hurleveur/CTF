@@ -163,7 +163,7 @@ export const EMOJIS = [
 1. Sign up a new user through the signup form
 2. Verify successful signup response
 3. Check the `user_projects` table in Supabase dashboard
-4. Navigate to `/solutions` or `/assembly-line` pages
+4. Navigate to `/projects` or `/assembly-line` pages
 5. Confirm the project appears with generated data
 
 ### Automated Testing

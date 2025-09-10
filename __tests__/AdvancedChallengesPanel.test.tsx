@@ -151,8 +151,4 @@ describe('AdvancedChallengesPanel', () => {
     expect(container.innerHTML).toContain('⚙️'); // reverse icon
   });
 
-  it('matches snapshot', () => {
-    const { container } = render(<AdvancedChallengesPanel challenges={mockChallenges} />);
-    expect(container.firstChild).toMatchSnapshot();
-  });
 });

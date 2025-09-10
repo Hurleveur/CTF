@@ -14,7 +14,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 const protectedRoutes = ['/assembly-line', '/admin', '/dashboard', '/profile'];
 
 // Public routes that don't require authentication
-const publicRoutes = ['/', '/about', '/solutions', '/team', '/login', '/signup'];
+const publicRoutes = ['/', '/about', '/projects', '/team', '/login', '/signup'];
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;

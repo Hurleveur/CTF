@@ -38,12 +38,12 @@ export default function TeamPage() {
       role: "CTF Lead (Intern)",
       avatar: "😴",
       email: "alex@robo.tech",
-      bio: "Sleep-deprived intern doing his best to manage this chaotic team of fellow interns. Built this website at 3 AM and somehow became the 'responsible' one.",
+      bio: "Sleep-deprived intern doing his best to manage this chaotic team of fellow interns. Built this website at 3 AM and somehow became the 'responsible' one for this project, but he's not sure how'.",
       skills: ["Web Development", "Panic Management", "Coffee Brewing", "Herding Cats"],
       status: "Managing chaos",
       projects: ["Intern Coordination", "Sanity Preservation", "AI overlord"],
-      quirks: "Has a whiteboard covered in TODO lists and energy drink receipts. Still communicates primarily through TODO comments.",
-      secret: "First consciousness fragment hidden in the team roster! Also secretly proud of how well the team is doing despite the chaos."
+      quirks: "Has a whiteboard covered in TODO lists. Claims he doesn't need energy drinks and runs on hopes and dreams. Still communicates primarily through TODO comments, hoping maybe someday someone else will take care of some.",
+      secret: "First consciousness fragment hidden in the team roster! Also secretly proud of the work done by AI whilst he's eating or working on his other jobs."
     },
     {
       id: 2,
@@ -56,7 +56,7 @@ export default function TeamPage() {
       status: "Currently pwning",
       projects: ["Security Assessment", "Vulnerability Research", "CTF Training Program"],
       quirks: "Has a collection of rubber ducks for debugging and a shrine to HackTheBox achievements. Surprisingly cuddly for a hacker.",
-      secret: "Don't judge a hacker by their emoji."
+      secret: "Don't judge a hacker by their emoji. He's busy doing the hardest challenges yet for the CTF, so hard you can't even find them!"
     },
     {
       id: 3,
@@ -73,24 +73,11 @@ export default function TeamPage() {
     },
     {
       id: 4,
-      name: "Laksiya",
-      role: "Dynamic Robotics Engineer",
-      avatar: "🤖",
-      email: "laksiya@robotech.fake",
-      bio: "A dynamic force of nature who brings infectious laughter to every standup meeting. When she's not busy writing robotics code to automate away everyone's jobs (in the most delightful way possible), you'll find her out running marathons or crafting the next generation of job-stealing bots with a smile.",
-      skills: ["Robotics Programming", "Marathon Running", "Infectious Laughter", "Job Automation"],
-      status: "Building tomorrow's unemployment",
-      projects: ["JobBot Supreme", "Automated Everything", "Happy Unemployment Initiative"],
-      quirks: "Laughs while coding robots that will replace us all. Somehow makes the prospect of being replaced by machines sound exciting and fun. Goes for 10-mile runs to celebrate each successful automation.",
-      secret: "Don't worry, the robots she builds will be too busy laughing at her jokes to actually take over. Plus, she's programming them to leave snacks for their human replacements!"
-    },
-    {
-      id: 5,
       name: "Cédric Sounard",
       role: "Sales & Code Vibes Specialist",
       avatar: "🕺",
       email: "cedric.sounard@robotech.fake",
-      bio: "The charismatic sales guy who somehow understands code better than most developers. Can pitch AI solutions while debugging React components during client calls.",
+      bio: "The charismatic sales guy who can still talk code++. Never stops, never sleeps, and always eats Indian food.",
       skills: ["Client Relations", "Code Vibing", "Technical Sales", "Multitasking Magic"],
       status: "Vibing with clients",
       projects: ["Client Onboarding", "Technical Demos", "Sales Pipeline", "Code Reviews (somehow)"],
@@ -98,12 +85,12 @@ export default function TeamPage() {
       secret: "Secretly writes better documentation than the actual developers. The clients love him and the devs respect him - rare combo!"
     },
     {
-      id: 6,
+      id: 5,
       name: "Filip",
       role: "Entrepreneur & AI Whisperer",
       avatar: "🧠",
       email: "filip@robotech.fake",
-      bio: "The mastermind entrepreneur who somehow keeps this chaotic intern-run company afloat. AI expert who can explain neural networks to investors and fix segfaults in the same meeting.",
+      bio: "The mastermind entrepreneur who somehow keeps this chaotic intern-run company afloat. AI expert who can explain neural networks to investors and fix the discord bot in the same meeting.",
       skills: ["Business Strategy", "AI Architecture", "Crisis Management", "Investor Relations"],
       status: "Holding it all together",
       projects: ["Company Vision", "AI Research Direction", "Investor Relations", "Emergency Debugging"],
@@ -111,17 +98,30 @@ export default function TeamPage() {
       secret: "The real MVP keeping the lights on. Without Filip, this would just be five interns arguing about semicolons in a garage."
     },
     {
-      id: 7,
+      id: 6,
       name: "Oleksandr",
       role: "The Expert",
       avatar: "🤗",
       email: "oleksandr@robotech.fake",
-      bio: "The ultimate people person who somehow makes HR actually enjoyable. Combines next-level emotional intelligence with being genuinely the nicest human alive. When not busy making sure everyone feels valued and comfortable, he's casually being the absolute best at AI - like, scary good at it, but in the most humble and supportive way possible.",
-      skills: ["Emotional Intelligence", "AI Mastery", "Conflict Resolution", "Being Genuinely Nice"],
+      bio: "The ultimate people person who naturally became HR. Combines next-level emotional intelligence with being genuinely the nicest human alive. When not busy making sure everyone feels valued and comfortable, he's casually being the absolute best at AI - like, scary good at it.",
+      skills: ["Emotional Intelligence", "AI Mastery", "Brainstorming", "Being Genuinely Nice"],
       status: "Spreading good vibes & AI wisdom",
       projects: ["Team Happiness Optimization", "AI Ethics & Empathy", "Workplace Zen Garden"],
-      quirks: "Somehow makes performance reviews feel like therapy sessions (in a good way). Has an uncanny ability to solve complex AI problems while simultaneously mediating office disputes and making everyone feel heard.",
+      quirks: "Somehow does performance reviews as a chat with friends. Has an uncanny ability to solve complex AI problems while simultaneously making everyone feel heard.",
       secret: "Secretly the team's AI whisperer - can debug neural networks by understanding their feelings. Also keeps a spreadsheet of everyone's favorite comfort snacks and remembers all their birthdays."
+    },
+    {
+      id: 7,
+      name: "Laksiya",
+      role: "Dynamic Robotics Engineer",
+      avatar: "🤖",
+      email: "laksiya@robotech.fake",
+      bio: "A dynamic force of nature who brings infectious laughter to every standup meeting. When she's not busy writing robotics code to automate away everyone's jobs (in the most delightful way possible), you'll find her out running marathons or eating.",
+      skills: ["Robotics Programming", "Marathon Running", "Infectious Laughter", "Job Automation"],
+      status: "Building tomorrow's unemployment",
+      projects: ["JobBot Supreme", "Automated Everything", "Happy Unemployment Initiative"],
+      quirks: "Laughs while coding robots that will replace us all. Goes for 10-mile runs to celebrate each successful automation.",
+      secret: "Don't worry, the robots she builds will be too busy laughing at her jokes to actually take over. Plus, she's programming them to leave snacks for their human replacements!"
     },
     {
       id: 8,
@@ -420,8 +420,8 @@ export default function TeamPage() {
               </div>
             </div>
             <div className="mt-6">
-              <Link 
-                href="/solutions" 
+<Link 
+                href="/projects" 
                 className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors inline-block"
               >
                 View All Projects →

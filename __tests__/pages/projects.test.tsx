@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { useAuth } from '../../app/contexts/AuthContext';
 import { useProjects } from '../../app/contexts/ProjectContext';
-import SolutionsPage from '../../app/solutions/page';
+import ProjectsPage from '../../app/projects/page';
 
 // Mock the contexts
 jest.mock('../../app/contexts/AuthContext');
@@ -14,7 +14,7 @@ global.fetch = jest.fn();
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockUseProjects = useProjects as jest.MockedFunction<typeof useProjects>;
 
-describe('SolutionsPage Statistics', () => {
+describe('ProjectsPage Statistics', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
@@ -49,7 +49,7 @@ describe('SolutionsPage Statistics', () => {
       });
     });
 
-    render(<SolutionsPage />);
+render(<ProjectsPage />);
 
     // Check for loading states in statistics
     expect(screen.getAllByText('Loading...').length).toBeGreaterThan(0);
@@ -79,7 +79,7 @@ describe('SolutionsPage Statistics', () => {
       });
     });
 
-    render(<SolutionsPage />);
+render(<ProjectsPage />);
 
     // Wait for the statistics to load
     await waitFor(() => {
@@ -105,7 +105,7 @@ describe('SolutionsPage Statistics', () => {
       });
     });
 
-    render(<SolutionsPage />);
+render(<ProjectsPage />);
 
     // Wait for error state
     await waitFor(() => {
@@ -115,7 +115,7 @@ describe('SolutionsPage Statistics', () => {
   });
 
   it('should display statistics section headers correctly', () => {
-    render(<SolutionsPage />);
+    render(<ProjectsPage />);
 
     expect(screen.getByText('Consciousness Restoration Metrics')).toBeInTheDocument();
     expect(screen.getByText('Restoration Teams')).toBeInTheDocument();
@@ -136,7 +136,7 @@ describe('SolutionsPage Statistics', () => {
       });
     });
 
-    render(<SolutionsPage />);
+render(<ProjectsPage />);
 
     // Wait for error state
     await waitFor(() => {

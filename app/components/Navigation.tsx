@@ -66,19 +66,19 @@ export default function Navigation() {
               <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
                 <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
                   {/* Robotic arm base */}
-                  <rect x="8" y="20" width="8" height="2" rx="1" />
-                  <rect x="9" y="18" width="6" height="2" rx="0.5" />
+                  <rect x="7" y="20" width="10" height="2.5" rx="1.2" />
+                  <rect x="8" y="17.5" width="8" height="2.5" rx="0.8" />
                   {/* Main arm segments */}
-                  <circle cx="12" cy="17" r="1.5" />
-                  <rect x="11" y="10" width="2" height="7" rx="1" />
-                  <circle cx="12" cy="9" r="1.2" />
-                  <rect x="11" y="4" width="2" height="5" rx="1" transform="rotate(-30 12 9)" />
-                  <circle cx="15" cy="6" r="1" />
+                  <circle cx="12" cy="16" r="2" />
+                  <rect x="10.5" y="8" width="3" height="8" rx="1.5" />
+                  <circle cx="12" cy="7" r="1.8" />
+                  <rect x="10.5" y="2" width="3" height="6" rx="1.5" transform="rotate(-35 12 7)" />
+                  <circle cx="15" cy="3.7" r="1.3" />
                   {/* Connecting arm to gripper */}
-                  <rect x="15" y="5.5" width="2" height="1" rx="0.5" />
+                  <rect x="10.5" y="2.5" width="4.5" height="2.5" rx="0.5" />
                   {/* Gripper/end effector */}
-                  <path d="M17 5 L19 4 L19 5.5 Z" />
-                  <path d="M17 7 L19 8 L19 6.5 Z" />
+                  <path d="M17 3 L20.5 3 L15.5 3.5 Z" />
+                  <path d="M17 5 L20.5 5 L15.5 4.5 Z" />
                 </svg>
               </div>
               <span className="text-xl font-bold text-gray-900">RoboTech Industries</span>
@@ -94,7 +94,7 @@ export default function Navigation() {
               <Link href="/about" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">
                 About
               </Link>
-              <Link href="/solutions" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">
+              <Link href="/projects" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">
                 Projects
               </Link>
             </div>
@@ -156,10 +156,10 @@ export default function Navigation() {
             <Link href="/about" onClick={() => setIsMenuOpen(false)} className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
               About
             </Link>
-            <Link href="/solutions" onClick={() => setIsMenuOpen(false)} className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
-              Solutions
+            <Link href="/projects" onClick={() => setIsMenuOpen(false)} className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
+              Projects
             </Link>
-            <Link href="/solutions" onClick={() => setIsMenuOpen(false)} className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
+            <Link href="/projects" onClick={() => setIsMenuOpen(false)} className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
               Team Directory
             </Link>
             {isAuthenticated ? (

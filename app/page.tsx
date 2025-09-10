@@ -38,24 +38,26 @@ export default function HomePage() {
             <div className="relative">
               <div className="bg-blue-700/20 rounded-2xl p-8 backdrop-blur-sm">
                 <div className="text-center">
-                  <div className="w-32 h-32 bg-blue-600 rounded-full mx-auto mb-6 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      {/* Robotic arm base */}
-                      <rect x="7" y="20" width="10" height="2.5" rx="1.2" />
-                      <rect x="8" y="17.5" width="8" height="2.5" rx="0.8" />
-                      {/* Main arm segments */}
-                      <circle cx="12" cy="16" r="2" />
-                      <rect x="10.5" y="8" width="3" height="8" rx="1.5" />
-                      <circle cx="12" cy="7" r="1.8" />
-                      <rect x="10.5" y="2" width="3" height="6" rx="1.5" transform="rotate(-35 12 7)" />
-                      <circle cx="15" cy="3.7" r="1.3" />
-                      {/* Connecting arm to gripper */}
-                      <rect x="10.5" y="2.5" width="4.5" height="2.5" rx="0.5" />
-                      {/* Gripper/end effector */}
-                      <path d="M17 3 L20.5 3 L15.5 3.5 Z" />
-                      <path d="M17 5 L20.5 5 L15.5 4.5 Z" />
-                    </svg>
-                  </div>
+                  <Link href="/projects" aria-label="View projects" title="View projects" className="block group">
+                    <div className="w-32 h-32 bg-blue-600 group-hover:bg-blue-500 transition-colors rounded-full mx-auto mb-6 flex items-center justify-center cursor-pointer">
+                      <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        {/* Robotic arm base */}
+                        <rect x="7" y="20" width="10" height="2.5" rx="1.2" />
+                        <rect x="8" y="17.5" width="8" height="2.5" rx="0.8" />
+                        {/* Main arm segments */}
+                        <circle cx="12" cy="16" r="2" />
+                        <rect x="10.5" y="8" width="3" height="8" rx="1.5" />
+                        <circle cx="12" cy="7" r="1.8" />
+                        <rect x="10.5" y="2" width="3" height="6" rx="1.5" transform="rotate(-35 12 7)" />
+                        <circle cx="15" cy="3.7" r="1.3" />
+                        {/* Connecting arm to gripper */}
+                        <rect x="10.5" y="2.5" width="4.5" height="2.5" rx="0.5" />
+                        {/* Gripper/end effector */}
+                        <path d="M17 3 L20.5 3 L15.5 3.5 Z" />
+                        <path d="M17 5 L20.5 5 L15.5 4.5 Z" />
+                      </svg>
+                    </div>
+                  </Link>
                   <h3 className="text-2xl font-bold mb-4">AI-Powered Assembly Line</h3>
                   <p className="text-blue-100">
                     Our latest robotic arm system with precision control and adaptive learning capabilities
@@ -134,7 +136,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
-              href="/solutions#demo" 
+              href="/projects#demo" 
               className="bg-white text-blue-900 hover:bg-gray-100 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               Start a project

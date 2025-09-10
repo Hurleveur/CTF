@@ -74,7 +74,7 @@ export default function RootLayout({
                 <h4 className="text-md font-semibold mb-4">Quick Links</h4>
                 <ul className="text-gray-300 text-sm space-y-2">
                   <li><a href="/about" className="hover:text-white">About Us</a></li>
-                  <li><a href="/solutions" className="hover:text-white">Solutions</a></li>
+                  <li><a href="/projects" className="hover:text-white">Projects</a></li>
                   <li><a href="/assembly-line" className="hover:text-white">Assembly Line Demo</a></li>
                   <li><a href="/login" className="hover:text-white">Login</a></li>
                 </ul>

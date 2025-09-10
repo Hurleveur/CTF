@@ -38,7 +38,7 @@ export async function GET() {
   </url>
   
   <url>
-    <loc>${baseUrl}/solutions</loc>
+    <loc>${baseUrl}/projects</loc>
     <lastmod>2024-11-14T15:30:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>${flagPart3}</priority>

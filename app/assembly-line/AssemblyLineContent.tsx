@@ -693,7 +693,7 @@ export default function AssemblyLineContent() {
                 Create your project first to start restoring AI consciousness.
               </p>
               <a
-                href="/solutions#demo"
+                href="/projects#demo"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors inline-block"
               >
                 Create Your Project

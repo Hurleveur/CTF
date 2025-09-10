@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS public.challenges (
 - **Step-by-Step Solution**:
   1. Right-click and "View Source" on the home page
   2. Look for HTML comments containing hex fragments
-  3. Visit `/about` and `/solutions` pages and view their source code
+3. Visit `/about` and `/projects` pages and view their source code
   4. Collect all hex fragments from HTML comments across pages
   5. Concatenate all fragments: `5242547B667261676D656E745F636F6C6C6563746F725F323032347D`
   6. Convert the hex string to ASCII to get the flag
