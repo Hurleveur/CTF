@@ -13,17 +13,16 @@ export const metadata = {
   description: 'Leading manufacturer of industrial robotics and automation solutions for modern manufacturing.',
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
-      { url: '/favicon.ico', sizes: '16x16', type: 'image/x-icon' }
+      { url: '/robot-arm.svg', sizes: 'any', type: 'image/svg+xml' }
     ],
-    shortcut: '/favicon.ico',
-    apple: '/favicon.ico',
+    shortcut: '/robot-arm.svg',
+    apple: '/robot-arm.svg',
     other: [
       {
         rel: 'icon',
-        type: 'image/x-icon',
-        sizes: '32x32',
-        url: '/favicon.ico',
+        type: 'image/svg+xml',
+        sizes: 'any',
+        url: '/robot-arm.svg',
       },
     ],
   },
