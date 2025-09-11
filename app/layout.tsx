@@ -71,7 +71,7 @@ export default function RootLayout({
               </div>
             </div>
             <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300 text-sm">
-              <p>© 2025 North Star AGI. All rights reserved. | <li><a href="/privacy" className="hover:text-white">Privacy Policy</a></li> | <li><a href="/signup" className="hover:text-white">Terms of Service</a></li></p>
+              <p>© 2025 North Star AGI. All rights reserved. | <a href="/privacy" className="hover:text-white">Privacy Policy</a> | <a href="/signup" className="hover:text-white">Terms of Service</a></p>
             </div>
           </div>
         </footer>
