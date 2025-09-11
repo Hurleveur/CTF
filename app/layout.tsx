@@ -2,9 +2,6 @@ import './globals.css';
 import { Inter } from 'next/font/google';
 import Navigation from './components/Navigation';
 import FabrileChatbot from './components/FabrileChatbot';
-import ConsentInitializer from './components/ConsentInitializer';
-import CookieManager from './components/CookieManager';
-import { isCookieConsentEnabled } from '@/lib/featureFlags';
 import { AuthProvider } from './contexts/AuthContext';
 import { UserDataProvider } from './contexts/UserDataContext';
 import { ProjectProvider } from './contexts/ProjectContext';
@@ -16,18 +13,17 @@ export const metadata = {
   description: 'Leading manufacturer of industrial robotics and automation solutions for modern manufacturing.',
   icons: {
     icon: [
-      { url: '/robot-arm.svg', sizes: '32x32', type: 'image/svg+xml' },
-      { url: '/robot-arm.svg', sizes: '16x16', type: 'image/svg+xml' },
-      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' }
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
+      { url: '/favicon.ico', sizes: '16x16', type: 'image/x-icon' }
     ],
-    shortcut: '/robot-arm.svg',
-    apple: '/robot-arm.svg',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.ico',
     other: [
       {
         rel: 'icon',
-        type: 'image/svg+xml',
-        sizes: 'any',
-        url: '/robot-arm.svg',
+        type: 'image/x-icon',
+        sizes: '32x32',
+        url: '/favicon.ico',
       },
     ],
   },
@@ -51,12 +47,6 @@ export default function RootLayout({
                 {children}
               </main>
               <FabrileChatbot />
-              {isCookieConsentEnabled() && (
-                <>
-                  <ConsentInitializer />
-                  <CookieManager />
-                </>
-              )}
             </ProjectProvider>
           </UserDataProvider>
         </AuthProvider>
@@ -81,13 +71,7 @@ export default function RootLayout({
               </div>
             </div>
             <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300 text-sm">
-              <p>
-                © 2025 RoboTech Industries. All rights reserved. |{' '}
-                <a href="/privacy" className="hover:text-white underline">
-                  Privacy Policy
-                </a>{' '}
-                | Terms of Service
-              </p>
+              <p>© 2025 North Star AGI. All rights reserved. | <li><a href="/assembly-line" className="hover:text-white">Privacy Policy</a></li> | <li><a href="/privacy" className="hover:text-white">Terms of Service</a></li></p>
             </div>
           </div>
         </footer>

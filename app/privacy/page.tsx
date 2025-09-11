@@ -102,7 +102,7 @@ export default function PrivacyPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
             <span className="text-2xl mr-2">🔧</span>
-            Managing Your Data
+            Managing Your Data (send us a mail)
           </h2>
           
           <div className="bg-white border border-gray-200 rounded-lg p-6 mb-4">
@@ -148,13 +148,7 @@ export default function PrivacyPage() {
           </h2>
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
             <p className="text-gray-700 mb-2">
-              <strong>Data Protection Officer:</strong> privacy@robotech-industries.com
-            </p>
-            <p className="text-gray-700 mb-2">
-              <strong>Technical Support:</strong> support@robotech-industries.com
-            </p>
-            <p className="text-gray-700">
-              <strong>General Inquiries:</strong> info@robotech-industries.com
+              <strong>All roles guy (actual email, don't spam it, don't bother trying to login with it guys):</strong> mail.robotech@gmx.com
             </p>
           </div>
         </section>
@@ -165,13 +159,8 @@ export default function PrivacyPage() {
             Legal Information
           </h2>
           <p className="text-gray-700 mb-4">
-            This Privacy Control Manual complies with:
+            This Privacy Control Manual complies with the General Data Protection Regulation (GDPR)
           </p>
-          <ul className="space-y-2 text-gray-700 mb-4">
-            <li>General Data Protection Regulation (GDPR)</li>
-            <li>California Consumer Privacy Act (CCPA)</li>
-            <li>Industry-specific robotics and manufacturing regulations</li>
-          </ul>
           <p className="text-sm text-gray-600">
             We reserve the right to update this policy as our systems evolve. 
             Material changes will be communicated through your account dashboard.
