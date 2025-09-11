@@ -82,8 +82,8 @@ export default function FabrileChatbot() {
         }
         
         // Reset console.error if we modified it
-        if (typeof window !== 'undefined' && (window as any).originalConsoleError) {
-          console.error = (window as any).originalConsoleError;
+        if (typeof window !== 'undefined' && (window as unknown as Record<string, unknown>).originalConsoleError) {
+          console.error = (window as unknown as Record<string, unknown>).originalConsoleError as typeof console.error;
         }
       };
     } else {

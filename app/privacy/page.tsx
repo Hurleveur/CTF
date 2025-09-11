@@ -148,7 +148,7 @@ export default function PrivacyPage() {
           </h2>
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
             <p className="text-gray-700 mb-2">
-              <strong>All roles guy (actual email, don't spam it, don't bother trying to login with it guys):</strong> mail.robotech@gmx.com
+              <strong>All roles guy (actual email, don&apos;t spam it, don&apos;t bother trying to login with it guys):</strong> mail.robotech@gmx.com
             </p>
           </div>
         </section>

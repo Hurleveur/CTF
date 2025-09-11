@@ -27,7 +27,6 @@ export default function AssemblyLineContent() {
   const [armStatus, setArmStatus] = useState('offline');
   // AI activation state now comes from database via userProject.aiActivated
   const aiPermanentlyActivated = userProject?.aiActivated || false;
-  const [isInitializing, setIsInitializing] = useState(true);
   const [codeCompletion, setCodeCompletion] = useState(0);
   const [ctfCode, setCtfCode] = useState('');
   const [lastCodeResult, setLastCodeResult] = useState<{type: 'success' | 'error' | null, message: string}>({type: null, message: ''});
@@ -66,8 +65,8 @@ export default function AssemblyLineContent() {
     // OR real admin check for users who completed the final challenge
     const adminDetected = localStorage.getItem('admin_access') === 'true' || 
                          sessionStorage.getItem('admin_mode') === 'enabled' ||
-                         (window as any).ADMIN_MODE === true ||
-                         (window as any).isAdmin === true ||
+                         (window as unknown as Record<string, unknown>).ADMIN_MODE === true ||
+                         (window as unknown as Record<string, unknown>).isAdmin === true ||
                          isAdmin; // Real admin users (from database) can also access
     
     setIsAdminFrontend(adminDetected);
@@ -889,7 +888,7 @@ export default function AssemblyLineContent() {
                           </div>
                           {!isAdminFrontend && (
                             <div className="text-xs text-yellow-300 mt-2 italic">
-                              💡 Hint: Sometimes frontend security isn't as secure as it appears...
+                              💡 Hint: Sometimes frontend security isn&apos;t as secure as it appears...
                             </div>
                           )}
                           {/* Arrow */}
