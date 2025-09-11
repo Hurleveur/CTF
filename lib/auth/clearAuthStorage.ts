@@ -35,13 +35,15 @@ export async function clearAuthStorage(): Promise<void> {
     if (typeof document !== 'undefined') {
       // Get all cookies and clear the ones related to Supabase
       const cookies = document.cookie.split(';');
+      const isSecure = window.location.protocol === 'https:' || process.env.NODE_ENV === 'production';
       cookies.forEach(cookie => {
         const [name] = cookie.trim().split('=');
         if (name.startsWith('sb-')) {
-          // Clear the cookie by setting it to expire in the past
-          document.cookie = `${name}=; Max-Age=0; path=/; domain=${window.location.hostname}`;
-          document.cookie = `${name}=; Max-Age=0; path=/; domain=.${window.location.hostname}`;
-          document.cookie = `${name}=; Max-Age=0; path=/`;
+          // Clear the cookie by setting it to expire in the past with Secure attribute when appropriate
+          const secureFlag = isSecure ? '; Secure' : '';
+          document.cookie = `${name}=; Max-Age=0; path=/; domain=${window.location.hostname}${secureFlag}; SameSite=Lax`;
+          document.cookie = `${name}=; Max-Age=0; path=/; domain=.${window.location.hostname}${secureFlag}; SameSite=Lax`;
+          document.cookie = `${name}=; Max-Age=0; path=/${secureFlag}; SameSite=Lax`;
         }
       });
     }
