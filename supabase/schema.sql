@@ -355,3 +355,112 @@ GRANT SELECT, INSERT ON public.notifications TO authenticated;
 
 -- Dev users get full access for management
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.notifications TO authenticated;
+
+-- Function to accept project invitations
+CREATE OR REPLACE FUNCTION public.accept_project_invitation(invitation_uuid UUID)
+RETURNS JSON
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  invitation_record RECORD;
+  project_record RECORD;
+  member_count INTEGER;
+  result JSON;
+BEGIN
+  -- Get the current user
+  IF auth.uid() IS NULL THEN
+    RETURN json_build_object('success', false, 'error', 'Authentication required');
+  END IF;
+
+  -- Get invitation details with a lock to prevent race conditions
+  SELECT * INTO invitation_record
+  FROM project_invitations
+  WHERE id = invitation_uuid AND invited_user_id = auth.uid()
+  FOR UPDATE;
+
+  -- Check if invitation exists and belongs to current user
+  IF NOT FOUND THEN
+    RETURN json_build_object('success', false, 'error', 'Invitation not found');
+  END IF;
+
+  -- Check if invitation is already accepted
+  IF invitation_record.accepted_at IS NOT NULL THEN
+    RETURN json_build_object('success', false, 'error', 'Invitation already accepted');
+  END IF;
+
+  -- Check if user is already a member of any project
+  IF EXISTS (
+    SELECT 1 FROM project_members WHERE user_id = auth.uid()
+  ) THEN
+    RETURN json_build_object('success', false, 'error', 'You are already a member of another project');
+  END IF;
+
+  -- Get project details
+  SELECT * INTO project_record
+  FROM user_projects
+  WHERE id = invitation_record.project_id;
+
+  IF NOT FOUND THEN
+    RETURN json_build_object('success', false, 'error', 'Project not found');
+  END IF;
+
+  -- Check if project is full (max 3 members)
+  SELECT COUNT(*) INTO member_count
+  FROM project_members
+  WHERE project_id = invitation_record.project_id;
+
+  IF member_count >= 3 THEN
+    RETURN json_build_object('success', false, 'error', 'Project is full (maximum 3 members)');
+  END IF;
+
+  -- Accept the invitation in a transaction
+  BEGIN
+    -- Mark invitation as accepted
+    UPDATE project_invitations
+    SET accepted_at = NOW()
+    WHERE id = invitation_uuid;
+
+    -- Add user to project_members
+    INSERT INTO project_members (project_id, user_id, is_lead, joined_at)
+    VALUES (invitation_record.project_id, auth.uid(), false, NOW());
+
+    -- Update project team_members array (legacy compatibility)
+    UPDATE user_projects
+    SET team_members = COALESCE(team_members, '{}') || ARRAY[(
+      SELECT COALESCE(full_name, email) 
+      FROM profiles 
+      WHERE id = auth.uid()
+    )]
+    WHERE id = invitation_record.project_id;
+
+    -- Build success response with project data
+    result := json_build_object(
+      'success', true,
+      'message', 'Successfully joined the project!',
+      'project', json_build_object(
+        'id', project_record.id,
+        'name', project_record.name,
+        'description', project_record.description,
+        'logo', project_record.logo,
+        'ai_status', project_record.ai_status,
+        'status_color', project_record.status_color,
+        'neural_reconstruction', project_record.neural_reconstruction,
+        'last_backup', project_record.last_backup,
+        'lead_developer', project_record.lead_developer,
+        'team_members', project_record.team_members,
+        'user_id', project_record.user_id
+      )
+    );
+
+    RETURN result;
+
+  EXCEPTION WHEN OTHERS THEN
+    -- If anything goes wrong, return error
+    RETURN json_build_object('success', false, 'error', 'Failed to accept invitation: ' || SQLERRM);
+  END;
+END;
+$$;
+
+-- Grant permissions for the invitation acceptance function
+GRANT EXECUTE ON FUNCTION public.accept_project_invitation(UUID) TO authenticated;

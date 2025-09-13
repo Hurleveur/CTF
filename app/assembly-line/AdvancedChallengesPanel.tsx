@@ -17,6 +17,30 @@ interface AdvancedChallengesPanelProps {
   challenges: Challenge[];
   completedChallengeIds?: Set<string>;
   isLoadingSubmissions?: boolean;
+  teamSubmissions?: Record<string, {
+    challengeId: string;
+    completedBy: Array<{
+      userId: string;
+      userName: string;
+      submittedAt: string;
+      pointsAwarded: number;
+    }>;
+    challenge: {
+      id: string;
+      title: string;
+      category: string;
+      difficulty: string;
+      points: number;
+    } | null;
+  }>;
+  teamMembers?: Array<{
+    id: string;
+    name: string;
+    email: string;
+    isLead: boolean;
+    joinedAt: string;
+    isCurrentUser: boolean;
+  }>;
 }
 
 const categoryIcons: { [key: string]: string } = {
@@ -63,12 +87,31 @@ const getCategoryColor = (category: string) => {
 export default function AdvancedChallengesPanel({ 
   challenges, 
   completedChallengeIds = new Set(),
-  isLoadingSubmissions = false 
+  isLoadingSubmissions = false,
+  teamSubmissions = {},
+  teamMembers = []
 }: AdvancedChallengesPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [isFirstTimeReveal, setIsFirstTimeReveal] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const [revealedCards, setRevealedCards] = useState<Set<string>>(new Set());
+
+  // Helper function to calculate team-wide completion count
+  const getTeamCompletionCount = () => {
+    const teamCompletedChallenges = new Set();
+    
+    // Add personal completions
+    completedChallengeIds.forEach(id => teamCompletedChallenges.add(id));
+    
+    // Add team member completions
+    Object.keys(teamSubmissions).forEach(challengeId => {
+      if (teamSubmissions[challengeId].completedBy.length > 0) {
+        teamCompletedChallenges.add(challengeId);
+      }
+    });
+    
+    return teamCompletedChallenges.size;
+  };
 
   // Check if this is the first time seeing advanced challenges
   useEffect(() => {
@@ -254,6 +297,19 @@ export default function AdvancedChallengesPanel({
           <span className="text-xl">🚨</span>
         </div>
         
+        {/* Team Status */}
+        {teamMembers.length > 0 && (
+          <div className="mt-2 text-center">
+            <div className="inline-flex items-center space-x-2 bg-white/20 rounded-full px-3 py-1">
+              <span className="text-xs font-medium">👥 Team:</span>
+              <span className="text-xs font-bold">{teamMembers.length} members</span>
+              <span className="text-xs opacity-75">
+                ({teamMembers.filter(m => m.isCurrentUser).length > 0 ? 'You' : 'Guest'})
+              </span>
+            </div>
+          </div>
+        )}
+        
         {/* Progress Summary */}
         <div className="flex items-center justify-center space-x-4 mt-2">
           <p className="text-sm opacity-90">
@@ -262,7 +318,7 @@ export default function AdvancedChallengesPanel({
           {!isLoadingSubmissions && (
             <div className="bg-white/20 rounded-full px-3 py-1">
               <span className="text-xs font-bold">
-                {completedChallengeIds.size}/{sortedChallenges.length} COMPLETED
+                {getTeamCompletionCount()}/{sortedChallenges.length} COMPLETED
               </span>
             </div>
           )}
@@ -273,9 +329,9 @@ export default function AdvancedChallengesPanel({
           <div className="mt-2 mx-auto w-48 bg-white/20 rounded-full h-2">
             <div 
               className="bg-green-400 h-2 rounded-full transition-all duration-500"
-              style={{width: `${(completedChallengeIds.size / sortedChallenges.length) * 100}%`}}
+              style={{width: `${(getTeamCompletionCount() / sortedChallenges.length) * 100}%`}}
               role="progressbar"
-              aria-valuenow={completedChallengeIds.size}
+              aria-valuenow={getTeamCompletionCount()}
               aria-valuemax={sortedChallenges.length}
               aria-valuemin={0}
             ></div>
@@ -288,15 +344,31 @@ export default function AdvancedChallengesPanel({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {sortedChallenges.map((challenge, index) => {
           const isCompleted = completedChallengeIds.has(challenge.id);
-          const isRevealed = revealedCards.has(challenge.id) || isCompleted; // Auto-reveal if completed
+          const isCompletedByTeam = teamSubmissions[challenge.id] && teamSubmissions[challenge.id].completedBy.length > 0;
+          const isRevealed = revealedCards.has(challenge.id) || isCompleted || isCompletedByTeam; // Auto-reveal if completed by anyone
+          
+          // Determine card styling based on completion status
+          let cardStyle = '';
+          let hoverEffect = '';
+          
+          if (isCompleted) {
+            // Completed by current user - green
+            cardStyle = 'border-green-400 bg-green-50';
+            hoverEffect = 'hover:border-green-500';
+          } else if (isCompletedByTeam) {
+            // Completed by team member - blue
+            cardStyle = 'border-blue-400 bg-blue-50';
+            hoverEffect = 'hover:border-blue-500';
+          } else {
+            // Not completed - red
+            cardStyle = 'border-red-300 bg-white';
+            hoverEffect = 'hover:border-orange-400';
+          }
+          
           return (
             <div
               key={challenge.id}
-              className={`bg-white border-2 rounded-lg p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 group relative cursor-pointer ${
-                isCompleted 
-                  ? 'border-green-400 bg-green-50' 
-                  : 'border-red-300 hover:border-orange-400'
-              }`}
+              className={`border-2 rounded-lg p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 group relative cursor-pointer ${cardStyle} ${hoverEffect}`}
               style={{ animationDelay: `${index * 0.1}s` }}
               onClick={() => handleCardClick(challenge.id)}
               aria-expanded={isRevealed}
@@ -318,6 +390,15 @@ export default function AdvancedChallengesPanel({
                 </div>
               )}
               
+              {/* Team Completion Badge */}
+              {!isCompleted && isCompletedByTeam && (
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg z-10" title="Completed by team member">
+                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              )}
+              
               {/* Header Row: Icon, Title, Points */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-2">
@@ -325,14 +406,16 @@ export default function AdvancedChallengesPanel({
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm transition-all duration-500 flex-shrink-0 ${
                     isCompleted 
                       ? 'bg-gradient-to-br from-green-500 to-green-600 group-hover:animate-bounce' 
+                      : isCompletedByTeam
+                      ? 'bg-gradient-to-br from-blue-500 to-blue-600 group-hover:animate-pulse'
                       : 'bg-gradient-to-br from-red-500 to-orange-500 group-hover:animate-spin'
                   }`}>
-                    {isCompleted ? '✓' : (categoryIcons[challenge.category] || categoryIcons.default)}
+                    {isCompleted ? '✓' : isCompletedByTeam ? '👥' : (categoryIcons[challenge.category] || categoryIcons.default)}
                   </div>
                   
                   {/* Title */}
                   <h4 className={`text-sm font-bold line-clamp-1 flex-1 ${
-                    isCompleted ? 'text-green-800' : 'text-gray-900'
+                    isCompleted ? 'text-green-800' : isCompletedByTeam ? 'text-blue-800' : 'text-gray-900'
                   }`}>
                     {challenge.title}
                   </h4>
@@ -340,7 +423,7 @@ export default function AdvancedChallengesPanel({
                 
                 {/* Points */}
                 <span className={`text-sm font-bold ml-2 flex-shrink-0 ${
-                  isCompleted ? 'text-green-600' : 'text-red-600'
+                  isCompleted ? 'text-green-600' : isCompletedByTeam ? 'text-blue-600' : 'text-red-600'
                 }`}>
                   {challenge.points}pts
                 </span>
@@ -362,6 +445,31 @@ export default function AdvancedChallengesPanel({
               </div>
             )}
 
+            {/* Team Completion Info */}
+            {teamSubmissions[challenge.id] && teamSubmissions[challenge.id].completedBy.length > 0 && (
+              <div className="mb-3 p-2 bg-blue-50 rounded border border-blue-200">
+                <div className="text-xs font-medium text-blue-800 mb-1">
+                  👥 Team Completions ({teamSubmissions[challenge.id].completedBy.length})
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {teamSubmissions[challenge.id].completedBy.map((completion, idx) => (
+                    <span 
+                      key={`${completion.userId}-${idx}`}
+                      className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-700 border border-blue-300"
+                      title={`Completed on ${new Date(completion.submittedAt).toLocaleDateString()} - ${completion.pointsAwarded} points`}
+                    >
+                      {completion.userName}
+                      {completion.pointsAwarded > 0 && (
+                        <span className="ml-1 text-blue-600 font-medium">
+                          +{completion.pointsAwarded}
+                        </span>
+                      )}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Compact Badges Row */}
             <div className="flex items-center justify-between">
               <div className="flex gap-1.5">
@@ -375,7 +483,13 @@ export default function AdvancedChallengesPanel({
             </div>
 
             {/* Hover Effect - Glow */}
-            <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-300 bg-gradient-to-r from-red-500 to-orange-500 pointer-events-none"></div>
+            <div className={`absolute inset-0 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none ${
+              isCompleted
+                ? 'bg-gradient-to-r from-green-500 to-green-600'
+                : isCompletedByTeam
+                ? 'bg-gradient-to-r from-blue-500 to-blue-600'
+                : 'bg-gradient-to-r from-red-500 to-orange-500'
+            }`}></div>
           </div>
         )})}
       </div>

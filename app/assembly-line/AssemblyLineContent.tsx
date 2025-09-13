@@ -51,6 +51,8 @@ export default function AssemblyLineContent() {
   const [adminSelectedProject, setAdminSelectedProject] = useState<RoboticProject | null>(null);
   const [adminProjectData, setAdminProjectData] = useState<{progress: number, stats: unknown, submissions: unknown[], completedChallengeIds: string[]}>({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
   const [showInvitationModal, setShowInvitationModal] = useState(false);
+  const [teamSubmissions, setTeamSubmissions] = useState<Record<string, any>>({});
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
   
   // Audio context for alarm sounds
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -293,11 +295,47 @@ export default function AssemblyLineContent() {
     }
   }, []);
 
+  // Function to load team submissions from API
+  const loadTeamSubmissions = useCallback(async () => {
+    try {
+      console.log('👥 Loading team submissions...');
+      const res = await fetch('/api/projects/team-submissions');
+      
+      if (!res.ok) {
+        if (res.status === 401) {
+          console.log('ℹ️ Not authenticated for team submissions');
+          return;
+        }
+        if (res.status === 404) {
+          console.log('ℹ️ No team found for user');
+          return;
+        }
+        throw new Error(`Failed to fetch team submissions: ${res.status}`);
+      }
+      
+      const { teamSubmissions, teamMembers, stats } = await res.json();
+      
+      console.log('✅ Team submissions loaded:', {
+        challengesWithCompletions: Object.keys(teamSubmissions || {}).length,
+        teamMembersCount: teamMembers?.length || 0,
+        stats
+      });
+      
+      setTeamSubmissions(teamSubmissions || {});
+      setTeamMembers(teamMembers || []);
+      
+    } catch (error) {
+      console.error('❌ Error loading team submissions:', error);
+      // Silently fail - feature is optional
+    }
+  }, []);
+
   // Monitor code completion threshold and load advanced challenges
   useEffect(() => {
     if (codeCompletion >= 10 && !showAdvanced) {
       setShowAdvanced(true);
       loadAdvancedChallenges();
+      loadTeamSubmissions();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [codeCompletion, showAdvanced]);
@@ -748,8 +786,7 @@ export default function AssemblyLineContent() {
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">No Project Found</h2>
               <p className="text-gray-600 mb-6">
-                You need to create a robotic project before you can access the assembly line. 
-                Create your project first to start restoring AI consciousness.
+                You need to create or join a robotic project before you can access the assembly line.
               </p>
               <a
                 href="/projects#demo"
@@ -1302,6 +1339,8 @@ export default function AssemblyLineContent() {
                   challenges={advancedChallenges} 
                   completedChallengeIds={adminSelectedProject ? new Set(adminProjectData.completedChallengeIds) : new Set(completedChallengeIds)}
                   isLoadingSubmissions={isLoadingUserData}
+                  teamSubmissions={teamSubmissions}
+                  teamMembers={teamMembers}
                 />
               )}
             </div>

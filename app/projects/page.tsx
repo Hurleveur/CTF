@@ -318,6 +318,16 @@ export default function SolutionsPage() {
           </div>
         </div>
       </section>
+
+      {/* Project Invitations - Moved to top for better visibility */}
+      {isAuthenticated && (
+        <section className="py-8 bg-blue-50 border-b border-blue-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <InvitationNotifications className="" />
+          </div>
+        </section>
+      )}
+
       {/* Team Leaderboards */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -396,15 +406,18 @@ export default function SolutionsPage() {
                   <div className="mt-auto pt-3 border-t border-gray-100">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 font-semibold text-sm">Project #{String(index + 1).padStart(3, '0')}</span>
-                      {/* Only show Access Lab button for own projects or if user is admin */}
+                      {/* Only show Access Lab button for own projects, team members, or if user is admin */}
                       {(() => {
                         // Use the helper function for ownership check
                         const projectOwned = isOwner(project, user);
                         
+                        // Check if user is a team member
+                        const isTeamMember = project.teamMemberDetails?.some(member => member.id === user?.id);
+                        
                         // Admin check using helper function
                         const userIsAdmin = isAdmin(user);
                         
-                        return (isAuthenticated && (projectOwned || userIsAdmin));
+                        return (isAuthenticated && (projectOwned || isTeamMember || userIsAdmin));
                       })() ? (
                         <Link 
                           href={(() => {
@@ -413,7 +426,7 @@ export default function SolutionsPage() {
                             if (userIsAdmin) {
                               return `/assembly-line?project=${encodeURIComponent(project.name)}`;
                             }
-                            // For regular users accessing their own projects, use standard URL
+                            // For regular users (owners or team members) accessing their projects, use standard URL
                             return `/assembly-line`;
                           })()} 
                           className="inline-block bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 text-white px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm transition-all duration-200"
@@ -503,15 +516,6 @@ export default function SolutionsPage() {
           </div>
         </div>
       </section>
-
-      {/* Project Invitations */}
-      {isAuthenticated && (
-        <section className="py-12 bg-blue-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <InvitationNotifications className="" />
-          </div>
-        </section>
-      )}
 
       {/* Technical Specifications */}
       <section className="py-20 bg-gray-50">

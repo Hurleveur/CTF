@@ -135,6 +135,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if any team member has already solved this challenge
+    let teamAlreadyCompleted = false;
+    
+    // Get user's project team members
+    const { data: userMembership } = await supabase
+      .from('project_members')
+      .select('project_id')
+      .eq('user_id', user_id)
+      .single();
+
+    if (userMembership) {
+      const { data: teamMembers } = await supabase
+        .from('project_members')
+        .select('user_id')
+        .eq('project_id', userMembership.project_id);
+
+      if (teamMembers && teamMembers.length > 0) {
+        const teamMemberIds = teamMembers.map(member => member.user_id);
+        
+        // Check if any team member has completed this challenge
+        const { data: teamSolutions } = await supabase
+          .from('submissions')
+          .select('id, user_id')
+          .eq('challenge_id', actualChallengeId)
+          .eq('is_correct', true)
+          .in('user_id', teamMemberIds)
+          .limit(1);
+
+        teamAlreadyCompleted = !!(teamSolutions && teamSolutions.length > 0);
+        
+        if (teamAlreadyCompleted) {
+          console.log(`[API] Challenge ${actualChallengeId} already completed by team member, awarding 0 points`);
+        }
+      }
+    }
+
     // Get the challenge details to check the flag
     const { data: challenge, error: challengeError } = await supabase
       .from('challenges')
@@ -153,7 +189,9 @@ export async function POST(request: NextRequest) {
 
     // Check if the flag is correct (case-insensitive comparison)
     const isCorrect = flag.trim().toLowerCase() === challenge.flag.toLowerCase();
-    const pointsAwarded = isCorrect ? challenge.points : 0;
+    
+    // Award points only if correct and team hasn't completed it yet
+    const pointsAwarded = isCorrect ? (teamAlreadyCompleted ? 0 : challenge.points) : 0;
 
     // Insert the submission
     const { error: insertError } = await supabase
@@ -219,14 +257,19 @@ export async function POST(request: NextRequest) {
       
       const progressIncrement = Math.min(pointsAwarded / 10, 25); // Calculate for frontend display
       
+      const successMessage = teamAlreadyCompleted 
+        ? `Consciousness fragment accepted! Neural pathway "${challenge.title}" already restored by your team. No additional points awarded.`
+        : `Consciousness fragment accepted! Neural pathway "${challenge.title}" restored.`;
+      
       return NextResponse.json({
         correct: true,
-        message: `Consciousness fragment accepted! Neural pathway "${challenge.title}" restored.`,
+        message: successMessage,
         challenge_id: actualChallengeId, // Include the challenge ID for optimistic updates
         challenge_title: challenge.title,
         points_awarded: pointsAwarded,
         progress_increment: progressIncrement, // Include this for frontend to use
         total_progress: totalProgress, // Include the total progress calculated from all submissions
+        team_already_completed: teamAlreadyCompleted, // Let frontend know about team completion
       });
     } else {
       return NextResponse.json({
