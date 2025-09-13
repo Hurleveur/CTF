@@ -94,7 +94,7 @@ export async function GET() {
     ];
 
     // Create a lookup map for profiles
-    const profileMap = new Map();
+    const profileMap = new Map<string, { id: string; full_name: string; email: string }>();
     if (userProfiles) {
       userProfiles.forEach(profile => {
         profileMap.set(profile.id, profile);
@@ -125,8 +125,7 @@ export async function GET() {
     }> = [];
     
     if (allUserProjects) {
-      for (let index = 0; index < allUserProjects.length; index++) {
-        const project = allUserProjects[index];
+      for (const [index, project] of allUserProjects.entries()) {
         const userProfile = profileMap.get(project.user_id);
         
         // Fetch team member details for this project
@@ -145,13 +144,18 @@ export async function GET() {
           .eq('project_id', project.id);
         
         // Transform team member data
-        const teamMemberDetails = membersData?.map(member => ({
-          id: member.user_id,
-          name: (member.profiles as any)?.full_name || (member.profiles as any)?.email || 'Anonymous',
-          email: (member.profiles as any)?.email || '',
-          isLead: member.is_lead,
-          joinedAt: member.joined_at,
-        })).sort((a, b) => {
+        const teamMemberDetails = membersData?.map(member => {
+          // Type-safe access to the nested profiles
+          const profile = Array.isArray(member.profiles) ? member.profiles[0] : member.profiles;
+          const profileData = profile as { id: string; full_name: string; email: string } | null | undefined;
+          return {
+            id: member.user_id,
+            name: profileData?.full_name || profileData?.email || 'Anonymous',
+            email: profileData?.email || '',
+            isLead: member.is_lead,
+            joinedAt: member.joined_at,
+          };
+        }).sort((a, b) => {
           // Sort by lead first, then by join date
           if (a.isLead && !b.isLead) return -1;
           if (!a.isLead && b.isLead) return 1;

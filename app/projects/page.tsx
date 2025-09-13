@@ -468,7 +468,7 @@ export default function SolutionsPage() {
                 <div className="p-5">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">Project Membership Active</h3>
                   <p className="text-gray-600 mb-2 text-sm">
-                    You're already part of a project team. Focus on your current consciousness restoration mission.
+                    You&apos;re already part of a project team. Focus on your current consciousness restoration mission.
                   </p>
                   <div className="text-center pt-3">
                     <span className="text-amber-600 font-medium text-sm">One project per user →</span>

@@ -128,7 +128,7 @@ export default function AssemblyLineContent() {
     } else if (hasUrlProject) {
       console.log('🎯 Admin has URL project parameter, skipping auto-select to allow URL-based selection');
     }
-  }, [userProject, hasManuallyDeselected, adminSelectedProject, isAdmin, searchParams, selectedArm]);
+  }, [userProject, hasManuallyDeselected, adminSelectedProject, isAdmin, searchParams, selectedArm, projects, profile, user]);
 
   // Smooth animation for progress changes
   useEffect(() => {
@@ -299,7 +299,8 @@ export default function AssemblyLineContent() {
       setShowAdvanced(true);
       loadAdvancedChallenges();
     }
-  }, [codeCompletion, showAdvanced, loadAdvancedChallenges]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [codeCompletion, showAdvanced]);
 
   // Function to fetch project data for admin users
   const fetchAdminProjectData = useCallback(async (projectName: string) => {

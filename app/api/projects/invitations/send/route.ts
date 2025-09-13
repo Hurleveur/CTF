@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     // Check if user is the project lead or project owner
     // First check project_members table
-    const { data: membership, error: membershipError } = await supabase
+    const { data: membership } = await supabase
       .from('project_members')
       .select('is_lead')
       .eq('project_id', projectId)
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       isAuthorized = true;
     } else {
       // Fallback: check if user owns the project in user_projects table
-      const { data: project, error: projectError } = await supabase
+      const { data: project } = await supabase
         .from('user_projects')
         .select('user_id')
         .eq('id', projectId)
