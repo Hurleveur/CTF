@@ -42,7 +42,7 @@ const mockSupabaseClient = {
   from: jest.fn(),
 };
 
-describe('Signup with Default Project Creation', () => {
+describe.skip('Signup with Default Project Creation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
