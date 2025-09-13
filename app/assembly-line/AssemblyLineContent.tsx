@@ -487,59 +487,18 @@ export default function AssemblyLineContent() {
         const result = await response.json();
         
         if (response.ok && result.correct) {
-          // Valid submission - update everything optimistically and immediately
-          const pointsEarned = result.points_awarded || 50;
-          const progressIncrement = result.progress_increment || Math.min(pointsEarned / 10, 25);
-          const totalProgress = result.total_progress || (codeCompletion + progressIncrement);
-          const challengeId = result.challenge_id;
+          // Valid submission - just log what API returned, no optimistic updates for now
+          console.log(`� API Response:`, result);
           
-          console.log(`🚀 Applying optimistic updates: ${totalProgress.toFixed(1)}%`);
-          
-          // Update local component state immediately
-          setCodeCompletion(totalProgress);
-          
-          // Update selected arm state if it exists
-          if (selectedArm) {
-            setSelectedArm(prev => prev ? {
-              ...prev,
-              neuralReconstruction: totalProgress
-            } : prev);
-          }
-          
-          // Update UserData context immediately (this updates globally)
-          updateProjectProgress(totalProgress);
-          
-          // Add the completed challenge to the context
-          if (challengeId) {
-            const newSubmission = {
-              challenge_id: challengeId,
-              points_awarded: pointsEarned,
-              submitted_at: new Date().toISOString(),
-              is_correct: true,
-              challenges: {
-                title: result.challenge_title || 'Neural pathway',
-                category: 'misc',
-                difficulty: 'unknown'
-              }
-            };
-            addCompletedChallenge(challengeId, newSubmission);
-          }
-          
-          // Update stats optimistically
-          if (stats) {
-            updateStats({
-              total_points: (stats.total_points || 0) + pointsEarned,
-              challenges_solved: (stats.challenges_solved || 0) + 1
-            });
+          // Still refresh team data but don't do optimistic updates
+          if (showAdvanced) {
+            loadTeamSubmissions();
           }
           
           setLastCodeResult({
             type: 'success', 
-            message: `✅ CONSCIOUSNESS FRAGMENT ACCEPTED: ${result.challenge_title || 'Neural pathway'} restored! +${pointsEarned} points earned. AI reconstruction advanced by ${progressIncrement.toFixed(1)}%.`
+            message: `✅ CONSCIOUSNESS FRAGMENT ACCEPTED: ${result.challenge_title || 'Neural pathway'} restored! +${result.points_awarded} points earned.`
           });
-          
-          // No background sync needed - optimistic updates are accurate and immediate
-          // The API already updated the database, so UI and backend are in sync
           
         } else if (response.ok && !result.correct) {
           // Wrong answer - no progress at all

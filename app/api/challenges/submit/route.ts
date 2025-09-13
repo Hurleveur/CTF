@@ -213,32 +213,91 @@ export async function POST(request: NextRequest) {
     }
 
     if (isCorrect) {
-      // Calculate total progress based on all successful submissions for this user
-      const { data: allSubmissions, error: submissionsError } = await supabase
-        .from('submissions')
-        .select('points_awarded')
-        .eq('user_id', user_id)
-        .eq('is_correct', true);
-      
+      // Calculate total progress based on ALL team members' successful submissions
       let totalProgress = 0;
-      if (allSubmissions && !submissionsError) {
-        // Calculate total progress based on all successful submissions
-        const totalPoints = allSubmissions.reduce((sum, sub) => sum + (sub.points_awarded || 0), 0);
-        totalProgress = Math.min(totalPoints / 10, 100); // Same scaling as frontend
-        console.log(`[API] Total points earned: ${totalPoints}, calculated progress: ${totalProgress}%`);
-      }
       
-      // Get user's current project
-      const { data: userProject, error: projectError } = await supabase
-        .from('user_projects')
-        .select('neural_reconstruction')
+      // Get user's project team members
+      const { data: userMembership } = await supabase
+        .from('project_members')
+        .select('project_id')
         .eq('user_id', user_id)
         .single();
+
+      if (userMembership) {
+        const { data: teamMembers } = await supabase
+          .from('project_members')
+          .select('user_id')
+          .eq('project_id', userMembership.project_id);
+
+        if (teamMembers && teamMembers.length > 0) {
+          const teamMemberIds = teamMembers.map(member => member.user_id);
+          
+          // Get all successful submissions for ALL team members
+          const { data: teamSubmissions, error: submissionsError } = await supabase
+            .from('submissions')
+            .select('points_awarded, challenge_id, user_id')
+            .in('user_id', teamMemberIds)
+            .eq('is_correct', true)
+            .order('submitted_at', { ascending: true });
+          
+          if (teamSubmissions && !submissionsError) {
+            // Calculate unique challenge completions (first team member to complete gets points counted)
+            const challengePoints = new Map<string, number>();
+            
+            teamSubmissions.forEach(submission => {
+              const challengeId = submission.challenge_id;
+              // Only count points from the first completion of each challenge
+              if (!challengePoints.has(challengeId)) {
+                challengePoints.set(challengeId, submission.points_awarded || 0);
+              }
+            });
+            
+            const totalTeamPoints = Array.from(challengePoints.values()).reduce((sum, points) => sum + points, 0);
+            totalProgress = Math.min(totalTeamPoints / 10, 100); // Same scaling as frontend
+          }
+        }
+      }
       
-      if (userProject && !projectError) {
-        console.log(`[API] Updating project progress to ${totalProgress}% (calculated from all submissions)`);
+      // Fallback to individual calculation if team lookup fails
+      if (totalProgress === 0) {
+        const { data: allSubmissions, error: submissionsError } = await supabase
+          .from('submissions')
+          .select('points_awarded')
+          .eq('user_id', user_id)
+          .eq('is_correct', true);
         
-        // Update the project's neural reconstruction to match total earned progress
+        if (allSubmissions && !submissionsError) {
+          const totalPoints = allSubmissions.reduce((sum, sub) => sum + (sub.points_awarded || 0), 0);
+          totalProgress = Math.min(totalPoints / 10, 100);
+        }
+      }
+      
+      // Update progress for ALL team members' projects
+      if (userMembership) {
+        const { data: teamMembers } = await supabase
+          .from('project_members')
+          .select('user_id')
+          .eq('project_id', userMembership.project_id);
+
+        if (teamMembers && teamMembers.length > 0) {
+          const teamMemberIds = teamMembers.map(member => member.user_id);
+          
+          // Update neural reconstruction for ALL team members
+          const { error: updateError } = await supabase
+            .from('user_projects')
+            .update({
+              neural_reconstruction: totalProgress,
+              updated_at: new Date().toISOString()
+            })
+            .in('user_id', teamMemberIds);
+          
+          if (updateError) {
+            console.error('[API] Failed to update team project progress:', updateError.message);
+            // Don't fail the submission, just log the error
+          }
+        }
+      } else {
+        // Fallback: update only current user's project
         const { error: updateError } = await supabase
           .from('user_projects')
           .update({
@@ -248,11 +307,8 @@ export async function POST(request: NextRequest) {
           .eq('user_id', user_id);
         
         if (updateError) {
-          console.error('[API] Failed to update project progress:', updateError.message);
-          // Don't fail the submission, just log the error
+          console.error('[API] Failed to update user project progress:', updateError.message);
         }
-      } else if (projectError) {
-        console.error('[API] Failed to fetch user project for progress update:', projectError.message);
       }
       
       const progressIncrement = Math.min(pointsAwarded / 10, 25); // Calculate for frontend display
