@@ -101,6 +101,15 @@ export default function AssemblyLineContent() {
     if (canAutoSelect) {
       console.log('✅ Auto-selecting user project:', userProject.name, '(Admin:', isAdmin, ')');
       
+      // Create team member details for the user's own project
+      const userTeamMemberDetails = [{
+        id: user?.id || '',
+        name: profile?.full_name || user?.email || 'Unknown',
+        email: user?.email || '',
+        isLead: true, // User is always the lead of their own project
+        joinedAt: new Date().toISOString(),
+      }];
+      
       const projectAsArm = {
         ...userProject,
         id: 1000, // Use consistent ID for compatibility
@@ -108,7 +117,9 @@ export default function AssemblyLineContent() {
         aiStatus: 'Corrupted',
         statusColor: 'red' as const,
         leadDeveloper: 'Unknown',
-        lastBackup: '???'
+        lastBackup: '???',
+        teamMemberDetails: userTeamMemberDetails, // Add team member details
+        teamMembers: [profile?.full_name || user?.email || 'Unknown'] // Legacy compatibility
       };
       
       setSelectedArm(projectAsArm);

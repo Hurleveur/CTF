@@ -17,6 +17,8 @@ const projectSchema = z.object({
 
 // GET - Fetch user's projects
 export async function GET() {
+  console.log('[Projects] GET request received');
+  
   try {
     const supabase = await createClient();
 
@@ -24,31 +26,76 @@ export async function GET() {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
     if (userError || !user) {
+      console.log('[Projects] Authentication failed:', userError?.message);
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
+    
+    console.log('[Projects] User authenticated:', user.id);
 
     // Fetch user's projects with team member information
-    const { data: projects, error } = await supabase
+    // Use only the base project_members table (removed problematic view)
+    let projects, error;
+    
+    console.log('[Projects] Fetching projects with base table approach...');
+    
+    // Step 1: Get the user's projects
+    const { data: userProjects, error: projectsError } = await supabase
       .from('user_projects')
-      .select(`
-        *,
-        ai_activated,
-        ai_activated_at,
-        project_members (
-          user_id,
-          is_lead,
-          joined_at,
-          profiles:user_id (
-            full_name,
-            email
-          )
-        )
-      `)
+      .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
+    
+    console.log('[Projects] Basic query result:', { data: userProjects, error: projectsError?.message });
+    
+    if (projectsError) {
+      error = projectsError;
+      projects = null;
+    } else {
+      console.log('[Projects] Fetching project members from base table...');
+      // Step 2: Fetch project members for each project using base table only
+      projects = await Promise.all(
+        (userProjects || []).map(async (project) => {
+          const { data: members } = await supabase
+            .from('project_members')
+            .select(`
+              user_id,
+              is_lead,
+              joined_at
+            `)
+            .eq('project_id', project.id);
+          
+          // Step 3: Fetch profile information for each member separately
+          const projectMembers = await Promise.all(
+            (members || []).map(async (member) => {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('full_name, email')
+                .eq('id', member.user_id)
+                .single();
+              
+              return {
+                user_id: member.user_id,
+                is_lead: member.is_lead,
+                joined_at: member.joined_at,
+                profiles: profile || { full_name: null, email: null }
+              };
+            })
+          );
+          
+          console.log(`[Projects] Project ${project.id} members:`, projectMembers.length);
+          
+          return {
+            ...project,
+            project_members: projectMembers
+          };
+        })
+      );
+      error = null;
+      console.log('[Projects] Projects fetched successfully:', projects?.length);
+    }
 
     if (error) {
       console.error('[Projects] Fetch error:', error.message);
@@ -96,6 +143,8 @@ export async function GET() {
         aiActivatedAt: project.ai_activated_at,
       };
     }) || [];
+
+    console.log('[Projects] Transformed projects:', transformedProjects.length, 'projects');
 
     return NextResponse.json({
       message: 'Projects fetched successfully',

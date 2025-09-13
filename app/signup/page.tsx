@@ -285,7 +285,7 @@ export default function SignupPage() {
                       <label htmlFor="createDefaultProject" className="text-sm text-gray-700 cursor-pointer">
                         <span className="font-medium">Start with a default robotics project</span>
                         <p className="text-xs text-gray-500 mt-1">
-                          Creates a randomized AI consciousness restoration project to get you started quickly.
+                          Creates a randomized AI consciousness restoration project to get you started quickly. Unselect if you have a team to join.
                         </p>
                       </label>
                     </div>

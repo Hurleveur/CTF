@@ -38,7 +38,8 @@ export async function POST(request: NextRequest) {
 
     const { username, projectId } = validationResult.data;
 
-    // Check if user is the project lead
+    // Check if user is the project lead or project owner
+    // First check project_members table
     const { data: membership, error: membershipError } = await supabase
       .from('project_members')
       .select('is_lead')
@@ -46,7 +47,41 @@ export async function POST(request: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
-    if (membershipError || !membership || !membership.is_lead) {
+    let isAuthorized = false;
+    
+    if (membership && membership.is_lead) {
+      // User is marked as lead in project_members
+      isAuthorized = true;
+    } else {
+      // Fallback: check if user owns the project in user_projects table
+      const { data: project, error: projectError } = await supabase
+        .from('user_projects')
+        .select('user_id')
+        .eq('id', projectId)
+        .eq('user_id', user.id)
+        .single();
+      
+      if (project) {
+        // User owns the project
+        isAuthorized = true;
+        
+        // Ensure they're also marked as lead in project_members
+        const { error: insertError } = await supabase
+          .from('project_members')
+          .upsert({
+            project_id: projectId,
+            user_id: user.id,
+            is_lead: true,
+            joined_at: new Date().toISOString()
+          });
+        
+        if (insertError) {
+          console.log('[Invitations] Note: Could not ensure project membership:', insertError.message);
+        }
+      }
+    }
+
+    if (!isAuthorized) {
       return NextResponse.json(
         { error: 'Only project leaders can send invitations' },
         { status: 403 }

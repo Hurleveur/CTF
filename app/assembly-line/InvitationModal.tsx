@@ -35,13 +35,49 @@ export default function InvitationModal({ isOpen, onClose, project }: Invitation
     setIsSubmitting(true);
     
     try {
-      const result = await sendInvitation(username.trim(), project.id.toString());
+      // Handle special case: if project ID is 1000 (user's own project), 
+      // we need to get the real database project ID
+      let projectIdToUse = project.id.toString();
+      
+      if (project.id === 1000) {
+        // This is the user's own project with the special ID
+        // We need to fetch the real project ID from the API
+        const projectsResponse = await fetch('/api/projects');
+        if (projectsResponse.ok) {
+          const { projects } = await projectsResponse.json();
+          const userProject = projects[0]; // User's first/main project
+          if (userProject && userProject.id) {
+            projectIdToUse = userProject.id.toString();
+          } else {
+            toast.error('Could not find your project. Please refresh and try again.');
+            return;
+          }
+        } else {
+          toast.error('Could not fetch project information. Please try again.');
+          return;
+        }
+      }
+      
+      const result = await sendInvitation(username.trim(), projectIdToUse);
       
       if (result.success) {
         toast.success(result.message || 'Invitation sent successfully!');
         setUsername('');
       } else {
-        toast.error(result.error || 'Failed to send invitation');
+        // Provide more specific error messages
+        let errorMessage = result.error || 'Failed to send invitation';
+        
+        if (errorMessage.includes('already a member')) {
+          errorMessage = `${username} is already a member of another project and cannot be invited.`;
+        } else if (errorMessage.includes('not found')) {
+          errorMessage = `User "${username}" not found. Please check the username and try again.`;
+        } else if (errorMessage.includes('already sent')) {
+          errorMessage = `An invitation has already been sent to ${username}.`;
+        } else if (errorMessage.includes('full')) {
+          errorMessage = 'Your project is full (maximum 3 members). Remove a member before inviting someone new.';
+        }
+        
+        toast.error(errorMessage);
       }
     } catch (error) {
       toast.error('Network error occurred');
