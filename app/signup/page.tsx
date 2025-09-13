@@ -74,7 +74,14 @@ export default function SignupPage() {
 
     setIsLoading(true);
 
-    const result = await signup(formData.email, formData.password, formData.username);
+    console.log('🔍 Form submission - createDefaultProject:', formData.createDefaultProject, 'type:', typeof formData.createDefaultProject);
+
+    const result = await signup(
+      formData.email, 
+      formData.password, 
+      formData.username,
+      formData.createDefaultProject
+    );
     
     if (result.success) {
       router.push('/assembly-line');

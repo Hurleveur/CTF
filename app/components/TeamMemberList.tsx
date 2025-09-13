@@ -96,7 +96,7 @@ export default function TeamMemberList({
             <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            {currentUserMember?.isLead && !hasOtherMembers ? 'Destroy Project' : 'Leave Project'}
+            {currentUserMember?.isLead && !hasOtherMembers ? 'Delete Project' : 'Leave Project'}
           </button>
         )}
 
@@ -105,7 +105,7 @@ export default function TeamMemberList({
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-2">
             <p className="text-sm text-red-800 font-medium">
               {currentUserMember?.isLead && !hasOtherMembers 
-                ? 'Are you sure you want to destroy this project?'
+                ? 'Are you sure you want to delete this project?'
                 : 'Are you sure you want to leave this project?'
               }
             </p>

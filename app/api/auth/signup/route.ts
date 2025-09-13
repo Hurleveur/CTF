@@ -30,6 +30,8 @@ export async function POST(request: NextRequest) {
     const { email, password, username, createDefaultProject: shouldCreateProject } = validationResult.data!;
     const supabase = await createClient();
 
+    console.log('[Auth] Signup request - createDefaultProject value:', shouldCreateProject, 'type:', typeof shouldCreateProject);
+
     // Attempt to sign up with Supabase
     const { data, error } = await supabase.auth.signUp({
       email,

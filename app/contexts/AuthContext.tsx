@@ -16,7 +16,7 @@ export interface User {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signup: (email: string, password: string, fullName?: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (email: string, password: string, fullName?: string, createDefaultProject?: boolean) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   requestPasswordReset: (email: string) => Promise<{ success: boolean; error?: string }>;
   updatePassword: (newPassword: string) => Promise<{ success: boolean; error?: string }>;
@@ -148,9 +148,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signup = async (email: string, password: string, fullName?: string): Promise<{ success: boolean; error?: string }> => {
+  const signup = async (email: string, password: string, fullName?: string, createDefaultProject?: boolean): Promise<{ success: boolean; error?: string }> => {
     try {
       console.log('📝 Starting signup process for:', email);
+      console.log('📝 createDefaultProject value:', createDefaultProject, 'type:', typeof createDefaultProject);
       setIsLoading(true);
       
       const response = await fetch('/api/auth/signup', {
@@ -158,7 +159,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, fullName }),
+        body: JSON.stringify({ 
+          email, 
+          password, 
+          fullName, 
+          username: fullName,
+          createDefaultProject 
+        }),
       });
 
       console.log('📝 Signup API response status:', response.status);
