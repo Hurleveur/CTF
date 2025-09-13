@@ -21,9 +21,10 @@ export default function TeamMemberList({
   const [isLeaving, setIsLeaving] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
-  // Check if current user is in this project and is not the lead
+  // Check if current user is in this project and can leave
   const currentUserMember = teamMembers?.find(member => member.id === user?.id);
-  const canLeave = currentUserMember && !currentUserMember.isLead;
+  const hasOtherMembers = (teamMembers?.length || 0) > 1;
+  const canLeave = currentUserMember && (!currentUserMember.isLead || !hasOtherMembers);
 
   const handleLeaveProject = async () => {
     if (!canLeave || isLeaving) return;
@@ -95,7 +96,7 @@ export default function TeamMemberList({
             <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            Leave Project
+            {currentUserMember?.isLead && !hasOtherMembers ? 'Destroy Project' : 'Leave Project'}
           </button>
         )}
 
@@ -103,10 +104,16 @@ export default function TeamMemberList({
         {showLeaveConfirm && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-2">
             <p className="text-sm text-red-800 font-medium">
-              Are you sure you want to leave this project?
+              {currentUserMember?.isLead && !hasOtherMembers 
+                ? 'Are you sure you want to destroy this project?'
+                : 'Are you sure you want to leave this project?'
+              }
             </p>
             <p className="text-xs text-red-600">
-              You will lose access to the project and need to be re-invited to rejoin.
+              {currentUserMember?.isLead && !hasOtherMembers
+                ? 'As the project creator and only member, leaving will permanently delete the entire project and all its data. This action cannot be undone.'
+                : 'You will lose access to the project and need to be re-invited to rejoin.'
+              }
             </p>
             <div className="flex space-x-2">
               <button
@@ -117,10 +124,10 @@ export default function TeamMemberList({
                 {isLeaving ? (
                   <>
                     <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
-                    Leaving...
+                    {currentUserMember?.isLead && !hasOtherMembers ? 'Destroying...' : 'Leaving...'}
                   </>
                 ) : (
-                  'Yes, Leave'
+                  currentUserMember?.isLead && !hasOtherMembers ? 'Yes, Destroy Project' : 'Yes, Leave'
                 )}
               </button>
               <button
@@ -135,7 +142,7 @@ export default function TeamMemberList({
         )}
 
         {/* Leader Cannot Leave Notice */}
-        {showLeaveButton && currentUserMember?.isLead && (
+        {showLeaveButton && currentUserMember?.isLead && hasOtherMembers && (
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-2">
             <div className="flex items-center space-x-1">
               <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -292,6 +292,17 @@ export default function SolutionsPage() {
     // If not authenticated, keep original sorting by neural reconstruction
     [...projects].sort((a, b) => b.neuralReconstruction - a.neuralReconstruction);
 
+  // Check if user is already a member or leader of any project
+  const userIsInAnyProject = isAuthenticated && projects.some(project => {
+    // Check if user owns the project
+    if (isOwner(project, user)) return true;
+    
+    // Check if user is in teamMemberDetails
+    if (project.teamMemberDetails?.some(member => member.id === user?.id)) return true;
+    
+    return false;
+  });
+
   return (
     <div className="bg-white">
       <div className="sr-only" aria-hidden="true" data-fragment="4rth">6C6563746F725F323032347D</div>
@@ -423,7 +434,7 @@ export default function SolutionsPage() {
             })}
             
             {/* Create New Project Card */}
-            {isAuthenticated ? (
+            {isAuthenticated && !userIsInAnyProject ? (
               <button 
                 onClick={() => setShowProjectForm(true)}
                 className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-200 cursor-pointer hover:border-blue-300 h-full text-left w-full"
@@ -445,6 +456,25 @@ export default function SolutionsPage() {
                   </div>
                 </div>
               </button>
+            ) : isAuthenticated && userIsInAnyProject ? (
+              <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-200 h-full">
+                <div className="h-48 bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
+                  <div className="text-center text-amber-700">
+                    <div className="text-6xl font-bold mb-2">👥</div>
+                    <div className="text-xl font-bold">Already a Member</div>
+                    <div className="text-sm opacity-90">ACTIVE</div>
+                  </div>
+                </div>
+                <div className="p-5">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Project Membership Active</h3>
+                  <p className="text-gray-600 mb-2 text-sm">
+                    You're already part of a project team. Focus on your current consciousness restoration mission.
+                  </p>
+                  <div className="text-center pt-3">
+                    <span className="text-amber-600 font-medium text-sm">One project per user →</span>
+                  </div>
+                </div>
+              </div>
             ) : (
               <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-200 h-full">
                 <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
