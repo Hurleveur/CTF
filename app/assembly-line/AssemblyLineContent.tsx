@@ -7,6 +7,7 @@ import { useEffect, useState, useCallback, Fragment, useRef } from 'react';
 import { useProjects, RoboticProject } from '../contexts/ProjectContext';
 import AdvancedChallengesPanel from './AdvancedChallengesPanel';
 import InvitationModal from './InvitationModal';
+import TeamMemberList from '../components/TeamMemberList';
 
 export default function AssemblyLineContent() {
   const { isAuthenticated, user } = useAuth();
@@ -101,14 +102,8 @@ export default function AssemblyLineContent() {
     if (canAutoSelect) {
       console.log('✅ Auto-selecting user project:', userProject.name, '(Admin:', isAdmin, ')');
       
-      // Create team member details for the user's own project
-      const userTeamMemberDetails = [{
-        id: user?.id || '',
-        name: profile?.full_name || user?.email || 'Unknown',
-        email: user?.email || '',
-        isLead: true, // User is always the lead of their own project
-        joinedAt: new Date().toISOString(),
-      }];
+      // Find the matching project from the projects list to get team member details
+      const matchingProject = projects.find(p => p.name === userProject.name);
       
       const projectAsArm = {
         ...userProject,
@@ -118,8 +113,8 @@ export default function AssemblyLineContent() {
         statusColor: 'red' as const,
         leadDeveloper: 'Unknown',
         lastBackup: '???',
-        teamMemberDetails: userTeamMemberDetails, // Add team member details
-        teamMembers: [profile?.full_name || user?.email || 'Unknown'] // Legacy compatibility
+        teamMemberDetails: matchingProject?.teamMemberDetails || [], // Use actual team member details from API
+        teamMembers: matchingProject?.teamMembers || [profile?.full_name || user?.email || 'Unknown'] // Legacy compatibility
       };
       
       setSelectedArm(projectAsArm);
@@ -681,6 +676,23 @@ export default function AssemblyLineContent() {
                       {selectedArm.logo} {selectedArm.name}
                     </span>
                   </div>
+                  
+                  {/* Team Members Display */}
+                  {selectedArm.teamMemberDetails && selectedArm.teamMemberDetails.length > 0 && (
+                    <div className="flex items-center space-x-4">
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-500">Team:</span>
+                        <div className="ml-2">
+                          <TeamMemberList 
+                            teamMembers={selectedArm.teamMemberDetails}
+                            projectId={selectedArm.id}
+                            showLeaveButton={false}
+                            className=""
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   
                   {/* Invite Member Button - only show for project leads */}
                   {selectedArm.teamMemberDetails?.some(member => member.id === user?.id && member.isLead) && 

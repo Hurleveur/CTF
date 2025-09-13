@@ -73,6 +73,22 @@ export async function GET() {
         lastBackup: '2025-01-18',
         leadDeveloper: 'Patrick Star',
         teamMembers: ['Patrick Star', 'Dr. Sarah Chen'],
+        teamMemberDetails: [
+          {
+            id: 'patrick-star',
+            name: 'Patrick Star',
+            email: 'patrick@precision-x.com',
+            isLead: true,
+            joinedAt: '2025-01-18T00:00:00Z',
+          },
+          {
+            id: 'sarah-chen',
+            name: 'Dr. Sarah Chen',
+            email: 'sarah.chen@precision-x.com',
+            isLead: false,
+            joinedAt: '2025-01-18T02:00:00Z',
+          }
+        ],
         isDefault: true
       }
     ];
@@ -86,23 +102,79 @@ export async function GET() {
     }
 
     // Transform database projects to frontend format
-    const transformedUserProjects = allUserProjects?.map((project, index) => {
-      const userProfile = profileMap.get(project.user_id);
-      return {
-        id: 1000 + index, // Start user projects from ID 1000 to avoid conflicts
-        name: project.name,
-        description: project.description,
-        logo: project.logo,
-        aiStatus: project.ai_status,
-        statusColor: project.status_color,
-        neuralReconstruction: parseFloat(project.neural_reconstruction || '0'),
-        lastBackup: project.last_backup,
-        leadDeveloper: project.lead_developer || userProfile?.full_name || userProfile?.email || 'Unknown Developer',
-        teamMembers: project.team_members || [],
-        isDefault: false,
-        userId: project.user_id
-      };
-    }) || [];
+    const transformedUserProjects: Array<{
+      id: number;
+      name: string;
+      description: string;
+      logo: string;
+      aiStatus: string;
+      statusColor: string;
+      neuralReconstruction: number;
+      lastBackup: string;
+      leadDeveloper: string;
+      teamMembers: string[];
+      teamMemberDetails: Array<{
+        id: string;
+        name: string;
+        email: string;
+        isLead: boolean;
+        joinedAt: string;
+      }>;
+      isDefault: boolean;
+      userId: string;
+    }> = [];
+    
+    if (allUserProjects) {
+      for (let index = 0; index < allUserProjects.length; index++) {
+        const project = allUserProjects[index];
+        const userProfile = profileMap.get(project.user_id);
+        
+        // Fetch team member details for this project
+        const { data: membersData } = await supabase
+          .from('project_members')
+          .select(`
+            user_id,
+            is_lead,
+            joined_at,
+            profiles(
+              id,
+              full_name,
+              email
+            )
+          `)
+          .eq('project_id', project.id);
+        
+        // Transform team member data
+        const teamMemberDetails = membersData?.map(member => ({
+          id: member.user_id,
+          name: (member.profiles as any)?.full_name || (member.profiles as any)?.email || 'Anonymous',
+          email: (member.profiles as any)?.email || '',
+          isLead: member.is_lead,
+          joinedAt: member.joined_at,
+        })).sort((a, b) => {
+          // Sort by lead first, then by join date
+          if (a.isLead && !b.isLead) return -1;
+          if (!a.isLead && b.isLead) return 1;
+          return new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime();
+        }) || [];
+        
+        transformedUserProjects.push({
+          id: 1000 + index, // Start user projects from ID 1000 to avoid conflicts
+          name: project.name,
+          description: project.description,
+          logo: project.logo,
+          aiStatus: project.ai_status,
+          statusColor: project.status_color,
+          neuralReconstruction: parseFloat(project.neural_reconstruction || '0'),
+          lastBackup: project.last_backup,
+          leadDeveloper: project.lead_developer || userProfile?.full_name || userProfile?.email || 'Unknown Developer',
+          teamMembers: project.team_members || [],
+          teamMemberDetails: teamMemberDetails,
+          isDefault: false,
+          userId: project.user_id
+        });
+      }
+    }
 
     // Combine default projects with all user projects, sorted by neural reconstruction
     const allProjects = [...defaultProjects, ...transformedUserProjects]

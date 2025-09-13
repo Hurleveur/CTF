@@ -36,28 +36,63 @@ export async function GET() {
     console.log('[Projects] User authenticated:', user.id);
 
     // Fetch user's projects with team member information
-    // Use only the base project_members table (removed problematic view)
+    // Include both owned projects AND projects where user is a member
     let projects, error;
     
     console.log('[Projects] Fetching projects with base table approach...');
     
-    // Step 1: Get the user's projects
-    const { data: userProjects, error: projectsError } = await supabase
+    // Step 1: Get all project IDs where user is a member
+    const { data: membershipData, error: membershipError } = await supabase
+      .from('project_members')
+      .select('project_id')
+      .eq('user_id', user.id);
+    
+    const memberProjectIds = membershipData?.map(m => m.project_id) || [];
+    
+    // Step 2: Get owned projects
+    const { data: ownedProjects, error: ownedError } = await supabase
       .from('user_projects')
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
     
-    console.log('[Projects] Basic query result:', { data: userProjects, error: projectsError?.message });
+    // Step 3: Get projects where user is a member (but not owner)
+    const ownedProjectIds = ownedProjects?.map(p => p.id) || [];
+    const nonOwnedMemberProjectIds = memberProjectIds.filter(id => !ownedProjectIds.includes(id));
     
-    if (projectsError) {
-      error = projectsError;
+    let memberProjects: typeof ownedProjects = [];
+    if (nonOwnedMemberProjectIds.length > 0) {
+      const { data: memberProjectsData, error: memberProjectsError } = await supabase
+        .from('user_projects')
+        .select('*')
+        .in('id', nonOwnedMemberProjectIds);
+      
+      memberProjects = memberProjectsData || [];
+      if (memberProjectsError) {
+        console.log('[Projects] Error fetching member projects:', memberProjectsError);
+      }
+    }
+    
+    // Combine owned and member projects
+    const allUserProjects = [
+      ...(ownedProjects || []),
+      ...memberProjects
+    ];
+    
+    console.log('[Projects] Found projects:', {
+      owned: ownedProjects?.length || 0,
+      member: memberProjects.length,
+      total: allUserProjects.length
+    });
+    
+    if (ownedError || membershipError) {
+      error = ownedError || membershipError;
       projects = null;
     } else {
       console.log('[Projects] Fetching project members from base table...');
-      // Step 2: Fetch project members for each project using base table only
+      // Step 4: Fetch project members for each project using base table only
       projects = await Promise.all(
-        (userProjects || []).map(async (project) => {
+        allUserProjects.map(async (project) => {
           const { data: members } = await supabase
             .from('project_members')
             .select(`
@@ -67,7 +102,7 @@ export async function GET() {
             `)
             .eq('project_id', project.id);
           
-          // Step 3: Fetch profile information for each member separately
+          // Step 5: Fetch profile information for each member separately
           const projectMembers = await Promise.all(
             (members || []).map(async (member) => {
               const { data: profile } = await supabase
@@ -125,6 +160,8 @@ export async function GET() {
         if (!a.isLead && b.isLead) return 1;
         return new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime();
       }) || [];
+      
+      console.log(`[Projects] Project ${project.id} teamMemberDetails:`, teamMembers);
       
       return {
         id: project.id,
