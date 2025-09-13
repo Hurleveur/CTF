@@ -10,3 +10,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const createClient = () => {
   return createBrowserClient(supabaseUrl, supabaseAnonKey);
 };
+
+// Synchronous version for contexts and components that need immediate access
+export const createClientSync = () => {
+  return createBrowserClient(supabaseUrl, supabaseAnonKey);
+};

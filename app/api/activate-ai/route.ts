@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createPermissionContext, canActivateAI } from '@/lib/auth/permissions';
+import { dispatchAIActivationNotification } from '@/lib/notifications/dispatch';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +23,7 @@ export async function POST() {
     // Real admin check - check against profiles table for admin or dev role
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('role, email')
+      .select('id, role, email, full_name')
       .eq('id', user.id)
       .single();
 
@@ -35,7 +36,24 @@ export async function POST() {
     }
 
     // Check if user can activate AI (admin or dev role)
-    const permissionContext = createPermissionContext(user, profile);
+    // Cast Supabase user to AuthContext user type (email is guaranteed to exist here since we checked for user existence)
+    const authUser = {
+      id: user.id,
+      email: user.email || '', // Fallback to empty string, though email should exist
+      name: user.user_metadata?.full_name,
+      role: user.role,
+      last_sign_in_at: user.last_sign_in_at,
+      email_confirmed_at: user.email_confirmed_at,
+    };
+    // Transform profile to match UserProfile interface
+    const userProfile = profile ? {
+      id: profile.id,
+      email: profile.email,
+      role: profile.role as 'user' | 'admin' | 'dev',
+      full_name: profile.full_name
+    } : null;
+    
+    const permissionContext = createPermissionContext(authUser, userProfile);
     const canActivate = canActivateAI(permissionContext);
 
     if (!canActivate) {
@@ -83,6 +101,18 @@ export async function POST() {
       // Continue anyway - the AI activation worked, database update is not critical
     } else {
       console.log(`💾 AI activation state saved to database for user ${user.email}`);
+    }
+    
+    // Dispatch real-time notification to all connected dev users
+    try {
+      await dispatchAIActivationNotification(
+        profile.email,
+        profile.full_name,
+        user.id
+      );
+    } catch (notificationError) {
+      console.error('[AI Activation] Notification dispatch failed (continuing anyway):', notificationError);
+      // Don't fail the AI activation if notification fails
     }
     
     return NextResponse.json({

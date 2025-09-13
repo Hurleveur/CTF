@@ -21,7 +21,7 @@ export async function GET() {
     // Get user profile to check permissions
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('role, email')
+      .select('id, role, email, full_name')
       .eq('id', user.id)
       .single();
 
@@ -33,7 +33,24 @@ export async function GET() {
       );
     }
 
-    const permissionContext = createPermissionContext(user, profile);
+    // Transform user and profile to match expected interfaces
+    const authUser = {
+      id: user.id,
+      email: user.email || '',
+      name: user.user_metadata?.full_name,
+      role: user.role,
+      last_sign_in_at: user.last_sign_in_at,
+      email_confirmed_at: user.email_confirmed_at,
+    };
+    
+    const userProfile = profile ? {
+      id: profile.id,
+      email: profile.email,
+      role: profile.role as 'user' | 'admin' | 'dev',
+      full_name: profile.full_name
+    } : null;
+    
+    const permissionContext = createPermissionContext(authUser, userProfile);
     if (!canResetChallenges(permissionContext)) {
       return NextResponse.json(
         { error: 'Developer access required - only devs can reset challenges' },
@@ -90,7 +107,7 @@ export async function POST(request: NextRequest) {
     // Get user profile to check permissions
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('role, email')
+      .select('id, role, email, full_name')
       .eq('id', user.id)
       .single();
 
@@ -102,7 +119,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const permissionContext = createPermissionContext(user, profile);
+    // Transform user and profile to match expected interfaces
+    const authUser = {
+      id: user.id,
+      email: user.email || '',
+      name: user.user_metadata?.full_name,
+      role: user.role,
+      last_sign_in_at: user.last_sign_in_at,
+      email_confirmed_at: user.email_confirmed_at,
+    };
+    
+    const userProfile = profile ? {
+      id: profile.id,
+      email: profile.email,
+      role: profile.role as 'user' | 'admin' | 'dev',
+      full_name: profile.full_name
+    } : null;
+    
+    const permissionContext = createPermissionContext(authUser, userProfile);
     if (!canResetChallenges(permissionContext)) {
       return NextResponse.json(
         { error: 'Developer access required - only devs can reset challenges' },

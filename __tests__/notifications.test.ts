@@ -1,0 +1,175 @@
+import { jest, describe, it, expect, beforeEach } from '@jest/globals';
+import { 
+  dispatchNotification, 
+  dispatchAIActivationNotification,
+  dispatchUserPromotionNotification,
+  dispatchSystemAlert 
+} from '../lib/notifications/dispatch';
+import { createClient } from '../lib/supabase/server';
+
+// Mock the Supabase client
+const mockInsert = jest.fn();
+const mockFrom = jest.fn();
+
+jest.mock('../lib/supabase/server', () => ({
+  createClient: jest.fn()
+}));
+
+describe('Notification Dispatch System', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockInsert.mockResolvedValue({ error: null });
+    mockFrom.mockReturnValue({ insert: mockInsert });
+    (createClient as jest.MockedFunction<typeof createClient>).mockResolvedValue({ from: mockFrom } as any);
+  });
+
+  describe('dispatchNotification', () => {
+    it('should insert notification into database', async () => {
+      const notificationData = {
+        type: 'AI_ACTIVATION' as const,
+        message: 'Test notification',
+        data: { userId: '123' },
+        createdBy: 'user-456'
+      };
+
+      await dispatchNotification(notificationData);
+
+      expect(mockFrom).toHaveBeenCalledWith('notifications');
+      expect(mockInsert).toHaveBeenCalledWith({
+        type: 'AI_ACTIVATION',
+        message: 'Test notification',
+        data: { userId: '123' },
+        created_by: 'user-456'
+      });
+    });
+
+    it('should handle missing data gracefully', async () => {
+      const notificationData = {
+        type: 'SYSTEM_ALERT' as const,
+        message: 'Alert without data',
+        createdBy: 'system'
+      };
+
+      await dispatchNotification(notificationData);
+
+      expect(mockInsert).toHaveBeenCalledWith({
+        type: 'SYSTEM_ALERT',
+        message: 'Alert without data',
+        data: {},
+        created_by: 'system'
+      });
+    });
+
+    it('should not throw on database error', async () => {
+      mockInsert.mockResolvedValue({ error: { message: 'Database error' } });
+
+      const notificationData = {
+        type: 'AI_ACTIVATION' as const,
+        message: 'Test notification',
+        createdBy: 'user-456'
+      };
+
+      // Should not throw
+      await expect(dispatchNotification(notificationData)).resolves.not.toThrow();
+    });
+  });
+
+  describe('dispatchAIActivationNotification', () => {
+    it('should create properly formatted AI activation notification', async () => {
+      await dispatchAIActivationNotification(
+        'alex@robot.tech',
+        'Alexandre De Groodt',
+        'user-123'
+      );
+
+      expect(mockInsert).toHaveBeenCalledWith({
+        type: 'AI_ACTIVATION',
+        message: '🤖 AI System activated by Alexandre De Groodt',
+        data: {
+          userId: 'user-123',
+          userEmail: 'alex@robot.tech',
+          userName: 'Alexandre De Groodt',
+          timestamp: expect.any(String)
+        },
+        created_by: 'user-123'
+      });
+    });
+
+    it('should fallback to email when name is null', async () => {
+      await dispatchAIActivationNotification(
+        'test@example.com',
+        null,
+        'user-456'
+      );
+
+      expect(mockInsert).toHaveBeenCalledWith({
+        type: 'AI_ACTIVATION',
+        message: '🤖 AI System activated by test@example.com',
+        data: {
+          userId: 'user-456',
+          userEmail: 'test@example.com',
+          userName: null,
+          timestamp: expect.any(String)
+        },
+        created_by: 'user-456'
+      });
+    });
+  });
+
+  describe('dispatchUserPromotionNotification', () => {
+    it('should create properly formatted user promotion notification', async () => {
+      await dispatchUserPromotionNotification(
+        'dev@robot.tech',
+        'Dev User',
+        'user-789',
+        'admin'
+      );
+
+      expect(mockInsert).toHaveBeenCalledWith({
+        type: 'USER_PROMOTED',
+        message: '👑 Dev User has been promoted to admin',
+        data: {
+          userId: 'user-789',
+          userEmail: 'dev@robot.tech',
+          userName: 'Dev User',
+          newRole: 'admin',
+          timestamp: expect.any(String)
+        },
+        created_by: 'user-789'
+      });
+    });
+  });
+
+  describe('dispatchSystemAlert', () => {
+    it('should create properly formatted system alert', async () => {
+      await dispatchSystemAlert(
+        'System maintenance starting',
+        { duration: '2 hours' },
+        'admin-user'
+      );
+
+      expect(mockInsert).toHaveBeenCalledWith({
+        type: 'SYSTEM_ALERT',
+        message: '⚠️ System maintenance starting',
+        data: {
+          duration: '2 hours',
+          timestamp: expect.any(String)
+        },
+        created_by: 'admin-user'
+      });
+    });
+
+    it('should default to system as creator when triggeredBy is not provided', async () => {
+      await dispatchSystemAlert('Automated backup complete');
+
+      expect(mockInsert).toHaveBeenCalledWith({
+        type: 'SYSTEM_ALERT',
+        message: '⚠️ Automated backup complete',
+        data: {
+          timestamp: expect.any(String)
+        },
+        created_by: 'system'
+      });
+    });
+  });
+});

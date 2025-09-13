@@ -5,6 +5,8 @@ import FabrileChatbot from './components/FabrileChatbot';
 import { AuthProvider } from './contexts/AuthContext';
 import { UserDataProvider } from './contexts/UserDataContext';
 import { ProjectProvider } from './contexts/ProjectContext';
+import { NotificationsProvider } from './contexts/NotificationsContext';
+import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -41,11 +43,28 @@ export default function RootLayout({
         <AuthProvider>
           <UserDataProvider>
             <ProjectProvider>
-              <Navigation />
-              <main className="min-h-screen bg-gray-50 text-gray-900">
-                {children}
-              </main>
-              <FabrileChatbot />
+              <NotificationsProvider>
+                <Navigation />
+                <main className="min-h-screen bg-gray-50 text-gray-900">
+                  {children}
+                </main>
+                <FabrileChatbot />
+                <Toaster
+                  position="top-right"
+                  toastOptions={{
+                    duration: 6000,
+                    style: {
+                      background: '#1f2937',
+                      color: '#ffffff',
+                      border: '1px solid #374151',
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                    },
+                  }}
+                />
+              </NotificationsProvider>
             </ProjectProvider>
           </UserDataProvider>
         </AuthProvider>

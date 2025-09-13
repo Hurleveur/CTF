@@ -8,7 +8,7 @@ import { useProjects, RoboticProject } from '../contexts/ProjectContext';
 import AdvancedChallengesPanel from './AdvancedChallengesPanel';
 
 export default function AssemblyLineContent() {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { 
     project: userProject, 
     profile,

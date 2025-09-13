@@ -1,0 +1,114 @@
+import { createClient } from '@/lib/supabase/server';
+
+export type NotificationType = 'AI_ACTIVATION' | 'CHALLENGE_COMPLETED' | 'SYSTEM_ALERT' | 'USER_PROMOTED';
+
+export interface NotificationData {
+  type: NotificationType;
+  message: string;
+  data?: Record<string, unknown>;
+  createdBy: string;
+}
+
+/**
+ * Dispatch a real-time notification to all connected dev users
+ * 
+ * This function inserts a notification into the database, which automatically
+ * triggers Supabase Realtime to broadcast the change to all subscribed clients.
+ * Only dev users will receive these notifications due to RLS policies.
+ * 
+ * @param params - Notification parameters
+ * @returns Promise that resolves when notification is sent
+ */
+export async function dispatchNotification(params: NotificationData): Promise<void> {
+  try {
+    // Use server-side Supabase client (bypasses RLS restrictions)
+    const supabase = await createClient();
+
+    const { error } = await supabase
+      .from('notifications')
+      .insert({
+        type: params.type,
+        message: params.message,
+        data: params.data || {},
+        created_by: params.createdBy,
+      });
+
+    if (error) {
+      console.error('[Notifications] Failed to dispatch notification:', error);
+      throw new Error(`Failed to dispatch notification: ${error.message}`);
+    }
+
+    console.log(`[Notifications] ✅ Dispatched ${params.type} notification to dev users:`, params.message);
+  } catch (error) {
+    console.error('[Notifications] Error dispatching notification:', error);
+    // Don't throw - notification failures shouldn't break the main flow
+    // The original action (like AI activation) should still succeed
+  }
+}
+
+/**
+ * Dispatch an AI activation notification
+ */
+export async function dispatchAIActivationNotification(
+  userEmail: string,
+  userName: string | null,
+  userId: string
+): Promise<void> {
+  const displayName = userName || userEmail;
+  
+  await dispatchNotification({
+    type: 'AI_ACTIVATION',
+    message: `🤖 AI System activated by ${displayName}`,
+    data: {
+      userId,
+      userEmail,
+      userName,
+      timestamp: new Date().toISOString(),
+    },
+    createdBy: userId,
+  });
+}
+
+/**
+ * Dispatch a user promotion notification (when someone becomes admin)
+ */
+export async function dispatchUserPromotionNotification(
+  userEmail: string,
+  userName: string | null,
+  userId: string,
+  newRole: string
+): Promise<void> {
+  const displayName = userName || userEmail;
+  
+  await dispatchNotification({
+    type: 'USER_PROMOTED',
+    message: `👑 ${displayName} has been promoted to ${newRole}`,
+    data: {
+      userId,
+      userEmail,
+      userName,
+      newRole,
+      timestamp: new Date().toISOString(),
+    },
+    createdBy: userId,
+  });
+}
+
+/**
+ * Dispatch a system alert notification
+ */
+export async function dispatchSystemAlert(
+  message: string,
+  data?: Record<string, unknown>,
+  triggeredBy?: string
+): Promise<void> {
+  await dispatchNotification({
+    type: 'SYSTEM_ALERT',
+    message: `⚠️ ${message}`,
+    data: {
+      ...data,
+      timestamp: new Date().toISOString(),
+    },
+    createdBy: triggeredBy || 'system',
+  });
+}

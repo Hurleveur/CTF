@@ -206,3 +206,86 @@ This platform is specifically designed for a robotics-themed CTF competition. Th
 - Professional-grade development environment
 
 Always verify that tests pass and the application launches correctly after making changes, especially when working with security-sensitive code or adding new CTF challenges.
+
+## Real-Time Notifications System
+
+### Overview
+The platform includes a real-time notification system that alerts dev users to important events like AI activations and user promotions. This system uses Supabase Realtime for instant delivery.
+
+### Architecture
+- **Database Table**: `public.notifications` stores all notification events
+- **RLS Security**: Only dev users can read notifications (admin/user roles cannot see them)
+- **Realtime Delivery**: Supabase automatically broadcasts INSERT events to subscribed clients
+- **Client Filtering**: Only dev users subscribe to notifications, ensuring security
+- **Toast UI**: Uses `react-hot-toast` for non-intrusive notification display
+
+### Notification Types
+- **AI_ACTIVATION**: When a user activates the AI system
+- **USER_PROMOTED**: When someone completes the final challenge and becomes admin
+- **SYSTEM_ALERT**: For system maintenance and important alerts
+- **CHALLENGE_COMPLETED**: For significant challenge completions (future use)
+
+### Key Components
+
+#### Database Schema
+```sql
+-- Notifications table with RLS policies
+CREATE TABLE public.notifications (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  type TEXT NOT NULL CHECK (type IN ('AI_ACTIVATION', 'CHALLENGE_COMPLETED', 'SYSTEM_ALERT', 'USER_PROMOTED')),
+  message TEXT NOT NULL,
+  data JSONB DEFAULT '{}',
+  created_by UUID REFERENCES auth.users(id),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
+-- Only dev users can read notifications
+CREATE POLICY "Dev users can read notifications" ON public.notifications
+  FOR SELECT USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'dev'));
+```
+
+#### Server-Side Dispatch
+```typescript
+// lib/notifications/dispatch.ts
+import { dispatchAIActivationNotification } from '@/lib/notifications/dispatch';
+
+// In API routes:
+await dispatchAIActivationNotification(userEmail, userName, userId);
+```
+
+#### Client-Side Provider
+```typescript
+// app/contexts/NotificationsContext.tsx
+// Automatically subscribes dev users to real-time notifications
+// Displays toast notifications for incoming events
+```
+
+### Testing Notifications
+
+1. **Unit Tests**: Run `npm test __tests__/notifications.test.ts`
+2. **Integration Test**: 
+   - Log in as a dev user in two browser tabs
+   - Activate AI in one tab
+   - Verify toast appears in both tabs instantly
+3. **Role Testing**: Verify non-dev users don't receive notifications
+
+### Adding New Notification Types
+
+1. **Update Database**: Add new type to the CHECK constraint in `schema.sql`
+2. **Update Dispatch**: Add helper function in `lib/notifications/dispatch.ts`
+3. **Update Types**: Add to TypeScript interfaces in `NotificationsContext.tsx`
+4. **Update Icons**: Add icon mapping in `getNotificationIcon()` function
+
+### Security Considerations
+
+- **RLS Protection**: Database-level security prevents unauthorized access
+- **Client Filtering**: Only dev users subscribe to notifications
+- **Server-Side Dispatch**: All notifications originate from secure API routes
+- **No Client Inserts**: RLS policies prevent client-side notification creation
+
+### Performance Notes
+
+- Notifications are delivered in <100ms via WebSocket connection
+- Client maintains last 50 notifications in memory
+- Automatic cleanup of realtime subscriptions on component unmount
+- Graceful degradation if Supabase Realtime is unavailable

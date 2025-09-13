@@ -275,6 +275,17 @@ BEGIN
     SET role = 'admin', updated_at = timezone('utc'::text, now())
     WHERE id = NEW.user_id;
     
+    -- Send real-time notification to dev users about the promotion
+    -- Note: This will be visible to dev users via Supabase Realtime
+    INSERT INTO public.notifications (type, message, data, created_by)
+    SELECT 
+      'USER_PROMOTED',
+      '👑 ' || COALESCE(p.full_name, p.email) || ' has been promoted to admin after completing the Ultimate Challenge!',
+      json_build_object('userId', NEW.user_id, 'userEmail', p.email, 'userName', p.full_name, 'newRole', 'admin', 'timestamp', timezone('utc'::text, now())),
+      NEW.user_id
+    FROM public.profiles p 
+    WHERE p.id = NEW.user_id;
+    
     RAISE NOTICE 'User % has been granted admin privileges for completing the final challenge!', NEW.user_id;
   END IF;
   
@@ -291,3 +302,56 @@ CREATE TRIGGER trg_final_challenge_promotion
 
 -- Grant permissions for the final challenge function
 GRANT EXECUTE ON FUNCTION public.handle_final_challenge_promotion() TO authenticated;
+
+-- ===============================================
+-- REAL-TIME NOTIFICATIONS SYSTEM
+-- ===============================================
+-- This system provides real-time notifications to dev users when certain events occur
+-- (like AI activation). Uses Supabase Realtime for instant delivery.
+
+-- Create notifications table
+CREATE TABLE IF NOT EXISTS public.notifications (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  type TEXT NOT NULL CHECK (type IN ('AI_ACTIVATION', 'CHALLENGE_COMPLETED', 'SYSTEM_ALERT', 'USER_PROMOTED')),
+  message TEXT NOT NULL,
+  data JSONB DEFAULT '{}',
+  created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS for notifications
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+-- Only dev users can read notifications (this ensures Realtime only broadcasts to dev users)
+CREATE POLICY "Dev users can read notifications" ON public.notifications
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles 
+      WHERE id = auth.uid() AND role = 'dev'
+    )
+  );
+
+-- Server-side only can insert notifications (no client inserts allowed)
+CREATE POLICY "Server can insert notifications" ON public.notifications
+  FOR INSERT WITH CHECK (false); -- Blocks all client inserts
+
+-- Only dev users can manage notifications (for cleanup/admin purposes)
+CREATE POLICY "Dev users can manage notifications" ON public.notifications
+  FOR INSERT, UPDATE, DELETE USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles 
+      WHERE id = auth.uid() AND role = 'dev'
+    )
+  );
+
+-- Add updated_at trigger for notifications
+CREATE TRIGGER handle_updated_at_notifications
+  BEFORE UPDATE ON public.notifications
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+-- Grant permissions for notifications (RLS will control actual access)
+GRANT SELECT, INSERT ON public.notifications TO authenticated;
+
+-- Dev users get full access for management
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.notifications TO authenticated;
