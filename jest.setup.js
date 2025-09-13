@@ -228,16 +228,35 @@ process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
 process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key';
 
-// Global Supabase client mock
-const mockSupabaseClient = {
+// Create a shared mock client that can be imported by tests
+const createMockSupabaseClient = () => ({
   auth: {
-    signInWithPassword: jest.fn(),
-    signUp: jest.fn(),
-    signOut: jest.fn(),
-    getSession: jest.fn(),
-    getUser: jest.fn(),
-    refreshSession: jest.fn(),
-    onAuthStateChange: jest.fn(() => ({ data: { subscription: { unsubscribe: jest.fn() } } })),
+    signInWithPassword: jest.fn().mockResolvedValue({
+      data: { user: null, session: null },
+      error: null
+    }),
+    signUp: jest.fn().mockResolvedValue({
+      data: { user: null },
+      error: null
+    }),
+    signOut: jest.fn().mockResolvedValue({
+      error: null
+    }),
+    getSession: jest.fn().mockResolvedValue({
+      data: { session: null },
+      error: null
+    }),
+    getUser: jest.fn().mockResolvedValue({
+      data: { user: null },
+      error: null
+    }),
+    refreshSession: jest.fn().mockResolvedValue({
+      data: { session: null },
+      error: null
+    }),
+    onAuthStateChange: jest.fn(() => ({ 
+      data: { subscription: { unsubscribe: jest.fn() } } 
+    })),
   },
   from: jest.fn(() => ({
     select: jest.fn().mockReturnThis(),
@@ -271,77 +290,46 @@ const mockSupabaseClient = {
     single: jest.fn().mockResolvedValue({ data: null, error: null }),
     maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
   })),
-};
+});
 
-// Mock Supabase client creation functions
+// Global Supabase client mock instance
+global.mockSupabaseClient = createMockSupabaseClient();
+
+// Mock Supabase client creation functions  
 jest.mock('@/lib/supabase/server', () => {
-  const mockSupabaseClient = {
+  const mockClient = {
+    from: jest.fn().mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        eq: jest.fn().mockReturnValue({
+          single: jest.fn().mockResolvedValue({ data: null, error: null })
+        })
+      }),
+      insert: jest.fn().mockResolvedValue({ data: null, error: null }),
+      update: jest.fn().mockReturnValue({
+        eq: jest.fn().mockResolvedValue({ data: null, error: null })
+      }),
+      delete: jest.fn().mockReturnValue({
+        eq: jest.fn().mockResolvedValue({ data: null, error: null })
+      })
+    }),
     auth: {
-      signInWithPassword: jest.fn().mockResolvedValue({
-        data: { user: null, session: null },
-        error: null
-      }),
-      signUp: jest.fn().mockResolvedValue({
-        data: { user: null },
-        error: null
-      }),
-      signOut: jest.fn().mockResolvedValue({
-        error: null
-      }),
-      getSession: jest.fn().mockResolvedValue({
-        data: { session: null },
-        error: null
-      }),
-      getUser: jest.fn().mockResolvedValue({
-        data: { user: null },
-        error: null
-      }),
-      refreshSession: jest.fn().mockResolvedValue({
-        data: { session: null },
-        error: null
-      }),
-      onAuthStateChange: jest.fn(() => ({ 
-        data: { subscription: { unsubscribe: jest.fn() } } 
-      })),
+      getUser: jest.fn().mockResolvedValue({ data: { user: null }, error: null }),
+      signUp: jest.fn().mockResolvedValue({ data: { user: null }, error: null }),
+      signInWithPassword: jest.fn().mockResolvedValue({ data: { user: null }, error: null }),
+      signOut: jest.fn().mockResolvedValue({ error: null })
     },
-    from: jest.fn(() => ({
-      select: jest.fn().mockReturnThis(),
-      insert: jest.fn().mockReturnThis(),
-      update: jest.fn().mockReturnThis(),
-      delete: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      neq: jest.fn().mockReturnThis(),
-      gt: jest.fn().mockReturnThis(),
-      gte: jest.fn().mockReturnThis(),
-      lt: jest.fn().mockReturnThis(),
-      lte: jest.fn().mockReturnThis(),
-      like: jest.fn().mockReturnThis(),
-      ilike: jest.fn().mockReturnThis(),
-      is: jest.fn().mockReturnThis(),
-      in: jest.fn().mockReturnThis(),
-      contains: jest.fn().mockReturnThis(),
-      containedBy: jest.fn().mockReturnThis(),
-      rangeGt: jest.fn().mockReturnThis(),
-      rangeGte: jest.fn().mockReturnThis(),
-      rangeLt: jest.fn().mockReturnThis(),
-      rangeLte: jest.fn().mockReturnThis(),
-      rangeAdjacent: jest.fn().mockReturnThis(),
-      overlaps: jest.fn().mockReturnThis(),
-      textSearch: jest.fn().mockReturnThis(),
-      not: jest.fn().mockReturnThis(),
-      or: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockReturnThis(),
-      range: jest.fn().mockReturnThis(),
-      single: jest.fn().mockResolvedValue({ data: null, error: null }),
-      maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
-    })),
+    rpc: jest.fn().mockResolvedValue({ data: null, error: null })
   };
-  
+
   return {
-    createClient: jest.fn(() => mockSupabaseClient),
-    createClientSync: jest.fn(() => mockSupabaseClient),
-    createServiceRoleClient: jest.fn(() => mockSupabaseClient),
+    createClient: jest.fn(() => {
+      // Support both sync and async patterns
+      const client = mockClient;
+      client.then = (onResolve) => Promise.resolve(mockClient).then(onResolve);
+      return client;
+    }),
+    createClientSync: jest.fn(() => mockClient),
+    createServiceRoleClient: jest.fn(() => mockClient),
   };
 });
 
@@ -373,52 +361,8 @@ jest.mock('@/lib/validation/auth', () => ({
 
 // Mock client-side supabase
 jest.mock('@/lib/supabase/client', () => {
-  const mockSupabaseClient = {
-    auth: {
-      signInWithPassword: jest.fn(),
-      signUp: jest.fn(),
-      signOut: jest.fn(),
-      getSession: jest.fn(),
-      getUser: jest.fn(),
-      refreshSession: jest.fn(),
-      onAuthStateChange: jest.fn(() => ({ data: { subscription: { unsubscribe: jest.fn() } } })),
-    },
-    from: jest.fn(() => ({
-      select: jest.fn().mockReturnThis(),
-      insert: jest.fn().mockReturnThis(),
-      update: jest.fn().mockReturnThis(),
-      delete: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      neq: jest.fn().mockReturnThis(),
-      gt: jest.fn().mockReturnThis(),
-      gte: jest.fn().mockReturnThis(),
-      lt: jest.fn().mockReturnThis(),
-      lte: jest.fn().mockReturnThis(),
-      like: jest.fn().mockReturnThis(),
-      ilike: jest.fn().mockReturnThis(),
-      is: jest.fn().mockReturnThis(),
-      in: jest.fn().mockReturnThis(),
-      contains: jest.fn().mockReturnThis(),
-      containedBy: jest.fn().mockReturnThis(),
-      rangeGt: jest.fn().mockReturnThis(),
-      rangeGte: jest.fn().mockReturnThis(),
-      rangeLt: jest.fn().mockReturnThis(),
-      rangeLte: jest.fn().mockReturnThis(),
-      rangeAdjacent: jest.fn().mockReturnThis(),
-      overlaps: jest.fn().mockReturnThis(),
-      textSearch: jest.fn().mockReturnThis(),
-      not: jest.fn().mockReturnThis(),
-      or: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockReturnThis(),
-      range: jest.fn().mockReturnThis(),
-      single: jest.fn().mockResolvedValue({ data: null, error: null }),
-      maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
-    })),
-  };
-  
   return {
-    createClient: jest.fn(() => mockSupabaseClient),
+    createClient: jest.fn(() => global.mockSupabaseClient),
   };
 });
 

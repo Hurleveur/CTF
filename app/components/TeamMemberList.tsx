@@ -12,7 +12,7 @@ interface TeamMemberListProps {
 
 export default function TeamMemberList({ 
   teamMembers, 
-  projectId, 
+  projectId, // eslint-disable-line @typescript-eslint/no-unused-vars
   showLeaveButton = false,
   className = '' 
 }: TeamMemberListProps) {
@@ -60,7 +60,7 @@ export default function TeamMemberList({
       <div className="space-y-2">
         {/* Team Member Avatars */}
         <div className="flex items-center space-x-2 flex-wrap">
-          {teamMembers.map((member, index) => (
+          {teamMembers.map((member) => (
             <div
               key={member.id}
               className="flex items-center space-x-1 bg-gray-100 rounded-full px-2 py-1"

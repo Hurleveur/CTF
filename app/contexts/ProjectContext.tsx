@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 
 export interface TeamMember {
@@ -85,21 +85,6 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   const [isLoadingInvitations, setIsLoadingInvitations] = useState<boolean>(false);
   const { isAuthenticated } = useAuth();
 
-  // Load projects and invitations from database when authenticated
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setProjects(DEFAULT_PROJECTS);
-      setInvitations([]);
-      return;
-    }
-    (async () => {
-      await Promise.all([
-        refreshProjects(),
-        refreshInvitations(),
-      ]);
-    })();
-  }, [isAuthenticated]);
-
   const refreshProjects = async () => {
     try {
       setIsLoading(true);
@@ -122,7 +107,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const refreshInvitations = async () => {
+  const refreshInvitations = useCallback(async () => {
     if (!isAuthenticated) return;
     
     try {
@@ -145,7 +130,22 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoadingInvitations(false);
     }
-  };
+  }, [isAuthenticated]);
+
+  // Load projects and invitations from database when authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setProjects(DEFAULT_PROJECTS);
+      setInvitations([]);
+      return;
+    }
+    (async () => {
+      await Promise.all([
+        refreshProjects(),
+        refreshInvitations(),
+      ]);
+    })();
+  }, [isAuthenticated, refreshInvitations]);
 
   const addProject = async (project: Omit<RoboticProject, 'id'>) => {
     try {

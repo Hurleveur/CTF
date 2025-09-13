@@ -3,9 +3,8 @@ import { GET } from '../../app/api/statistics/route';
 import { createServiceRoleClient } from '../../lib/supabase/server';
 
 // Mock the Supabase service role client
-jest.mock('../../lib/supabase/server', () => ({
-  createServiceRoleClient: jest.fn(),
-}));
+jest.mock('../../lib/supabase/server');
+const mockCreateServiceRoleClient = createServiceRoleClient as jest.MockedFunction<typeof createServiceRoleClient>;
 
 const mockSupabase = {
   from: jest.fn(),
@@ -21,7 +20,7 @@ const mockQuery = {
 describe('/api/statistics', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (createServiceRoleClient as jest.Mock).mockReturnValue(mockSupabase);
+    mockCreateServiceRoleClient.mockReturnValue(mockSupabase as any);
     
     // Setup default mock chain
     mockSupabase.from.mockReturnValue(mockQuery);
@@ -80,7 +79,7 @@ describe('/api/statistics', () => {
       });
 
     const request = new NextRequest('http://localhost:3000/api/statistics');
-    const response = await GET(request);
+    const response = await GET();
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -137,7 +136,7 @@ describe('/api/statistics', () => {
       });
 
     const request = new NextRequest('http://localhost:3000/api/statistics');
-    const response = await GET(request);
+    const response = await GET();
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -152,7 +151,7 @@ describe('/api/statistics', () => {
     });
 
     const request = new NextRequest('http://localhost:3000/api/statistics');
-    const response = await GET(request);
+    const response = await GET();
     const data = await response.json();
 
     expect(response.status).toBe(500);
@@ -207,7 +206,7 @@ describe('/api/statistics', () => {
       });
 
     const request = new NextRequest('http://localhost:3000/api/statistics');
-    const response = await GET(request);
+    const response = await GET();
     const data = await response.json();
 
     expect(data.data.neuralProgress).toBe(46); // 10.5 + 20.2 + 15.3 = 46

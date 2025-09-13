@@ -7,33 +7,7 @@ import { POST as sendInvitation } from '../../app/api/projects/invitations/send/
 import { POST as acceptInvitation } from '../../app/api/projects/invitations/accept/route';
 import { POST as leaveProject } from '../../app/api/projects/leave/route';
 import { GET as getInvitations } from '../../app/api/projects/invitations/route';
-
-// Mock Supabase client
-jest.mock('@/lib/supabase/server', () => ({
-  createClient: jest.fn(() => ({
-    auth: {
-      getUser: jest.fn(),
-    },
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          single: jest.fn(),
-          limit: jest.fn(() => ({})),
-        })),
-        is: jest.fn(() => ({
-          order: jest.fn(() => ({})),
-        })),
-        order: jest.fn(() => ({})),
-      })),
-      insert: jest.fn(() => ({
-        select: jest.fn(() => ({
-          single: jest.fn(),
-        })),
-      })),
-    })),
-    rpc: jest.fn(),
-  })),
-}));
+import { createClient } from '@/lib/supabase/server';
 
 // Mock user authentication
 const mockUser = {

@@ -1,5 +1,10 @@
 import { NextRequest } from 'next/server';
 import { GET, POST } from '../../app/api/admin/challenge-reset/route';
+import { createClient } from '@/lib/supabase/server';
+
+// Mock the Supabase server client
+jest.mock('@/lib/supabase/server');
+const mockCreateClient = createClient as jest.MockedFunction<typeof createClient>;
 
 // Mock methods that we'll reference in tests  
 const mockSingle = jest.fn();
@@ -13,8 +18,7 @@ const mockQueryChain = {
   upsert: mockUpsert,
 };
 
-
-// Create a mock client object
+// Create a mock client object for this test
 const mockSupabaseClient = {
   auth: {
     getUser: jest.fn(),
@@ -22,19 +26,13 @@ const mockSupabaseClient = {
   from: jest.fn(() => mockQueryChain),
 };
 
-// Mock the Supabase server client
-jest.mock('@/lib/supabase/server', () => ({
-  createClient: jest.fn(() => Promise.resolve(mockSupabaseClient)),
-}));
-
 
 describe('/api/admin/challenge-reset', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
-    // Re-setup the createClient mock after clearAllMocks
-    const { createClient } = require('@/lib/supabase/server');
-    createClient.mockResolvedValue(mockSupabaseClient);
+    // Set up the mock chain
+    mockCreateClient.mockResolvedValue(mockSupabaseClient as any);
     
     // Re-setup the query chain mocks after clearAllMocks
     (mockQueryChain.select as jest.MockedFunction<any>).mockReturnThis();

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useProjects, type ProjectInvitation } from '../contexts/ProjectContext';
+import { useProjects } from '../contexts/ProjectContext';
 import toast from 'react-hot-toast';
 
 interface InvitationNotificationsProps {
@@ -11,7 +11,7 @@ export default function InvitationNotifications({ className = '' }: InvitationNo
   const [acceptingInvite, setAcceptingInvite] = useState<string | null>(null);
 
   // Filter for received invitations only
-  const receivedInvitations = invitations.filter(invite => invite.type === 'received');
+  const receivedInvitations = invitations?.filter(invite => invite.type === 'received') || [];
 
   const handleAcceptInvitation = async (invitationId: string) => {
     setAcceptingInvite(invitationId);

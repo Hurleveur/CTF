@@ -8,7 +8,19 @@ import { buildDefaultProject } from '../default-project';
 
 export interface CreateDefaultProjectResult {
   success: boolean;
-  project?: any;
+  project?: {
+    id: number;
+    name: string;
+    description: string;
+    logo: string;
+    aiStatus: string;
+    statusColor: string;
+    neuralReconstruction: number;
+    lastBackup: string;
+    leadDeveloper: string;
+    teamMembers: unknown[];
+    userId: string;
+  };
   error?: string;
 }
 

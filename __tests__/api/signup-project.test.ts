@@ -5,22 +5,11 @@
 import { NextRequest } from 'next/server';
 import { POST as signupRoute } from '../../app/api/auth/signup/route';
 import { createDefaultProject } from '../../lib/projects/createDefaultProject';
+import { createClient } from '@/lib/supabase/server';
 
-// Mock Supabase client
-jest.mock('@/lib/supabase/server', () => ({
-  createClient: jest.fn(() => ({
-    auth: {
-      signUp: jest.fn(),
-    },
-    from: jest.fn(() => ({
-      insert: jest.fn(() => ({
-        select: jest.fn(() => ({
-          single: jest.fn(),
-        })),
-      })),
-    })),
-  })),
-}));
+// Mock Supabase
+jest.mock('@/lib/supabase/server');
+const mockCreateClient = createClient as jest.MockedFunction<typeof createClient>;
 
 // Mock rate limiter
 jest.mock('@/lib/rate-limiter', () => ({
@@ -44,15 +33,25 @@ const mockUser = {
   email_confirmed_at: new Date().toISOString(),
 };
 
+// Create a local mock client for this test file
+const mockSupabaseClient = {
+  auth: {
+    signUp: jest.fn(),
+    getUser: jest.fn(),
+  },
+  from: jest.fn(),
+};
+
 describe('Signup with Default Project Creation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('should create default project when checkbox is checked', async () => {
-    const { createClient } = require('@/lib/supabase/server');
     const { validate } = require('@/lib/validation/auth');
-    const mockSupabase = createClient();
+    
+    // Set up the mock chain
+    mockCreateClient.mockResolvedValue(mockSupabaseClient as any);
 
     // Mock validation success
     validate.mockReturnValue({
@@ -66,7 +65,7 @@ describe('Signup with Default Project Creation', () => {
     });
 
     // Mock successful signup
-    mockSupabase.auth.signUp.mockResolvedValue({
+    mockSupabaseClient.auth.signUp.mockResolvedValue({
       data: { user: mockUser },
       error: null,
     });
@@ -101,9 +100,10 @@ describe('Signup with Default Project Creation', () => {
   });
 
   it('should skip project creation when checkbox is unchecked', async () => {
-    const { createClient } = require('@/lib/supabase/server');
     const { validate } = require('@/lib/validation/auth');
-    const mockSupabase = createClient();
+    
+    // Set up the mock chain
+    mockCreateClient.mockResolvedValue(mockSupabaseClient as any);
 
     // Mock validation success with createDefaultProject: false
     validate.mockReturnValue({
@@ -117,7 +117,7 @@ describe('Signup with Default Project Creation', () => {
     });
 
     // Mock successful signup
-    mockSupabase.auth.signUp.mockResolvedValue({
+    mockSupabaseClient.auth.signUp.mockResolvedValue({
       data: { user: mockUser },
       error: null,
     });
@@ -143,7 +143,7 @@ describe('Signup with Default Project Creation', () => {
   it('should default to creating project when field not specified', async () => {
     const { createClient } = require('@/lib/supabase/server');
     const { validate } = require('@/lib/validation/auth');
-    const mockSupabase = createClient();
+    // Use mockSupabaseClient instead
 
     // Mock validation success without createDefaultProject field
     validate.mockReturnValue({
@@ -157,7 +157,7 @@ describe('Signup with Default Project Creation', () => {
     });
 
     // Mock successful signup
-    mockSupabase.auth.signUp.mockResolvedValue({
+    mockSupabaseClient.auth.signUp.mockResolvedValue({
       data: { user: mockUser },
       error: null,
     });
@@ -188,7 +188,7 @@ describe('Signup with Default Project Creation', () => {
   it('should not fail signup if project creation fails', async () => {
     const { createClient } = require('@/lib/supabase/server');
     const { validate } = require('@/lib/validation/auth');
-    const mockSupabase = createClient();
+    // Use mockSupabaseClient instead
 
     // Mock validation success
     validate.mockReturnValue({
@@ -202,7 +202,7 @@ describe('Signup with Default Project Creation', () => {
     });
 
     // Mock successful signup
-    mockSupabase.auth.signUp.mockResolvedValue({
+    mockSupabaseClient.auth.signUp.mockResolvedValue({
       data: { user: mockUser },
       error: null,
     });
@@ -239,10 +239,10 @@ describe('Signup with Default Project Creation', () => {
 
     it('should create project successfully', async () => {
       const { createClient } = require('@/lib/supabase/server');
-      const mockSupabase = createClient();
+      // Use mockSupabaseClient instead
 
       // Mock successful project insertion
-      mockSupabase.from.mockReturnValue({
+      mockSupabaseClient.from.mockReturnValue({
         insert: jest.fn(() => ({
           select: jest.fn(() => ({
             single: jest.fn().mockResolvedValue({
@@ -279,10 +279,10 @@ describe('Signup with Default Project Creation', () => {
 
     it('should handle database errors gracefully', async () => {
       const { createClient } = require('@/lib/supabase/server');
-      const mockSupabase = createClient();
+      // Use mockSupabaseClient instead
 
       // Mock database error
-      mockSupabase.from.mockReturnValue({
+      mockSupabaseClient.from.mockReturnValue({
         insert: jest.fn(() => ({
           select: jest.fn(() => ({
             single: jest.fn().mockResolvedValue({

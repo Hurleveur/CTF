@@ -7,20 +7,27 @@ import {
 } from '../lib/notifications/dispatch';
 import { createClient } from '../lib/supabase/server';
 
-// Mock the Supabase client
-const mockInsert = jest.fn();
-const mockFrom = jest.fn();
-
-jest.mock('../lib/supabase/server', () => ({
-  createClient: jest.fn()
-}));
+// Mock the createClient import
+jest.mock('../lib/supabase/server');
+const mockCreateClient = createClient as jest.MockedFunction<typeof createClient>;
 
 describe('Notification Dispatch System', () => {
+  let mockInsert: jest.Mock;
+  let mockFrom: jest.Mock;
+  let mockSupabaseClient: any;
+  
   beforeEach(() => {
     jest.clearAllMocks();
-    mockInsert.mockResolvedValue({ error: null });
+    
+    // Set up the mock chain with proper typing
+    mockInsert = jest.fn();
+    (mockInsert as any).mockResolvedValue({ error: null });
+    
+    mockFrom = jest.fn();
     mockFrom.mockReturnValue({ insert: mockInsert });
-    (createClient as jest.MockedFunction<typeof createClient>).mockResolvedValue({ from: mockFrom } as any);
+    
+    mockSupabaseClient = { from: mockFrom };
+    mockCreateClient.mockResolvedValue(mockSupabaseClient);
   });
 
   describe('dispatchNotification', () => {
@@ -61,7 +68,7 @@ describe('Notification Dispatch System', () => {
     });
 
     it('should not throw on database error', async () => {
-      mockInsert.mockResolvedValue({ error: { message: 'Database error' } });
+      (mockInsert as any).mockResolvedValue({ error: { message: 'Database error' } });
 
       const notificationData = {
         type: 'AI_ACTIVATION' as const,

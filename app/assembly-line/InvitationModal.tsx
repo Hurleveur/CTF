@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useProjects, type ProjectInvitation, type RoboticProject } from '../contexts/ProjectContext';
+import { useProjects, type RoboticProject } from '../contexts/ProjectContext';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -123,7 +123,7 @@ export default function InvitationModal({ isOpen, onClose, project }: Invitation
                   disabled={isSubmitting}
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Must match the user's exact username from their profile.
+                  Must match the user&apos;s exact username from their profile.
                 </p>
               </div>
 

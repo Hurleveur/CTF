@@ -1,36 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { checkRateLimit, resetRateLimit } from '@/lib/rate-limiter';
+import { validate } from '@/lib/validation/auth';
 
 // Mock functions
-const mockCheckRateLimit = jest.fn();
-const mockResetRateLimit = jest.fn();
-const mockValidate = jest.fn();
+const mockCheckRateLimit = checkRateLimit as jest.MockedFunction<typeof checkRateLimit>;
+const mockResetRateLimit = resetRateLimit as jest.MockedFunction<typeof resetRateLimit>;
+const mockValidate = validate as jest.MockedFunction<typeof validate>;
+const mockCreateClient = createClient as jest.MockedFunction<typeof createClient>;
+
+// Mock modules first
+jest.mock('@/lib/supabase/server');
+jest.mock('@/lib/rate-limiter');
+jest.mock('@/lib/validation/auth', () => ({
+  loginSchema: {},
+  validate: jest.fn(),
+}));
+
+// Create local mock client for this test file
 const mockSupabaseAuth = {
   signInWithPassword: jest.fn(),
   getUser: jest.fn(),
 };
 const mockSupabaseFrom = jest.fn();
-const mockCreateClient = jest.fn();
-
-// Mock Supabase client
 const mockSupabaseClient = {
   auth: mockSupabaseAuth,
   from: mockSupabaseFrom,
 };
-
-// Mock modules first
-jest.mock('@/lib/supabase/server', () => ({
-  createClient: jest.fn(),
-}));
-
-jest.mock('@/lib/rate-limiter', () => ({
-  checkRateLimit: jest.fn(),
-  resetRateLimit: jest.fn(),
-}));
-
-jest.mock('@/lib/validation/auth', () => ({
-  loginSchema: {},
-  validate: jest.fn(),
-}));
 
 // Import after mocking
 import { POST } from '@/app/api/auth/login/route';
@@ -166,7 +162,7 @@ describe('Authentication Integration Tests', () => {
         method: 'GET',
       });
 
-      const response = await GET(request);
+      const response = await GET();
       const data = await response.json();
 
       expect(response.status).toBe(401);
@@ -237,7 +233,7 @@ describe('Authentication Integration Tests', () => {
         method: 'GET',
       });
 
-      const response = await GET(request);
+      const response = await GET();
       
       expect(response.status).toBe(200);
       expect(mockSupabaseClient.from).toHaveBeenCalledWith('profiles');
@@ -361,7 +357,7 @@ describe('Authentication Integration Tests', () => {
         }
       });
 
-      const response = await GET(request);
+      const response = await GET();
       expect(response.status).toBe(401);
     });
   });
