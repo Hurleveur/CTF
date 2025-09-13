@@ -14,6 +14,7 @@ function LoginContent() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sessionExpiredMessage, setSessionExpiredMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -23,11 +24,21 @@ function LoginContent() {
 
   useEffect(() => {
     const reason = searchParams?.get?.('reason');
+    const message = searchParams?.get?.('message');
+    
     if (reason === 'session-expired' || reason === 'token-expired') {
       setSessionExpiredMessage('Your session has expired. Please log in again.');
-      // Clear the URL parameter after showing the message
+    }
+    
+    if (message === 'password-updated') {
+      setSuccessMessage('Password updated successfully! Please log in with your new password.');
+    }
+    
+    // Clear the URL parameters after showing the message
+    if (reason || message) {
       const url = new URL(window.location.href);
       url.searchParams.delete('reason');
+      url.searchParams.delete('message');
       window.history.replaceState({}, '', url.toString());
     }
   }, [searchParams]);
@@ -72,6 +83,17 @@ function LoginContent() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p className="text-sm text-yellow-700">{sessionExpiredMessage}</p>
+              </div>
+            </div>
+          )}
+          
+          {successMessage && (
+            <div className="bg-green-50 border border-green-200 rounded-md p-4">
+              <div className="flex items-center">
+                <svg className="h-5 w-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <p className="text-sm text-green-700">{successMessage}</p>
               </div>
             </div>
           )}
@@ -132,7 +154,12 @@ function LoginContent() {
             </button>
           </div>
           
-          <div className="text-center">
+          <div className="text-center space-y-2">
+            <p className="text-sm text-gray-600">
+              <Link href="/forgot-password" className="text-blue-600 hover:text-blue-800 font-medium">
+                Forgot your password?
+              </Link>
+            </p>
             <p className="text-sm text-gray-600">
               Don&apos;t have an account?{' '}
               <Link href="/signup" className="text-blue-600 hover:text-blue-800 font-medium">

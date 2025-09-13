@@ -53,7 +53,7 @@ export default function AssemblyLineContent() {
   const audioContextRef = useRef<AudioContext | null>(null);
   
   // Check if user is admin - now using actual database profile role!
-  const isAdmin = profile?.role === 'admin' || user?.email === 'admin@example.com';
+  const isAdmin = profile?.role === 'admin' || profile?.role === 'dev';
   
   // APPARENT WEAKNESS: Frontend admin check - users might think they can bypass this easily!
   // This appears to be a security vulnerability that participants can exploit!

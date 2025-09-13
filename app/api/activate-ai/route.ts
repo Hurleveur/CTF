@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createPermissionContext, canActivateAI } from '@/lib/auth/permissions';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +19,7 @@ export async function POST() {
     }
 
     // Check if user is ACTUALLY admin (not just frontend bypass)
-    // Real admin check - check against profiles table admin role
+    // Real admin check - check against profiles table for admin or dev role
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('role, email')
@@ -33,10 +34,11 @@ export async function POST() {
       );
     }
 
-    // Check if user has admin role or specific admin email
-    const isRealAdmin = profile.role === 'admin' || profile.email === 'admin@example.com';
+    // Check if user can activate AI (admin or dev role)
+    const permissionContext = createPermissionContext(user, profile);
+    const canActivate = canActivateAI(permissionContext);
 
-    if (!isRealAdmin) {
+    if (!canActivate) {
       // NOT ADMIN - RICKROLL TIME! 🎵
       console.log(`🎭 Non-admin user ${user.email} tried to activate AI - deploying rickroll defense!`);
       

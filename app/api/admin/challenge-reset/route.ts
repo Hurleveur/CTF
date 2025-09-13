@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createPermissionContext, canResetChallenges } from '@/lib/auth/permissions';
 
 // Force dynamic rendering since we use user authentication
 export const dynamic = 'force-dynamic';
@@ -8,11 +9,34 @@ export async function GET() {
   try {
     const supabase = await createClient();
     
-    // Verify admin access
+    // Verify dev admin access (only devs can reset challenges)
     const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user || !user.email?.includes('admin')) {
+    if (userError || !user) {
       return NextResponse.json(
-        { error: 'Admin access required' },
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Get user profile to check permissions
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('role, email')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      console.error('[Admin] Profile fetch error:', profileError.message);
+      return NextResponse.json(
+        { error: 'Unable to verify permissions' },
+        { status: 500 }
+      );
+    }
+
+    const permissionContext = createPermissionContext(user, profile);
+    if (!canResetChallenges(permissionContext)) {
+      return NextResponse.json(
+        { error: 'Developer access required - only devs can reset challenges' },
         { status: 403 }
       );
     }
@@ -54,11 +78,34 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     
-    // Verify admin access
+    // Verify dev admin access (only devs can reset challenges)
     const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user || !user.email?.includes('admin')) {
+    if (userError || !user) {
       return NextResponse.json(
-        { error: 'Admin access required' },
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Get user profile to check permissions
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('role, email')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      console.error('[Admin] Profile fetch error:', profileError.message);
+      return NextResponse.json(
+        { error: 'Unable to verify permissions' },
+        { status: 500 }
+      );
+    }
+
+    const permissionContext = createPermissionContext(user, profile);
+    if (!canResetChallenges(permissionContext)) {
+      return NextResponse.json(
+        { error: 'Developer access required - only devs can reset challenges' },
         { status: 403 }
       );
     }

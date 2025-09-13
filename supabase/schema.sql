@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   email TEXT UNIQUE NOT NULL,
   full_name TEXT,
   avatar_url TEXT,
-  role TEXT DEFAULT 'user' CHECK (role IN ('user', 'admin', 'moderator')),
+  role TEXT DEFAULT 'user' CHECK (role IN ('user', 'admin', 'dev')),
   ctf_role TEXT DEFAULT '🎯 CTF Participant',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
@@ -78,11 +78,12 @@ CREATE POLICY "Users can delete their own profile" ON public.profiles
 CREATE POLICY "Active challenges are viewable by authenticated users" ON public.challenges
   FOR SELECT USING (auth.role() = 'authenticated' AND is_active = true);
 
-CREATE POLICY "Admins can manage all challenges" ON public.challenges
+-- Admins and dev users can manage all challenges
+CREATE POLICY "Admin users can manage all challenges" ON public.challenges
   FOR ALL USING (
     EXISTS (
       SELECT 1 FROM public.profiles 
-      WHERE id = auth.uid() AND role = 'admin'
+      WHERE id = auth.uid() AND role IN ('admin', 'dev')
     )
   );
 
@@ -93,11 +94,21 @@ CREATE POLICY "Users can view their own submissions" ON public.submissions
 CREATE POLICY "Users can insert their own submissions" ON public.submissions
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Admins can view all submissions" ON public.submissions
+-- Admins can view all submissions, dev users can manage all
+CREATE POLICY "Admin users can view all submissions" ON public.submissions
   FOR SELECT USING (
     EXISTS (
       SELECT 1 FROM public.profiles 
-      WHERE id = auth.uid() AND role = 'admin'
+      WHERE id = auth.uid() AND role IN ('admin', 'dev')
+    )
+  );
+
+-- Only dev users can modify/delete submissions
+CREATE POLICY "Dev users can manage all submissions" ON public.submissions
+  FOR INSERT, UPDATE, DELETE USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles 
+      WHERE id = auth.uid() AND role = 'dev'
     )
   );
 
@@ -189,11 +200,20 @@ CREATE POLICY "Authenticated users can view all projects" ON public.user_project
   FOR SELECT USING (auth.role() = 'authenticated');
 
 -- Admins can view all projects
-CREATE POLICY "Admins can view all projects" ON public.user_projects
+CREATE POLICY "Admin users can view all projects" ON public.user_projects
   FOR SELECT USING (
     EXISTS (
       SELECT 1 FROM public.profiles 
-      WHERE id = auth.uid() AND role = 'admin'
+      WHERE id = auth.uid() AND role IN ('admin', 'dev')
+    )
+  );
+
+-- Only dev users can modify projects
+CREATE POLICY "Dev users can manage all projects" ON public.user_projects
+  FOR INSERT, UPDATE, DELETE USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles 
+      WHERE id = auth.uid() AND role = 'dev'
     )
   );
 

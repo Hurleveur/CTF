@@ -26,6 +26,20 @@ export const signupSchema = z.object({
     .optional(),
 });
 
+// Password reset request validation schema
+export const passwordResetSchema = z.object({
+  email: z.string().email('Invalid email format').max(320, 'Email too long'),
+});
+
+// Password update validation schema
+export const passwordUpdateSchema = z.object({
+  password: passwordSchema,
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ['confirmPassword'],
+});
+
 // Generic validation result type
 export interface ValidationResult<T> {
   ok: boolean;

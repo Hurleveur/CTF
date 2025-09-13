@@ -84,8 +84,10 @@ More information on the challenge can be found here: https://docs.google.com/doc
 - **Server-side authentication** with Supabase
 - **HTTP-only cookies** for secure session management
 - **Row Level Security (RLS)** policies in database
-- **Role-based access control** (user, admin, moderator)
+- **Role-based access control** (user, admin, dev)
 - **JWT token handling** with automatic refresh
+- **Password reset flow** with secure email-based recovery
+- **Email enumeration protection** for security
 
 #### Built-in Protections
 - **Content Security Policy (CSP)**: Prevents XSS attacks
@@ -108,6 +110,40 @@ More information on the challenge can be found here: https://docs.google.com/doc
 - **Error handling** without information leakage
 - **Rate limiting** considerations (timing attack prevention)
 - **Request logging** for monitoring
+
+## 🔐 Password Reset Flow
+
+The platform includes a secure password reset system with the following features:
+
+### Security Features
+- **Email enumeration protection**: Always returns the same message regardless of email validity
+- **Rate limiting**: Prevents abuse of the password reset endpoint  
+- **Server-side validation**: Comprehensive input validation and sanitization
+- **Secure redirect URLs**: Uses environment variables for redirect configuration
+- **Audit logging**: All password reset requests are logged for monitoring
+
+### User Flow
+1. **Forgot Password**: Users can access `/forgot-password` to request a password reset
+2. **Email Verification**: System sends a secure reset link to the provided email address
+3. **Token Validation**: Reset tokens are validated both client-side and server-side
+4. **Password Update**: Users set a new password that meets security requirements
+5. **Automatic Redirect**: After successful reset, users are redirected to login
+
+### API Endpoints
+- **POST `/api/auth/reset-password`**: Request password reset email
+- **AuthContext Methods**: `requestPasswordReset()` and `updatePassword()` for client integration
+
+### Configuration
+Password reset emails use the following redirect URL hierarchy:
+1. `NEXTAUTH_URL` environment variable (primary)
+2. `VERCEL_URL` environment variable (deployment)
+3. `http://localhost:3000` (fallback for development)
+
+### Email Integration
+To enable password reset functionality:
+1. Configure Supabase Email Auth settings in your dashboard
+2. Set redirect URL to: `{your-domain}/reset-password`
+3. Customize email templates as needed
 
 ## 🚀 Getting Started
 

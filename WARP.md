@@ -96,9 +96,11 @@ The codebase is structured to support CTF challenges:
 
 #### Authentication (`app/contexts/AuthContext.tsx`)
 - Client-side authentication context
-- Simple credential validation (admin@example.com/admin)
-- localStorage-based session persistence
-- React hooks for authentication state
+- Supabase-based authentication with secure session management
+- Password reset flow with email-based recovery
+- React hooks for authentication state including:
+  - `requestPasswordReset(email)` - Request password reset via email
+  - `updatePassword(newPassword)` - Update user password securely
 
 #### API Security (`app/api/hello/route.ts`)
 - Demonstrates secure API patterns
@@ -112,6 +114,8 @@ The codebase is structured to support CTF challenges:
 - **Projects** (`/projects`) - Project showcase
 - **Assembly Line** (`/assembly-line`) - Interactive robotics demo
 - **Login** (`/login`) - Authentication interface
+- **Forgot Password** (`/forgot-password`) - Password reset request form
+- **Reset Password** (`/reset-password`) - Password update form with token validation
 
 ## Recent Major Upgrades
 
@@ -175,8 +179,8 @@ When adding CTF challenges:
 
 ### Configuration
 - `next.config.mjs` - Next.js config with security headers
-- `jest.config.ts` - Test configuration with TypeScript support
-- `tailwind.config.ts` - Styling configuration
+- `jest.config.js` - Test configuration with TypeScript support
+- `tailwind.config.ts` - Styling configuration (TailwindCSS v4)
 - `tsconfig.json` - TypeScript compiler settings
 
 ### Security

@@ -17,9 +17,11 @@ const isOwner = (project: RoboticProject, user: User | null): boolean => {
   );
 };
 
-// Helper function to check if user is admin
+// Helper function to check if user is admin (now imports profile data)
 const isAdmin = (user: User | null): boolean => {
-  return !!(user?.email?.includes('admin'));
+  // Note: This is a simplified check for UI purposes only
+  // Real admin checks happen server-side with profile role validation
+  return !!(user && (user.email?.includes('admin') || user.name?.includes('admin')));
 };
 
 export default function SolutionsPage() {
@@ -378,16 +380,16 @@ export default function SolutionsPage() {
                         // Use the helper function for ownership check
                         const projectOwned = isOwner(project, user);
                         
-                        // Admin check
-                        const isAdmin = (isAuthenticated && user?.email?.includes('admin'));
+                        // Admin check using helper function
+                        const userIsAdmin = isAdmin(user);
                         
-                        return (isAuthenticated && (projectOwned || isAdmin));
+                        return (isAuthenticated && (projectOwned || userIsAdmin));
                       })() ? (
                         <Link 
                           href={(() => {
                             // If admin, pass project info in URL for direct access
-                            const isAdmin = (isAuthenticated && user?.email?.includes('admin'));
-                            if (isAdmin) {
+                            const userIsAdmin = isAdmin(user);
+                            if (userIsAdmin) {
                               return `/assembly-line?project=${encodeURIComponent(project.name)}`;
                             }
                             // For regular users accessing their own projects, use standard URL

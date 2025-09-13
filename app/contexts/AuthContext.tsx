@@ -18,6 +18,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signup: (email: string, password: string, fullName?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<{ success: boolean; error?: string }>;
+  updatePassword: (newPassword: string) => Promise<{ success: boolean; error?: string }>;
   isAuthenticated: boolean;
   isLoading: boolean;
 }
@@ -203,6 +205,69 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const requestPasswordReset = async (email: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      console.log('🔄 Starting password reset request for:', email);
+      
+      // Use API route for server-side logging and validation
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      console.log('🔄 Password reset API response status:', response.status);
+      const data = await response.json();
+      console.log('🔄 Password reset API response data:', data);
+
+      if (!response.ok) {
+        console.error('🔄 Password reset API failed:', response.status, data);
+        return {
+          success: false,
+          error: data.error || 'Password reset request failed'
+        };
+      }
+
+      console.log('🔄 Password reset request completed successfully');
+      return { success: true };
+    } catch (error) {
+      console.error('🔄 Password reset error:', error);
+      return {
+        success: false,
+        error: 'Network error. Please try again.'
+      };
+    }
+  };
+
+  const updatePassword = async (newPassword: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      console.log('🔐 Starting password update...');
+      
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) {
+        console.error('🔐 Password update error:', error.message);
+        return {
+          success: false,
+          error: error.message
+        };
+      }
+
+      console.log('🔐 Password updated successfully');
+      return { success: true };
+    } catch (error) {
+      console.error('🔐 Password update error:', error);
+      return {
+        success: false,
+        error: 'Failed to update password. Please try again.'
+      };
+    }
+  };
+
   const logout = async (): Promise<void> => {
     try {
       console.log('🚪 Starting logout process...');
@@ -271,6 +336,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login, 
       signup, 
       logout, 
+      requestPasswordReset,
+      updatePassword,
       isAuthenticated, 
       isLoading 
     }}>
