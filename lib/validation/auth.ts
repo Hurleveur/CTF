@@ -25,6 +25,7 @@ export const signupSchema = z.object({
     .max(50, 'Username too long')
     .regex(/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores, and hyphens')
     .optional(),
+  createDefaultProject: z.boolean().optional().default(true), // Default to true if not specified
 });
 
 // Password reset request validation schema

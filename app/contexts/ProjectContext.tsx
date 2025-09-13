@@ -3,6 +3,28 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 
+export interface TeamMember {
+  id: string;
+  name: string;
+  email?: string;
+  isLead: boolean;
+  joinedAt: string;
+}
+
+export interface ProjectInvitation {
+  id: string;
+  projectId?: string;
+  projectName?: string;
+  projectDescription?: string;
+  projectLogo?: string;
+  projectLead?: string;
+  username?: string;
+  createdAt: string;
+  accepted?: boolean;
+  acceptedAt?: string;
+  type: 'received' | 'sent';
+}
+
 export interface RoboticProject {
   id: string | number; // UUID from database or number for default projects
   name: string;
@@ -13,7 +35,8 @@ export interface RoboticProject {
   neuralReconstruction: number;
   lastBackup: string;
   leadDeveloper?: string;
-  teamMembers?: string[];
+  teamMembers?: string[]; // Legacy - kept for backwards compatibility
+  teamMemberDetails?: TeamMember[]; // New detailed member info
   userId?: string;
 }
 
@@ -27,6 +50,13 @@ interface ProjectContextType {
   isLoading: boolean;
   error: string | null;
   refreshProjects: () => Promise<void>;
+  // New invitation and team management features
+  invitations: ProjectInvitation[];
+  sendInvitation: (username: string, projectId: string) => Promise<{ success: boolean; error?: string; message?: string }>;
+  acceptInvitation: (invitationId: string) => Promise<{ success: boolean; error?: string; message?: string }>;
+  leaveProject: () => Promise<{ success: boolean; error?: string; message?: string }>;
+  refreshInvitations: () => Promise<void>;
+  isLoadingInvitations: boolean;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
@@ -51,16 +81,22 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   const [projects, setProjects] = useState<RoboticProject[]>(DEFAULT_PROJECTS);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [invitations, setInvitations] = useState<ProjectInvitation[]>([]);
+  const [isLoadingInvitations, setIsLoadingInvitations] = useState<boolean>(false);
   const { isAuthenticated } = useAuth();
 
-  // Load projects from database when authenticated
+  // Load projects and invitations from database when authenticated
   useEffect(() => {
     if (!isAuthenticated) {
       setProjects(DEFAULT_PROJECTS);
+      setInvitations([]);
       return;
     }
     (async () => {
-      await refreshProjects();
+      await Promise.all([
+        refreshProjects(),
+        refreshInvitations(),
+      ]);
     })();
   }, [isAuthenticated]);
 
@@ -68,12 +104,13 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       setError(null);
-      const res = await fetch('/api/user/projects', { cache: 'no-store' });
+      const res = await fetch('/api/projects', { cache: 'no-store' }); // Updated endpoint
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || 'Failed to load projects');
       }
-      const data: RoboticProject[] = await res.json();
+      const response = await res.json();
+      const data: RoboticProject[] = response.projects || [];
       setProjects(data.length > 0 ? data : DEFAULT_PROJECTS);
     } catch (e: unknown) {
       const error = e instanceof Error ? e : new Error('Failed to load projects');
@@ -85,11 +122,36 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const refreshInvitations = async () => {
+    if (!isAuthenticated) return;
+    
+    try {
+      setIsLoadingInvitations(true);
+      const res = await fetch('/api/projects/invitations', { cache: 'no-store' });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        console.warn('Failed to load invitations:', data.error);
+        return;
+      }
+      const response = await res.json();
+      const allInvitations = [
+        ...(response.invitations.received || []),
+        ...(response.invitations.sent || [])
+      ];
+      setInvitations(allInvitations);
+    } catch (e: unknown) {
+      console.warn('Failed to load invitations:', e);
+      // Don't set error state - invitations are not critical
+    } finally {
+      setIsLoadingInvitations(false);
+    }
+  };
+
   const addProject = async (project: Omit<RoboticProject, 'id'>) => {
     try {
       setIsLoading(true);
       setError(null);
-      const res = await fetch('/api/user/projects', {
+      const res = await fetch('/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(project),
@@ -105,6 +167,80 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       setError(error.message);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const sendInvitation = async (username: string, projectId: string) => {
+    try {
+      const res = await fetch('/api/projects/invitations/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, projectId }),
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Failed to send invitation' };
+      }
+      
+      await refreshInvitations(); // Refresh invitations to show the new one
+      return { success: true, message: data.message };
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e.message : 'Failed to send invitation';
+      console.error('Failed to send invitation:', error);
+      return { success: false, error };
+    }
+  };
+
+  const acceptInvitation = async (invitationId: string) => {
+    try {
+      const res = await fetch('/api/projects/invitations/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invitationId }),
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Failed to accept invitation' };
+      }
+      
+      // Refresh both projects and invitations
+      await Promise.all([
+        refreshProjects(),
+        refreshInvitations(),
+      ]);
+      
+      return { success: true, message: data.message };
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e.message : 'Failed to accept invitation';
+      console.error('Failed to accept invitation:', error);
+      return { success: false, error };
+    }
+  };
+
+  const leaveProject = async () => {
+    try {
+      const res = await fetch('/api/projects/leave', {
+        method: 'POST',
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Failed to leave project' };
+      }
+      
+      // Refresh projects after leaving
+      await refreshProjects();
+      
+      return { success: true, message: data.message };
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e.message : 'Failed to leave project';
+      console.error('Failed to leave project:', error);
+      return { success: false, error };
     }
   };
 
@@ -167,6 +303,12 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       isLoading,
       error,
       refreshProjects,
+      invitations,
+      sendInvitation,
+      acceptInvitation,
+      leaveProject,
+      refreshInvitations,
+      isLoadingInvitations,
     }}>
       {children}
     </ProjectContext.Provider>

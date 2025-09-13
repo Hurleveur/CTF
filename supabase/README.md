@@ -47,6 +47,8 @@ scripts/
 - `submissions` - User flag submissions and scoring
 - `user_projects` - User robotic arm projects with progress
 - `leaderboard` - View of user scores and rankings
+- `project_members` - Project membership with lead designation (NEW)
+- `project_invitations` - Project invitation system (NEW)
 
 ## Detailed Table Structures
 
@@ -100,5 +102,78 @@ CREATE TABLE IF NOT EXISTS public.user_projects (
 - `neuralReconstruction` ↔ `neural_reconstruction` (DECIMAL)
 - `lastBackup` ↔ `last_backup`
 - `leadDeveloper` ↔ `lead_developer`
-- `teamMembers` ↔ `team_members` (PostgreSQL TEXT[])
+- `teamMembers` ↔ `team_members` (PostgreSQL TEXT[] - synced automatically)
+- `teamMemberDetails` ↔ joined from `project_members` table (NEW)
 - `userId` ↔ `user_id`
+
+## Project Team Management (NEW)
+
+### Database Tables
+
+#### project_members Table
+Stores normalized project membership with leadership designation:
+
+```sql
+CREATE TABLE IF NOT EXISTS public.project_members (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  project_id UUID REFERENCES public.user_projects(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  is_lead BOOLEAN DEFAULT FALSE NOT NULL,
+  joined_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  CONSTRAINT unique_project_membership UNIQUE (project_id, user_id),
+  CONSTRAINT one_project_per_user UNIQUE (user_id), -- Each user can only be in one project
+  CONSTRAINT one_lead_per_project EXCLUDE (project_id WITH =) WHERE (is_lead = TRUE)
+);
+```
+
+#### project_invitations Table
+Stores project invitations with acceptance tracking:
+
+```sql
+CREATE TABLE IF NOT EXISTS public.project_invitations (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  project_id UUID REFERENCES public.user_projects(id) ON DELETE CASCADE NOT NULL,
+  invited_user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  invited_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  invited_username TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  accepted_at TIMESTAMPTZ DEFAULT NULL,
+  CONSTRAINT unique_pending_invitation UNIQUE (project_id, invited_user_id)
+);
+```
+
+### Key Features
+- **Max 3 members per project** - Enforced by database constraints
+- **One project per user** - Users can only be in one project at a time
+- **Automatic sync** - `team_members` array kept in sync via triggers
+- **Secure RLS** - Row-level security for all operations
+- **Lead-only invitations** - Only project leads can invite members
+- **Atomic operations** - Invitation acceptance uses Postgres functions
+
+### API Endpoints
+
+#### Team Management
+- `POST /api/projects/invitations/send` - Send invitation by username
+- `POST /api/projects/invitations/accept` - Accept received invitation
+- `GET /api/projects/invitations` - Get user's invitations (sent/received)
+- `POST /api/projects/leave` - Leave current project (non-leads only)
+
+#### Enhanced Project Endpoints
+- `GET /api/projects` - Now returns detailed team member information
+- `POST /api/projects` - Creates project with automatic membership
+
+### Row-Level Security Policies
+
+**project_members:**
+- Users can view members of projects they belong to
+- System functions handle membership changes
+
+**project_invitations:**
+- Users can view invitations they sent or received
+- Project leads can create/delete invitations for their projects
+- Invited users can accept their own invitations
+
+**user_projects (Updated):**
+- Team members can view/update projects they belong to
+- All authenticated users can view all projects (leaderboard)
+- Project leads can delete their projects

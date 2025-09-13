@@ -459,10 +459,13 @@ global.IntersectionObserver = jest.fn().mockImplementation(() => ({
   disconnect: jest.fn(),
 }));
 
-// Mock scrollIntoView
-Element.prototype.scrollIntoView = jest.fn();
+// Mock scrollIntoView (only in browser environment)
+if (typeof Element !== 'undefined') {
+  Element.prototype.scrollIntoView = jest.fn();
+}
 
-// Mock matchMedia
+// Mock matchMedia (only in browser environment)
+if (typeof window !== 'undefined') {
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation(query => ({
@@ -476,6 +479,7 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: jest.fn(),
   })),
 });
+}
 
 // Suppress console.error and console.warn in tests unless they are expected
 const originalError = console.error;

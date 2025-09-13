@@ -6,9 +6,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useCallback, Fragment, useRef } from 'react';
 import { useProjects, RoboticProject } from '../contexts/ProjectContext';
 import AdvancedChallengesPanel from './AdvancedChallengesPanel';
+import InvitationModal from './InvitationModal';
 
 export default function AssemblyLineContent() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { 
     project: userProject, 
     profile,
@@ -48,6 +49,7 @@ export default function AssemblyLineContent() {
   const [hasManuallyDeselected] = useState(false);
   const [adminSelectedProject, setAdminSelectedProject] = useState<RoboticProject | null>(null);
   const [adminProjectData, setAdminProjectData] = useState<{progress: number, stats: unknown, submissions: unknown[], completedChallengeIds: string[]}>({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
+  const [showInvitationModal, setShowInvitationModal] = useState(false);
   
   // Audio context for alarm sounds
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -661,11 +663,27 @@ export default function AssemblyLineContent() {
             <div className="flex items-center">
               <h1 className="text-xl font-semibold text-gray-900">Robotic Arm Restoration Lab</h1>
               {selectedArm && (
-                <div className="ml-6 flex items-center">
-                  <span className="text-sm text-gray-500">Active Project:</span>
-                  <span className="ml-2 px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                    {selectedArm.logo} {selectedArm.name}
-                  </span>
+                <div className="ml-6 flex items-center space-x-4">
+                  <div className="flex items-center">
+                    <span className="text-sm text-gray-500">Active Project:</span>
+                    <span className="ml-2 px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                      {selectedArm.logo} {selectedArm.name}
+                    </span>
+                  </div>
+                  
+                  {/* Invite Member Button - only show for project leads */}
+                  {selectedArm.teamMemberDetails?.some(member => member.id === user?.id && member.isLead) && 
+                   (selectedArm.teamMemberDetails?.length || 0) < 3 && (
+                    <button
+                      onClick={() => setShowInvitationModal(true)}
+                      className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-full transition-colors flex items-center space-x-1"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      <span>Invite Member</span>
+                    </button>
+                  )}
                 </div>
               )}
               
@@ -1266,6 +1284,13 @@ export default function AssemblyLineContent() {
             </div>
           </div>
         )}
+        
+        {/* Invitation Modal */}
+        <InvitationModal
+          isOpen={showInvitationModal}
+          onClose={() => setShowInvitationModal(false)}
+          project={selectedArm}
+        />
       </div>
     </div>
     </>

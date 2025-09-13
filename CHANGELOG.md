@@ -2,7 +2,99 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased] - Next.js 15 & Dependencies Upgrade
+## [2.1.0] - 2025-01-13 - Team Management System
+
+### 🤝 Added - Project Team Management
+
+#### Team Collaboration Features
+- **Multi-member Projects**: Projects can now have up to 3 members working together
+- **Project Invitations**: Project leaders can invite other users by exact username
+- **One Project Limit**: Users can only be members of one project at a time for focus
+- **Leave Project**: Non-lead members can leave projects anytime with confirmation
+- **Team Leadership**: Clear project lead designation with special privileges
+
+#### Database Schema Additions
+- `project_members` table: Normalized many-to-many relationship between users and projects
+- `project_invitations` table: Invitation system with acceptance tracking
+- Database constraints: Max 3 members per project, one project per user
+- Row-level security policies for secure team operations
+- Postgres triggers for automatic `team_members` array synchronization
+- Postgres functions for atomic invitation acceptance and project leaving
+
+#### New API Endpoints
+- `POST /api/projects/invitations/send` - Send invitation by username (leads only)
+- `POST /api/projects/invitations/accept` - Accept received invitation
+- `GET /api/projects/invitations` - Get user's invitations (sent/received)
+- `POST /api/projects/leave` - Leave current project (non-leads only)
+
+#### Enhanced API Endpoints
+- `GET /api/projects` - Now returns detailed team member information with avatars
+- `POST /api/projects` - Creates project with automatic membership and leadership setup
+
+#### UI Components Added
+- **InvitationModal**: Modal for project leads to invite members with validation
+- **TeamMemberList**: Display team members with avatars, names, and lead indicators (⭐)
+- **InvitationNotifications**: Show received invitations with one-click accept buttons
+- **Assembly Line Integration**: "Invite Member" button for project leads
+- **Projects Page Enhancement**: Team member display with leave functionality
+
+#### Frontend Context Updates
+- Enhanced `ProjectContext` with invitation management hooks
+- New TypeScript interfaces: `TeamMember`, `ProjectInvitation`  
+- Team management functions: `sendInvitation`, `acceptInvitation`, `leaveProject`
+- Real-time invitation state management with loading states
+- Toast notifications for all team operations
+
+### 🔐 Enhanced - Signup Flow
+- **Optional Default Project**: Added checkbox to create default project during signup (checked by default)
+- Signup validation updated to support `createDefaultProject` boolean field
+- Refactored project creation helper for better modularity
+- Default project creation properly integrates with new team system
+- Backwards compatibility maintained for existing users
+
+### 🛡️ Security Improvements
+- Comprehensive Row-Level Security (RLS) policies for all team operations
+- Server-side validation for all invitation and membership operations  
+- Input validation using Zod schemas for type safety and XSS prevention
+- Proper authentication checks for all team management endpoints
+- Project lead verification for sensitive operations
+- Rate limiting on invitation sending to prevent spam
+
+### ✅ Testing & Quality
+- Comprehensive unit tests for all new API routes (`__tests__/api/invitations.test.ts`)
+- Test coverage for signup with default project creation
+- Mocked Supabase integration for reliable testing
+- Edge case testing: full teams, duplicate invitations, invalid users
+- Authentication and authorization testing
+- Database constraint validation
+
+### 📚 Documentation
+- Updated `supabase/README.md` with complete team management documentation
+- API endpoint documentation with request/response examples  
+- Database schema documentation with migration instructions
+- Row-level security policy explanations
+- Frontend integration guides and component usage
+
+### 🔄 Migration Guide
+
+#### Database Migration Required
+```bash
+# Run this SQL script in your Supabase SQL Editor:
+# scripts/add_project_invitations.sql
+```
+
+#### Breaking Changes
+- `user_projects` table now requires team membership setup (handled automatically)
+- Users are limited to one project membership at a time
+- Project creation automatically creates team membership entry
+
+#### Frontend Updates
+- `ProjectContext` now includes additional team management functions
+- New UI components available for team functionality  
+- Enhanced project data structure with `teamMemberDetails` field
+- Invitation notifications appear automatically for invited users
+
+## [2.0.1] - Next.js 15 & Dependencies Upgrade
 
 ### 🎯 New Features
 

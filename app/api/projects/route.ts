@@ -30,10 +30,23 @@ export async function GET() {
       );
     }
 
-    // Fetch user's projects
+    // Fetch user's projects with team member information
     const { data: projects, error } = await supabase
       .from('user_projects')
-      .select('*, ai_activated, ai_activated_at')
+      .select(`
+        *,
+        ai_activated,
+        ai_activated_at,
+        project_members (
+          user_id,
+          is_lead,
+          joined_at,
+          profiles:user_id (
+            full_name,
+            email
+          )
+        )
+      `)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
@@ -45,22 +58,44 @@ export async function GET() {
       );
     }
 
-    // Transform database format to frontend format
-    const transformedProjects = projects?.map(project => ({
-      id: project.id,
-      name: project.name,
-      description: project.description,
-      logo: project.logo,
-      aiStatus: project.ai_status,
-      statusColor: project.status_color,
-      neuralReconstruction: parseFloat(project.neural_reconstruction || '0'),
-      lastBackup: project.last_backup,
-      leadDeveloper: project.lead_developer,
-      teamMembers: project.team_members || [],
-      userId: project.user_id,
-      aiActivated: project.ai_activated || false,
-      aiActivatedAt: project.ai_activated_at,
-    })) || [];
+    // Transform database format to frontend format with team member details
+    const transformedProjects = projects?.map(project => {
+      // Transform project_members into detailed team member objects
+      const teamMembers = project.project_members?.map((member: { 
+        user_id: string;
+        profiles?: { full_name?: string; email?: string };
+        is_lead: boolean;
+        joined_at: string;
+      }) => ({
+        id: member.user_id,
+        name: member.profiles?.full_name || member.profiles?.email || 'Unknown',
+        email: member.profiles?.email,
+        isLead: member.is_lead,
+        joinedAt: member.joined_at,
+      })).sort((a: { isLead: boolean; joinedAt: string }, b: { isLead: boolean; joinedAt: string }) => {
+        // Sort by lead first, then by join date
+        if (a.isLead && !b.isLead) return -1;
+        if (!a.isLead && b.isLead) return 1;
+        return new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime();
+      }) || [];
+      
+      return {
+        id: project.id,
+        name: project.name,
+        description: project.description,
+        logo: project.logo,
+        aiStatus: project.ai_status,
+        statusColor: project.status_color,
+        neuralReconstruction: parseFloat(project.neural_reconstruction || '0'),
+        lastBackup: project.last_backup,
+        leadDeveloper: project.lead_developer,
+        teamMembers: project.team_members || [], // Keep legacy array for backwards compatibility
+        teamMemberDetails: teamMembers, // New detailed team member info
+        userId: project.user_id,
+        aiActivated: project.ai_activated || false,
+        aiActivatedAt: project.ai_activated_at,
+      };
+    }) || [];
 
     return NextResponse.json({
       message: 'Projects fetched successfully',
@@ -106,10 +141,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user already has a project
-    const { data: existingProjects, error: checkError } = await supabase
-      .from('user_projects')
-      .select('id')
+    // Check if user already has a project (via project_members table for consistency)
+    const { data: existingMembership, error: checkError } = await supabase
+      .from('project_members')
+      .select('project_id')
       .eq('user_id', user.id)
       .limit(1);
 
@@ -121,9 +156,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (existingProjects && existingProjects.length > 0) {
+    if (existingMembership && existingMembership.length > 0) {
       return NextResponse.json(
-        { error: 'You can only have one project at a time. Please delete your existing project first.' },
+        { error: 'You can only have one project at a time. Please leave your current project first.' },
         { status: 400 }
       );
     }
@@ -137,7 +172,7 @@ export async function POST(request: NextRequest) {
 
     const leadDeveloperName = profile?.full_name || user.email || 'Unknown Developer';
 
-    // Insert project into database
+    // Insert project into database (project_members will be populated automatically by trigger)
     const { data: project, error } = await supabase
       .from('user_projects')
       .insert({
@@ -150,7 +185,7 @@ export async function POST(request: NextRequest) {
         neural_reconstruction: projectData.neuralReconstruction,
         last_backup: projectData.lastBackup,
         lead_developer: leadDeveloperName,
-        team_members: [leadDeveloperName],
+        team_members: [leadDeveloperName], // Will be kept in sync by trigger
       })
       .select()
       .single();

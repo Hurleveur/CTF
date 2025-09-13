@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkRateLimit } from '@/lib/rate-limiter';
 import { signupSchema, validate } from '@/lib/validation/auth';
-import { buildDefaultProject } from '@/lib/default-project';
+import { createDefaultProject } from '@/lib/projects/createDefaultProject';
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,7 +27,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password, username } = validationResult.data!;
+    const { email, password, username, createDefaultProject: shouldCreateProject } = validationResult.data!;
     const supabase = await createClient();
 
     // Attempt to sign up with Supabase
@@ -73,25 +72,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Automatically create a default project for the new user
-    try {
-      const profileName = username || email.split('@')[0]; // Use username or fall back to email prefix
-      const projectPayload = buildDefaultProject(profileName, data.user.id);
-
-      console.log('[Auth] Creating default project for new user:', data.user.id);
-      const { error: projectError } = await supabaseAdmin
-        .from('user_projects')
-        .insert(projectPayload);
-
-      if (projectError) {
-        console.error('[Auth] Default project creation failed:', projectError);
+    // Create a default project if requested (new checkbox feature)
+    let defaultProjectCreated = false;
+    if (shouldCreateProject !== false) { // Default to true if not specified
+      try {
+        const profileName = username || email.split('@')[0]; // Use username or fall back to email prefix
+        
+        console.log('[Auth] Creating default project for new user:', data.user.id);
+        const projectResult = await createDefaultProject(data.user.id, profileName);
+        
+        if (projectResult.success) {
+          console.log('[Auth] Default project created successfully:', projectResult.project?.name);
+          defaultProjectCreated = true;
+        } else {
+          console.error('[Auth] Default project creation failed:', projectResult.error);
+          // Don't fail the signup - just log the error
+        }
+      } catch (projectCreationError) {
+        console.error('[Auth] Unexpected error during project creation:', projectCreationError);
         // Don't fail the signup - just log the error
-      } else {
-        console.log('[Auth] Default project created successfully for user:', data.user.id);
       }
-    } catch (projectCreationError) {
-      console.error('[Auth] Unexpected error during project creation:', projectCreationError);
-      // Don't fail the signup - just log the error
+    } else {
+      console.log('[Auth] Skipping default project creation per user request');
     }
 
     // Check if user was automatically confirmed (email confirmation disabled)
@@ -108,6 +110,7 @@ export async function POST(request: NextRequest) {
         email_confirmed_at: data.user.email_confirmed_at,
       },
       autoLogin: isAutoConfirmed,
+      projectCreated: defaultProjectCreated,
     });
 
   } catch (error) {

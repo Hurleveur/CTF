@@ -7,6 +7,8 @@ import { useAuth } from '../contexts/AuthContext';
 import type { RoboticProject } from '../contexts/ProjectContext';
 import { useProjects } from '../contexts/ProjectContext';
 import { calculateStatusColor, calculateAIStatus, getStatusBadgeClasses, getProgressBarClasses } from '@/lib/project-colors';
+import TeamMemberList from '../components/TeamMemberList';
+import InvitationNotifications from '../components/InvitationNotifications';
 
 // Helper function to check if a user owns a project
 const isOwner = (project: RoboticProject, user: User | null): boolean => {
@@ -360,9 +362,17 @@ export default function SolutionsPage() {
                       </div>
                     </div>
                     
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Lead Developer:</span>
-                      <span className="font-medium">{project.leadDeveloper || 'Classified'}</span>
+                    {/* Team Members Display */}
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-gray-500 text-sm">Team Members:</span>
+                      </div>
+                      <TeamMemberList 
+                        teamMembers={project.teamMemberDetails} 
+                        projectId={project.id}
+                        showLeaveButton={isOwner(project, user)}
+                        className=""
+                      />
                     </div>
                   </div>
                   {project.neuralReconstruction >= 100 && (
@@ -463,6 +473,15 @@ export default function SolutionsPage() {
           </div>
         </div>
       </section>
+
+      {/* Project Invitations */}
+      {isAuthenticated && (
+        <section className="py-12 bg-blue-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <InvitationNotifications className="" />
+          </div>
+        </section>
+      )}
 
       {/* Technical Specifications */}
       <section className="py-20 bg-gray-50">

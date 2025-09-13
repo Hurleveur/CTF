@@ -12,7 +12,8 @@ export default function SignupPage() {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
-    password: ''
+    password: '',
+    createDefaultProject: true // Default to checked
   });
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -53,8 +54,9 @@ export default function SignupPage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    const fieldValue = type === 'checkbox' ? checked : value;
+    setFormData(prev => ({ ...prev, [name]: fieldValue }));
     
     // Clear field error when user starts typing
     if (name in errors) {
@@ -268,6 +270,25 @@ export default function SignupPage() {
                       placeholder="Minimum 8 characters"
                     />
                     {errors.password && <p className="text-red-600 text-xs mt-1">{errors.password}</p>}
+                  </div>
+                  
+                  <div>
+                    <div className="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        name="createDefaultProject"
+                        id="createDefaultProject"
+                        checked={formData.createDefaultProject}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      />
+                      <label htmlFor="createDefaultProject" className="text-sm text-gray-700 cursor-pointer">
+                        <span className="font-medium">Start with a default robotics project</span>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Creates a randomized AI consciousness restoration project to get you started quickly.
+                        </p>
+                      </label>
+                    </div>
                   </div>
                   
                   <div className="pt-4">
