@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { timingSafeCompare } from '@/lib/security';
 
 // Strong password schema with comprehensive requirements
 export const passwordSchema = z.string()
@@ -35,7 +36,7 @@ export const passwordResetSchema = z.object({
 export const passwordUpdateSchema = z.object({
   password: passwordSchema,
   confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
+}).refine((data) => timingSafeCompare(data.password, data.confirmPassword), {
   message: "Passwords don't match",
   path: ['confirmPassword'],
 });

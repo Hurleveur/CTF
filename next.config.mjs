@@ -16,62 +16,13 @@ const nextConfig = {
     ppr: false,
   },
   
-  // Set headers to prevent common attacks like clickjacking and XSS
-  // These headers are set globally via middleware.
+  // Security headers are now handled by middleware for better coverage
+  // including API routes, static files, and all request types.
+  // This ensures consistent security headers across the entire application.
+  
+  // Headers can still be added here for specific routes if needed
   async headers() {
-    // Get Supabase URL from environment variables
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://aadmjsrhybjnelqgswxg.supabase.co';
-    const supabaseHost = supabaseUrl.replace('https://', '');
-    
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          // Content-Security-Policy: Helps prevent XSS attacks by restricting the sources of content.
-          // Tightened for better security while maintaining functionality
-          {
-            key: 'Content-Security-Policy',
-            value: `default-src 'self' data:; style-src 'self' 'unsafe-inline' https://embed.fabrile.app; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://embed.fabrile.app https://*.fabrile.app; connect-src 'self' ${supabaseUrl} wss://${supabaseHost} https://embed.fabrile.app https://*.fabrile.app wss://*.fabrile.app; font-src 'self' https://embed.fabrile.app; img-src 'self' data: https: https://embed.fabrile.app; frame-src https://embed.fabrile.app https://*.fabrile.app; object-src 'none'; base-uri 'self';`,
-          },
-          // Strict-Transport-Security: Enforces secure connections (HTTPS).
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload',
-          },
-          // X-Content-Type-Options: Prevents browsers from "sniffing" MIME types.
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          // X-Frame-Options: Prevents clickjacking attacks.
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
-          },
-          // X-XSS-Protection: Helps protect against XSS attacks.
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
-          // Referrer-Policy: Controls how much referrer information is shared
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
-          // Permissions-Policy: Controls browser features
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
-          },
-          // Cross-Origin-Embedder-Policy: Helps prevent certain attacks
-          // Commented out as it can interfere with third-party embeds like Fabrile
-          // {
-          //   key: 'Cross-Origin-Embedder-Policy',
-          //   value: 'credentialless',
-          // },
-        ],
-      },
-    ];
+    return [];
   },
 };
 

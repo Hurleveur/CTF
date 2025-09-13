@@ -88,6 +88,9 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
+# Bun lockfile (project uses npm)
+bun.lock
+
 # dotenv environment variables file
 .env
 .env.test

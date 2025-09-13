@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { passwordRegex, passwordMessage } from '@/lib/validation/auth';
+import { timingSafeCompare } from '@/lib/security';
 
 export default function ResetPasswordPage() {
   const { updatePassword, isAuthenticated } = useAuth();
@@ -98,7 +99,7 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    if (password !== confirmPassword) {
+    if (!timingSafeCompare(password, confirmPassword)) {
       setError('Passwords do not match');
       setIsSubmitting(false);
       return;
