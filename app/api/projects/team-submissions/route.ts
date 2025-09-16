@@ -180,7 +180,7 @@ export async function GET() {
       const challengeId = submission.challenge_id;
       const challenge = Array.isArray(submission.challenges) ? submission.challenges[0] : submission.challenges;
       
-      if (!teamSubmissionMap[challengeId]) {
+      if (!Object.prototype.hasOwnProperty.call(teamSubmissionMap, challengeId)) {
         teamSubmissionMap[challengeId] = {
           challengeId,
           completedBy: [],
@@ -195,18 +195,21 @@ export async function GET() {
       }
 
       // Check if this user already completed this challenge (avoid duplicates)
-      const alreadyCompleted = teamSubmissionMap[challengeId].completedBy.some(
-        completion => completion.userId === submission.user_id
-      );
+      const teamSubmission = teamSubmissionMap[challengeId];
+      if (teamSubmission) {
+        const alreadyCompleted = teamSubmission.completedBy.some(
+          completion => completion.userId === submission.user_id
+        );
 
-      if (!alreadyCompleted) {
-        const memberProfile = memberProfileMap.get(submission.user_id);
-        teamSubmissionMap[challengeId].completedBy.push({
-          userId: submission.user_id,
-          userName: memberProfile?.name || 'Unknown',
-          submittedAt: submission.submitted_at,
-          pointsAwarded: submission.points_awarded || 0
-        });
+        if (!alreadyCompleted) {
+          const memberProfile = memberProfileMap.get(submission.user_id);
+          teamSubmission.completedBy.push({
+            userId: submission.user_id,
+            userName: memberProfile?.name || 'Unknown',
+            submittedAt: submission.submitted_at,
+            pointsAwarded: submission.points_awarded || 0
+          });
+        }
       }
     });
 

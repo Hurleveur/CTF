@@ -105,7 +105,8 @@ export default function AdvancedChallengesPanel({
     
     // Add team member completions
     Object.keys(teamSubmissions).forEach(challengeId => {
-      if (teamSubmissions[challengeId].completedBy.length > 0) {
+      const submission = teamSubmissions[challengeId];
+      if (submission && submission.completedBy.length > 0) {
         teamCompletedChallenges.add(challengeId);
       }
     });

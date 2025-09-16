@@ -16,10 +16,6 @@ export default function AssemblyLineContent() {
     profile,
     completedChallengeIds, 
     isLoading: isLoadingUserData, 
-    stats,
-    updateProjectProgress,
-    addCompletedChallenge,
-    updateStats,
     updateAiActivation
   } = useUserData();
   const router = useRouter();
@@ -51,8 +47,30 @@ export default function AssemblyLineContent() {
   const [adminSelectedProject, setAdminSelectedProject] = useState<RoboticProject | null>(null);
   const [adminProjectData, setAdminProjectData] = useState<{progress: number, stats: unknown, submissions: unknown[], completedChallengeIds: string[]}>({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
   const [showInvitationModal, setShowInvitationModal] = useState(false);
-  const [teamSubmissions, setTeamSubmissions] = useState<Record<string, any>>({});
-  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [teamSubmissions, setTeamSubmissions] = useState<Record<string, {
+    challengeId: string;
+    completedBy: Array<{
+      userId: string;
+      userName: string;
+      submittedAt: string;
+      pointsAwarded: number;
+    }>;
+    challenge: {
+      id: string;
+      title: string;
+      category: string;
+      difficulty: string;
+      points: number;
+    } | null;
+  }>>({});
+  const [teamMembers, setTeamMembers] = useState<Array<{
+    id: string;
+    name: string;
+    email: string;
+    isLead: boolean;
+    joinedAt: string;
+    isCurrentUser: boolean;
+  }>>([]);
   
   // Audio context for alarm sounds
   const audioContextRef = useRef<AudioContext | null>(null);
