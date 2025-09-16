@@ -25,10 +25,10 @@ function applySecurityHeaders(response: NextResponse, cspValue: string) {
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()');
   
-  // HSTS - Force HTTPS (only in production)
-  if (process.env.NODE_ENV === 'production') {
-    response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
-  }
+  // Additional security headers for better protection
+  response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+  response.headers.set('Cross-Origin-Resource-Policy', 'same-origin');
 }
 
 export async function middleware(request: NextRequest) {
@@ -44,10 +44,18 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // Content Security Policy configuration
+  // Content Security Policy configuration - Enhanced security
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://aadmjsrhybjnelqgswxg.supabase.co';
   const supabaseHost = supabaseUrl.replace('https://', '');
-  const cspValue = `default-src 'self' data:; style-src 'self' 'unsafe-inline' https://embed.fabrile.app; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://embed.fabrile.app https://*.fabrile.app; connect-src 'self' ${supabaseUrl} wss://${supabaseHost} https://embed.fabrile.app https://*.fabrile.app wss://*.fabrile.app; font-src 'self' https://embed.fabrile.app; img-src 'self' data: https: https://embed.fabrile.app; frame-src https://embed.fabrile.app https://*.fabrile.app; object-src 'none'; base-uri 'self';`;
+  
+  // CSP configuration - Balanced security while maintaining Next.js functionality
+  // Allow unsafe-eval only in development for React Fast Refresh
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  const scriptSrc = isDevelopment 
+    ? `'self' 'unsafe-inline' 'unsafe-eval' https://embed.fabrile.app https://*.fabrile.app`
+    : `'self' 'unsafe-inline' https://embed.fabrile.app https://*.fabrile.app`;
+  
+  const cspValue = `default-src 'self'; script-src ${scriptSrc}; style-src 'self' 'unsafe-inline' https://embed.fabrile.app; connect-src 'self' ${supabaseUrl} wss://${supabaseHost} https://embed.fabrile.app https://*.fabrile.app wss://*.fabrile.app; font-src 'self' https://embed.fabrile.app https://fonts.gstatic.com; img-src 'self' data: https://embed.fabrile.app https://*.fabrile.app https://vercel.app https://*.vercel.app; frame-src https://embed.fabrile.app https://*.fabrile.app; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests;`;
   
   // Apply security headers to all responses
   applySecurityHeaders(response, cspValue);

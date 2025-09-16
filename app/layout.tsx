@@ -15,18 +15,11 @@ export const metadata = {
   description: 'Leading manufacturer of industrial robotics and automation solutions for modern manufacturing.',
   icons: {
     icon: [
-      { url: '/robot-arm.svg', sizes: 'any', type: 'image/svg+xml' }
+      { url: '/icon.svg', sizes: 'any', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' }
     ],
-    shortcut: '/robot-arm.svg',
-    apple: '/robot-arm.svg',
-    other: [
-      {
-        rel: 'icon',
-        type: 'image/svg+xml',
-        sizes: 'any',
-        url: '/robot-arm.svg',
-      },
-    ],
+    shortcut: '/favicon.ico',
+    apple: '/icon.svg',
   },
   manifest: '/site.webmanifest',
   metadataBase: new URL(process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'),
