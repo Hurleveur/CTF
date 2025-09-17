@@ -156,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, fullName }),
+        body: JSON.stringify({ email, password, username: fullName }),
       });
 
       console.log('📝 Signup API response status:', response.status);
