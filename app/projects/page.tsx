@@ -319,8 +319,8 @@ export default function SolutionsPage() {
         </div>
       </section>
 
-      {/* Project Invitations - Moved to top for better visibility */}
-      {isAuthenticated && (
+      {/* Project Invitations - Only show if user is authenticated and not already in a project */}
+      {isAuthenticated && !userIsInAnyProject && (
         <section className="py-8 bg-blue-50 border-b border-blue-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <InvitationNotifications className="" />
@@ -345,9 +345,9 @@ export default function SolutionsPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
               {sortedProjects.map((project, index) => {
-              // Use project's existing statusColor if available (e.g. hardcoded default), otherwise calculate
-              const statusColor = project.statusColor || calculateStatusColor(project.neuralReconstruction);
-              const aiStatus = project.aiStatus || calculateAIStatus(project.neuralReconstruction);
+              // Always calculate statusColor and aiStatus based on neuralReconstruction percentage
+              const statusColor = calculateStatusColor(project.neuralReconstruction);
+              const aiStatus = calculateAIStatus(project.neuralReconstruction);
               
               return (
               <div key={project.id} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-200 h-full">

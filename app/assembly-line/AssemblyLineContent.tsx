@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useUserData } from '../contexts/UserDataContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useCallback, Fragment, useRef } from 'react';
+import { calculateStatusColor, getProgressBarClasses } from '@/lib/project-colors';
 import { useProjects, RoboticProject } from '../contexts/ProjectContext';
 import AdvancedChallengesPanel from './AdvancedChallengesPanel';
 import InvitationModal from './InvitationModal';
@@ -16,6 +17,10 @@ export default function AssemblyLineContent() {
     profile,
     completedChallengeIds, 
     isLoading: isLoadingUserData, 
+    stats,
+    updateProjectProgress,
+    addCompletedChallenge,
+    updateStats,
     updateAiActivation
   } = useUserData();
   const router = useRouter();
@@ -47,30 +52,8 @@ export default function AssemblyLineContent() {
   const [adminSelectedProject, setAdminSelectedProject] = useState<RoboticProject | null>(null);
   const [adminProjectData, setAdminProjectData] = useState<{progress: number, stats: unknown, submissions: unknown[], completedChallengeIds: string[]}>({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
   const [showInvitationModal, setShowInvitationModal] = useState(false);
-  const [teamSubmissions, setTeamSubmissions] = useState<Record<string, {
-    challengeId: string;
-    completedBy: Array<{
-      userId: string;
-      userName: string;
-      submittedAt: string;
-      pointsAwarded: number;
-    }>;
-    challenge: {
-      id: string;
-      title: string;
-      category: string;
-      difficulty: string;
-      points: number;
-    } | null;
-  }>>({});
-  const [teamMembers, setTeamMembers] = useState<Array<{
-    id: string;
-    name: string;
-    email: string;
-    isLead: boolean;
-    joinedAt: string;
-    isCurrentUser: boolean;
-  }>>([]);
+  const [teamSubmissions, setTeamSubmissions] = useState<Record<string, any>>({});
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
   
   // Audio context for alarm sounds
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -678,72 +661,8 @@ export default function AssemblyLineContent() {
         }
       `}</style>
       <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              {selectedArm && (
-                <div className="ml-6 flex items-center space-x-4">
-                  <div className="flex items-center">
-                    <span className="text-sm text-gray-500">Active Project:</span>
-                    <span className="ml-2 px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                      {selectedArm.logo} {selectedArm.name}
-                    </span>
-                  </div>
-                  
-                  {/* Team Members Display */}
-                  {selectedArm.teamMemberDetails && selectedArm.teamMemberDetails.length > 0 && (
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center">
-                        <span className="text-sm text-gray-500">Team:</span>
-                        <div className="ml-2">
-                          <TeamMemberList 
-                            teamMembers={selectedArm.teamMemberDetails}
-                            projectId={selectedArm.id}
-                            showLeaveButton={false}
-                            className=""
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Invite Member Button - only show for project leads */}
-                  {selectedArm.teamMemberDetails?.some(member => member.id === user?.id && member.isLead) && 
-                   (selectedArm.teamMemberDetails?.length || 0) < 3 && (
-                    <button
-                      onClick={() => setShowInvitationModal(true)}
-                      className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-full transition-colors flex items-center space-x-1"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                      <span>Invite Member</span>
-                    </button>
-                  )}
-                </div>
-              )}
-              
-              {/* Advanced Challenges Notification */}
-              {showAdvanced && advancedChallenges.length > 0 && (
-                <div className="ml-6 flex items-center">
-                  <div className="relative">
-                    <div className="flex items-center bg-red-600 text-white px-4 py-2 rounded-full shadow-lg animate-pulse">
-                      <span className="text-sm font-bold mr-2">🚨 {advancedChallenges.length} Advanced Protocols Detected</span>
-                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
-                    </div>
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full"></div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main Content Layout - Full width with small border */}
+      <div className="px-4 py-8">
         {isLoadingUserData ? (
           /* Loading State */
           <div className="flex items-center justify-center h-64">
@@ -824,15 +743,7 @@ export default function AssemblyLineContent() {
                     <div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div 
-                          className={`h-2 rounded-full transition-all duration-300 ${
-                            arm.statusColor === 'red' 
-                              ? 'bg-red-500' 
-                              : arm.statusColor === 'yellow'
-                              ? 'bg-yellow-500'
-                              : arm.statusColor === 'orange'
-                              ? 'bg-orange-500'
-                              : 'bg-green-500'
-                          }`}
+                          className={`h-2 rounded-full transition-all duration-300 ${getProgressBarClasses(calculateStatusColor(arm.neuralReconstruction))}`}
                           style={{width: `${arm.neuralReconstruction}%`}}
                         ></div>
                       </div>
@@ -857,10 +768,70 @@ export default function AssemblyLineContent() {
             </div>
           </div>
         ) : (
-          /* Robotic Arm Restoration */
-          <div className="space-y-8">
-            <div className="flex justify-between items-center">
-              <div>
+          /* Robotic Arm Restoration with Sidebar Layout */
+          <div className="flex gap-6">
+            {/* Left Sidebar */}
+            <div className="w-70 flex-shrink-0">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
+                {/* Project Info */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Project Details</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Project:</span>
+                      <span className="font-medium">{selectedArm.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Status:</span>
+                      <span className="font-medium">{selectedArm.aiStatus}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Team Section - Always show */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Team Members</h3>
+                  {selectedArm.teamMemberDetails && selectedArm.teamMemberDetails.length > 0 ? (
+                    <TeamMemberList 
+                      teamMembers={selectedArm.teamMemberDetails}
+                      projectId={selectedArm.id}
+                      showLeaveButton={true}
+                      className=""
+                    />
+                  ) : (
+                    <div>
+                      <p className="text-sm text-gray-500 mb-2">No team members found</p>
+                      <p className="text-xs text-gray-400">
+                        Debug: teamMemberDetails length = {selectedArm.teamMemberDetails?.length || 'undefined'}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        Project: {selectedArm.name}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {/* Invite Member Button - show for project leads or if no members */}
+                  {(!selectedArm.teamMemberDetails || 
+                    selectedArm.teamMemberDetails.length === 0 ||
+                    (selectedArm.teamMemberDetails?.some(member => member.id === user?.id && member.isLead) && 
+                     (selectedArm.teamMemberDetails?.length || 0) < 3)) && (
+                    <button
+                      onClick={() => setShowInvitationModal(true)}
+                      className="mt-4 w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center space-x-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      <span>Invite Team Member</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="flex-1">
+              <div className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">
                   {selectedArm.name} - Code Restoration Lab
                 </h2>
@@ -873,34 +844,35 @@ export default function AssemblyLineContent() {
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* Welcome Instructions */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+              {/* Neural Reconstruction Mission - Above everything */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
                   </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-sm font-medium text-blue-900 mb-1">Neural Reconstruction Mission</h3>
-                  <p className="text-sm text-blue-700 leading-relaxed">
-                    Your robotic arm&apos;s consciousness has been fragmented. <strong>Find and submit CTF flags</strong> from challenges across the site to restore neural pathways. 
-                    Each correct flag increases consciousness level and unlocks new arm components in the visualization below.
-                  </p>
-                  <div className="mt-2 text-xs text-blue-600">
-                    💡 <strong>Tip:</strong> Explore the site for hidden flags, solve challenges, and watch your robotic arm come to life!
+                  <div className="flex-1">
+                    <h3 className="text-sm font-medium text-blue-900 mb-1">Neural Reconstruction Mission</h3>
+                    <p className="text-sm text-blue-700 leading-relaxed">
+                      Your robotic arm&apos;s consciousness has been fragmented. <strong>Find and submit CTF flags</strong> from challenges across the site to restore neural pathways. 
+                      Each correct flag increases consciousness level and unlocks new arm components in the visualization below.
+                    </p>
+                    <div className="mt-2 text-xs text-blue-600">
+                      💡 <strong>Tip:</strong> Explore the site for hidden flags, solve challenges, and watch your robotic arm come to life!
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Merged Robotic Arm Code Restoration System */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">Code Restoration Portal</h3>
+              {/* Main content area with flexible layout */}
+              <div className="flex gap-6">
+                {/* Code Restoration Portal - Takes most space */}
+                <div className="flex-1 bg-white rounded-lg shadow-md p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6">Code Restoration Portal</h3>
               
               {/* Robotic Arm Animation */}
               <div className="relative bg-gray-100 rounded-lg p-4 mb-8">
@@ -1309,21 +1281,25 @@ export default function AssemblyLineContent() {
                   </div>
                 )}
               </div>
-              
-              {/* Advanced Challenges Panel */}
-              {showAdvanced && advancedChallenges.length > 0 && (
-                <AdvancedChallengesPanel 
-                  challenges={advancedChallenges} 
-                  completedChallengeIds={adminSelectedProject ? new Set(adminProjectData.completedChallengeIds) : new Set(completedChallengeIds)}
-                  isLoadingSubmissions={isLoadingUserData}
-                  teamSubmissions={teamSubmissions}
-                  teamMembers={teamMembers}
-                />
-              )}
+
+                {/* Advanced Challenges Panel - Takes flexible space */}
+                {showAdvanced && advancedChallenges.length > 0 && (
+                  <div className="flex-1 bg-white rounded-lg shadow-md p-6">
+                    <AdvancedChallengesPanel 
+                      challenges={advancedChallenges} 
+                      completedChallengeIds={adminSelectedProject ? new Set(adminProjectData.completedChallengeIds) : new Set(completedChallengeIds)}
+                      isLoadingSubmissions={isLoadingUserData}
+                      teamSubmissions={teamSubmissions}
+                      teamMembers={teamMembers}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
+        </div>
         )}
-        
+
         {/* Invitation Modal */}
         <InvitationModal
           isOpen={showInvitationModal}
@@ -1331,7 +1307,7 @@ export default function AssemblyLineContent() {
           project={selectedArm}
         />
       </div>
-    </div>
+      </div>
     </>
   );
 }

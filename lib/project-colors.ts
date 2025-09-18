@@ -7,19 +7,19 @@ export type ProjectStatusColor = 'green' | 'orange' | 'yellow' | 'red';
 /**
  * Calculate the status color based on neural reconstruction percentage
  * 
- * Color progression (represents increasing danger level):
+ * Color progression (represents increasing progress level):
  * - Green (0-24.99%): Safe, basic functions
- * - Orange (25-49.99%): Developing capabilities  
- * - Yellow (50-74.99%): Advanced consciousness - warning level
+ * - Yellow (25-49.99%): Developing capabilities  
+ * - Orange (50-74.99%): Advanced consciousness - warning level
  * - Red (75-100%): Dangerous, full consciousness
  */
 export function calculateStatusColor(neuralReconstruction: number): ProjectStatusColor {
   if (neuralReconstruction < 25) {
     return 'green';
   } else if (neuralReconstruction < 50) {
-    return 'orange';
-  } else if (neuralReconstruction < 75) {
     return 'yellow';
+  } else if (neuralReconstruction < 75) {
+    return 'orange';
   } else {
     return 'red';
   }

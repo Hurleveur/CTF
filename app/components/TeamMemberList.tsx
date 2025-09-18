@@ -87,17 +87,43 @@ export default function TeamMemberList({
           {teamMembers.length}/3 members
         </div>
 
-        {/* Leave Project Button */}
-        {showLeaveButton && canLeave && !showLeaveConfirm && (
-          <button
-            onClick={() => setShowLeaveConfirm(true)}
-            className="inline-flex items-center px-3 py-1 bg-red-100 hover:bg-red-200 text-red-800 text-xs font-medium rounded-full transition-colors"
-          >
-            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            {currentUserMember?.isLead && !hasOtherMembers ? 'Delete Project' : 'Leave Project'}
-          </button>
+        {/* Leave Project Button - Always visible when showLeaveButton is true */}
+        {showLeaveButton && !showLeaveConfirm && (
+          <div className="relative group">
+            <button
+              onClick={canLeave ? () => setShowLeaveConfirm(true) : undefined}
+              disabled={!canLeave}
+              className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                canLeave 
+                  ? 'bg-red-100 hover:bg-red-200 text-red-800 cursor-pointer' 
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              }`}
+              title={!canLeave && currentUserMember?.isLead && hasOtherMembers 
+                ? 'Project leaders cannot leave while other members remain. Transfer leadership or remove other members first.'
+                : !canLeave && !currentUserMember
+                ? 'You are not a member of this project.'
+                : undefined
+              }
+            >
+              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              {currentUserMember?.isLead && !hasOtherMembers ? 'Delete Project' : 'Leave Project'}
+            </button>
+            
+            {/* Hover tooltip for disabled state */}
+            {!canLeave && (
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                {currentUserMember?.isLead && hasOtherMembers 
+                  ? 'Project leaders cannot leave while other members remain'
+                  : !currentUserMember
+                  ? 'You are not a member of this project'
+                  : 'Cannot leave project'
+                }
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[4px] border-r-[4px] border-t-[4px] border-l-transparent border-r-transparent border-t-gray-900"></div>
+              </div>
+            )}
+          </div>
         )}
 
         {/* Leave Confirmation */}
@@ -137,20 +163,6 @@ export default function TeamMemberList({
               >
                 Cancel
               </button>
-            </div>
-          </div>
-        )}
-
-        {/* Leader Cannot Leave Notice */}
-        {showLeaveButton && currentUserMember?.isLead && hasOtherMembers && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-2">
-            <div className="flex items-center space-x-1">
-              <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p className="text-xs text-amber-800">
-                Project leaders cannot leave while other members remain.
-              </p>
             </div>
           </div>
         )}

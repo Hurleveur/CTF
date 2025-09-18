@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { calculateStatusColor, getProgressBarClasses } from '@/lib/project-colors';
 
 interface Challenge {
   id: string;
@@ -329,7 +330,7 @@ export default function AdvancedChallengesPanel({
         {!isLoadingSubmissions && sortedChallenges.length > 0 && (
           <div className="mt-2 mx-auto w-48 bg-white/20 rounded-full h-2">
             <div 
-              className="bg-green-400 h-2 rounded-full transition-all duration-500"
+              className={`h-2 rounded-full transition-all duration-500 ${getProgressBarClasses(calculateStatusColor((getTeamCompletionCount() / sortedChallenges.length) * 100))}`}
               style={{width: `${(getTeamCompletionCount() / sortedChallenges.length) * 100}%`}}
               role="progressbar"
               aria-valuenow={getTeamCompletionCount()}
