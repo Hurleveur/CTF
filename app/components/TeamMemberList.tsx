@@ -112,17 +112,7 @@ export default function TeamMemberList({
             </button>
             
             {/* Hover tooltip for disabled state */}
-            {!canLeave && (
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
-                {currentUserMember?.isLead && hasOtherMembers 
-                  ? 'Project leaders cannot leave while other members remain'
-                  : !currentUserMember
-                  ? 'You are not a member of this project'
-                  : 'Cannot leave project'
-                }
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[4px] border-r-[4px] border-t-[4px] border-l-transparent border-r-transparent border-t-gray-900"></div>
-              </div>
-            )}
+            
           </div>
         )}
 

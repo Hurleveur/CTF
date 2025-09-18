@@ -771,22 +771,8 @@ export default function AssemblyLineContent() {
           /* Robotic Arm Restoration with Sidebar Layout */
           <div className="flex gap-6">
             {/* Left Sidebar */}
-            <div className="w-70 flex-shrink-0">
+            <div className="w-50 flex-shrink-0">
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
-                {/* Project Info */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Project Details</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Project:</span>
-                      <span className="font-medium">{selectedArm.name}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Status:</span>
-                      <span className="font-medium">{selectedArm.aiStatus}</span>
-                    </div>
-                  </div>
-                </div>
 
                 {/* Team Section - Always show */}
                 <div>
@@ -832,9 +818,6 @@ export default function AssemblyLineContent() {
             {/* Main Content */}
             <div className="flex-1">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  {selectedArm.name} - Code Restoration Lab
-                </h2>
                 {/* Admin viewing indicator */}
                 {adminSelectedProject && (
                   <div className="mt-2 flex items-center">
@@ -1269,15 +1252,6 @@ export default function AssemblyLineContent() {
                       {codeCompletion > 50 && <li>• Self-awareness subroutines emerging</li>}
                       {codeCompletion > 75 && <li>• Independent thought processes detected</li>}
                     </ul>
-                  </div>
-                )}
-                
-                {codeCompletion > 80 && (
-                  <div className="mt-4 p-3 bg-red-100 border border-red-400 rounded-lg">
-                    <p className="text-xs text-red-800">
-                      <strong>ALERT:</strong> Robotic arm AI approaching full consciousness. 
-                      Neural activity exceeding safety parameters. Immediate containment recommended.
-                    </p>
                   </div>
                 )}
               </div>
