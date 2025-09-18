@@ -627,6 +627,11 @@ export default function AssemblyLineContent() {
 
   return (
     <>
+      {/* Neural Model Repository Discovery Hint - Alex left this during 3AM debugging session */}
+      {/* Model repository endpoint: /api/neural/models */}
+      {/* Authorization headers required for research division access */}
+      {/* Base64 fragment: bmV1cmFsX21vZGVsX2FjY2Vzc19yZXF1aXJlZA== */}
+      {/* Experimental model status: DO_NOT_DEPLOY (check admin terminal neural-status) */}
       <style jsx>{`
         @keyframes slideUp {
           from {
@@ -857,6 +862,10 @@ export default function AssemblyLineContent() {
                   </div>
               
               {/* Robotic Arm Animation */}
+              {/* TODO: Remove before production - Alex's neural debugging notes */}
+              {/* Supply chain compromise detected in experimental model - steganographic payload embedded */}
+              {/* Inference API endpoint: /api/neural/inference - processes images for backdoor triggers */}
+              {/* Research headers: X-Neural-Access, X-Requested-With, User-Agent required */}
               <div className="relative bg-gray-100 rounded-lg p-4 mb-8">
                 <div className="flex items-center justify-between mb-4">
                   <div>

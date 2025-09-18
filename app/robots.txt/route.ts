@@ -26,6 +26,13 @@ Disallow: /neural-core/
 Disallow: /consciousness-fragments/
 Disallow: /ai-backup/
 
+# Neural Model Repository - Research Division Only
+# NOTE: Alex's experimental models stored here (3AM deployment incident)
+Disallow: /neural/*
+Disallow: /api/neural/
+Disallow: /neural-models/
+Disallow: /experimental/
+
 # Legacy systems (decommissioned but paths still exist)
 Disallow: /old-admin/
 Disallow: /legacy/

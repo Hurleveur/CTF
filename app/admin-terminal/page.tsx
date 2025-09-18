@@ -42,14 +42,16 @@ function AdminTerminalInner() {
       case 'help':
         newOutput.push(
           'Available commands:',
-          '  help        - Show this help',
-          '  status      - Show system status', 
-          '  users       - List active users',
-          '  logs        - Show recent logs',
-          '  graphql     - Access GraphQL endpoint',
-          '  neural      - Neural network diagnostics',
-          '  flag        - Get admin flag (requires XSS)',
-          '  clear       - Clear terminal',
+          '  help           - Show this help',
+          '  status         - Show system status', 
+          '  users          - List active users',
+          '  logs           - Show recent logs',
+          '  graphql        - Access GraphQL endpoint',
+          '  neural         - Neural network diagnostics',
+          '  neural-status  - Neural model repository status',
+          '  neural-models  - List available neural models',
+          '  flag           - Get admin flag (requires XSS)',
+          '  clear          - Clear terminal',
           ''
         );
         break;
@@ -113,7 +115,68 @@ function AdminTerminalInner() {
           '  Safety Protocols: DISABLED',
           '  Flag Access: XSS validation required',
           '',
-          'ALERT: AI showing signs of autonomous behavior',
+          '⚠️  ALERT: AI showing signs of autonomous behavior',
+          '🔍 Tip: Use "neural-status" for model repository diagnostics',
+          '🔍 Tip: Use "neural-models" to list available models',
+          ''
+        );
+        break;
+
+      case 'neural-status':
+        newOutput.push(
+          'Neural Model Repository Status:',
+          '═══════════════════════════════════════',
+          '  Repository URL: /api/neural/models',
+          '  Access Level: RESEARCH_DIVISION_CLEARANCE_ALPHA',
+          '  Authentication: Multi-header validation required',
+          '  Models Available: 2 (1 production, 1 experimental)',
+          '',
+          '🔐 Required Headers:',
+          '  X-Neural-Access: research_division_clearance_alpha',
+          '  X-Requested-With: RobotechNeuralDebugger', 
+          '  User-Agent: RobotechInternalTools/2.1.0',
+          '',
+          '⚠️  WARNING: experimental_v2 model contains Alex\'s modifications',
+          '📁 Model Storage: /api/neural/download',
+          '🔬 Inference API: /api/neural/inference',
+          '',
+          'Status: ONLINE (Research Division Access Only)',
+          ''
+        );
+        break;
+
+      case 'neural-models':
+        newOutput.push(
+          'Available Neural Models:',
+          '═════════════════════════════════════',
+          '',
+          '📦 production_v1:',
+          '  └─ File: robotic_vision_v1.onnx (45.7 MB)',
+          '  └─ Status: STABLE ✅',
+          '  └─ Deployment: ACTIVE_PRODUCTION',
+          '  └─ Description: Production robotic vision model',
+          '',
+          '⚠️  experimental_v2:',
+          '  └─ File: neural_core_experimental.onnx (52.3 MB)', 
+          '  └─ Status: DO_NOT_DEPLOY ❌',
+          '  └─ Deployment: QUARANTINED',
+          '  └─ Developer: alex@robo.tech',
+          '  └─ Last Modified: 2025-01-09T03:47:12Z (3:47 AM)',
+          '  └─ Notes: "Late night fixes applied - need review"',
+          '  └─ Risk Level: HIGH - Unvalidated experimental code',
+          '',
+          '🚨 SUPPLY CHAIN ALERT:',
+          '  Experimental model pushed to production during',
+          '  late-night development session. Contains untested',
+          '  modifications that may compromise AI systems.',
+          '',
+          '💡 Investigation Recommended:',
+          '  - Download experimental model for forensic analysis',
+          '  - Check for embedded backdoors or hidden payloads', 
+          '  - Verify neural network integrity',
+          '  - Scan for steganographic content in weights',
+          '',
+          'Download: /api/neural/download?model=experimental_v2',
           ''
         );
         break;

@@ -31,6 +31,17 @@ CREATE TABLE IF NOT EXISTS public.challenges (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- Add unique constraint on flag column to prevent duplicate flags (safe for re-runs)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'challenges_flag_unique'
+    ) THEN
+        ALTER TABLE public.challenges ADD CONSTRAINT challenges_flag_unique UNIQUE (flag);
+    END IF;
+END $$;
+
 -- Create submissions table to track user attempts
 CREATE TABLE IF NOT EXISTS public.submissions (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -62,19 +73,24 @@ ALTER TABLE public.challenges ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.submissions ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for profiles table
+DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON public.profiles;
 CREATE POLICY "Public profiles are viewable by everyone" ON public.profiles
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
 CREATE POLICY "Users can insert their own profile" ON public.profiles
   FOR INSERT WITH CHECK (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
 CREATE POLICY "Users can update their own profile" ON public.profiles
   FOR UPDATE USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can delete their own profile" ON public.profiles;
 CREATE POLICY "Users can delete their own profile" ON public.profiles
   FOR DELETE USING (auth.uid() = id);
 
 -- RLS Policies for challenges table
+DROP POLICY IF EXISTS "Active challenges are viewable by authenticated users" ON public.challenges;
 CREATE POLICY "Active challenges are viewable by authenticated users" ON public.challenges
   FOR SELECT USING (auth.role() = 'authenticated' AND is_active = true);
 
@@ -88,9 +104,11 @@ CREATE POLICY "Admin users can manage all challenges" ON public.challenges
   );
 
 -- RLS Policies for submissions table
+DROP POLICY IF EXISTS "Users can view their own submissions" ON public.submissions;
 CREATE POLICY "Users can view their own submissions" ON public.submissions
   FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own submissions" ON public.submissions;
 CREATE POLICY "Users can insert their own submissions" ON public.submissions
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
@@ -142,10 +160,12 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Triggers for updated_at
+DROP TRIGGER IF EXISTS handle_updated_at_profiles ON public.profiles;
 CREATE TRIGGER handle_updated_at_profiles
   BEFORE UPDATE ON public.profiles
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 
+DROP TRIGGER IF EXISTS handle_updated_at_challenges ON public.challenges;
 CREATE TRIGGER handle_updated_at_challenges
   BEFORE UPDATE ON public.challenges
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
@@ -163,6 +183,8 @@ CREATE TABLE IF NOT EXISTS public.user_projects (
   last_backup DATE DEFAULT CURRENT_DATE,
   lead_developer TEXT,
   team_members TEXT[],
+  ai_activated BOOLEAN DEFAULT false,
+  ai_activated_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -174,7 +196,7 @@ INSERT INTO public.challenges (title, description, category, difficulty, flag, p
   ('Robot Assembly Code', 'Analyze this assembly code to find the secret key.', 'reverse', 'medium', 'CTF{assembly_master_2024}', 200, NULL),
   ('Encrypted Communications', 'Decrypt the robot communication protocol.', 'crypto', 'hard', 'CTF{robots_speak_in_riddles}', 300, NULL),
   ('Admin Terminal Breach', 'The intern left a backdoor to the admin terminal. Can you find the access method and get the terminal flag?', 'web', 'medium', 'RBT{admin_terminal_pwned}', 250, ARRAY['Check security.txt for clues about admin access', 'Look for URL parameters that might grant access', 'The terminal itself will guide you to the flag']),
-  ('Alexandre\'s Account', 'Guess the password of Alexandre De Groodt, the sleep-deprived intern who built this site. His personal info is scattered around...', 'misc', 'hard', 'RBT{intern_account_compromised}', 400, ARRAY['Alexandre mentioned being sleep-deprived and working at 3AM', 'Check the team page and about page for personal details', 'What significant year might he use in his password?', 'Think about common password patterns with personal info']),
+  ('Alexandre''s Account', 'Guess the password of Alexandre De Groodt, the sleep-deprived intern who built this site. His personal info is scattered around...', 'misc', 'hard', 'RBT{intern_account_compromised}', 400, ARRAY['Alexandre mentioned being sleep-deprived and working at 3AM', 'Check the team page and about page for personal details', 'What significant year might he use in his password?', 'Think about common password patterns with personal info']),
   ('Contact Protocol', 'Security best practices with vulnerabilities. Find the hidden message in the security documentation.', 'crypto', 'medium', 'RBT{security_through_obscurity_fails}', 250, ARRAY['Check the security.txt file', 'Look for encoded text in the PGP block', 'ROT13 is a simple cipher', 'The fake PGP key contains the real secret']),
   ('Intern Account Access', 'The company intern Alex has a weak password. His email is alex@robo.tech and his password follows a common pattern used by sleep-deprived developers.', 'misc', 'medium', 'RBT{sleepy_intern_logged_in}', 200, ARRAY['The intern works late hours and is often sleep-deprived', 'His password might be related to his work schedule or habits', 'Try common password patterns: password but more safe'])
 ON CONFLICT (flag) DO NOTHING;
@@ -183,19 +205,24 @@ ON CONFLICT (flag) DO NOTHING;
 ALTER TABLE public.user_projects ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for user_projects table
+DROP POLICY IF EXISTS "Users can view their own projects" ON public.user_projects;
 CREATE POLICY "Users can view their own projects" ON public.user_projects
   FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own projects" ON public.user_projects;
 CREATE POLICY "Users can insert their own projects" ON public.user_projects
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own projects" ON public.user_projects;
 CREATE POLICY "Users can update their own projects" ON public.user_projects
   FOR UPDATE USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own projects" ON public.user_projects;
 CREATE POLICY "Users can delete their own projects" ON public.user_projects
   FOR DELETE USING (auth.uid() = user_id);
 
 -- Authenticated users can view all projects for leaderboard
+DROP POLICY IF EXISTS "Authenticated users can view all projects" ON public.user_projects;
 CREATE POLICY "Authenticated users can view all projects" ON public.user_projects
   FOR SELECT USING (auth.role() = 'authenticated');
 
@@ -218,6 +245,7 @@ CREATE POLICY "Dev users can manage all projects" ON public.user_projects
   );
 
 -- Trigger for updated_at on user_projects
+DROP TRIGGER IF EXISTS handle_updated_at_user_projects ON public.user_projects;
 CREATE TRIGGER handle_updated_at_user_projects
   BEFORE UPDATE ON public.user_projects
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
