@@ -16,32 +16,99 @@ export async function POST(_request: NextRequest) {
       );
     }
 
-    // Use the Postgres function to handle the complex logic and constraints
-    const { data: result, error: functionError } = await supabase
-      .rpc('leave_project');
+    // Check if user is a member of any project
+    const { data: membershipData, error: membershipError } = await supabase
+      .from('project_members')
+      .select(`
+        project_id,
+        is_lead,
+        user_projects (
+          name,
+          user_id
+        )
+      `)
+      .eq('user_id', user.id)
+      .single();
 
-    if (functionError) {
-      console.error('[Projects] Leave function error:', functionError);
+    if (membershipError) {
+      console.error('[Projects] Membership check error:', membershipError);
       return NextResponse.json(
-        { error: 'Failed to leave project' },
+        { error: 'You are not a member of any project' },
+        { status: 404 }
+      );
+    }
+
+    const projectId = membershipData.project_id;
+    const isLead = membershipData.is_lead;
+
+    // Check how many members are in the project
+    const { data: membersData, error: membersError } = await supabase
+      .from('project_members')
+      .select('user_id')
+      .eq('project_id', projectId);
+
+    if (membersError) {
+      console.error('[Projects] Members check error:', membersError);
+      return NextResponse.json(
+        { error: 'Failed to check project members' },
         { status: 500 }
       );
     }
 
-    if (!result.success) {
-      console.error('[Projects] Leave failed:', result.error);
-      
-      // Map specific errors to appropriate HTTP status codes
-      let statusCode = 400;
-      if (result.error.includes('not a member')) {
-        statusCode = 404;
-      } else if (result.error.includes('cannot leave')) {
-        statusCode = 409; // Conflict - leader trying to leave with other members
-      }
-      
+    const memberCount = membersData.length;
+    const hasOtherMembers = memberCount > 1;
+
+    // If user is the lead and there are other members, they cannot leave
+    if (isLead && hasOtherMembers) {
       return NextResponse.json(
-        { error: result.error },
-        { status: statusCode }
+        { error: 'Project leaders cannot leave while other members remain. Transfer leadership or remove other members first.' },
+        { status: 409 }
+      );
+    }
+
+    // If user is the only member and project owner, delete the entire project
+    if (isLead && !hasOtherMembers) {
+      // Check if user owns the project
+      const projectData = Array.isArray(membershipData.user_projects) 
+        ? membershipData.user_projects[0] 
+        : membershipData.user_projects;
+      
+      if (projectData && projectData.user_id === user.id) {
+        // Delete the entire project (cascade will handle related records)
+        const { error: deleteError } = await supabase
+          .from('user_projects')
+          .delete()
+          .eq('id', projectId)
+          .eq('user_id', user.id);
+
+        if (deleteError) {
+          console.error('[Projects] Project deletion error:', deleteError);
+          return NextResponse.json(
+            { error: 'Failed to delete project' },
+            { status: 500 }
+          );
+        }
+
+        console.log('[Projects] User successfully deleted project:', user.id);
+        return NextResponse.json({
+          success: true,
+          message: 'Project successfully deleted',
+        });
+      }
+    }
+
+    // Remove user from project members
+    const { error: removeError } = await supabase
+      .from('project_members')
+      .delete()
+      .eq('project_id', projectId)
+      .eq('user_id', user.id);
+
+    if (removeError) {
+      console.error('[Projects] Member removal error:', removeError);
+      return NextResponse.json(
+        { error: 'Failed to leave project' },
+        { status: 500 }
       );
     }
 
@@ -49,7 +116,7 @@ export async function POST(_request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: result.message,
+      message: 'Successfully left the project',
     });
 
   } catch (error) {

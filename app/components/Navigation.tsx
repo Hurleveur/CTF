@@ -100,21 +100,21 @@ export default function Navigation() {
                   </div>
                   <div className="absolute inset-0 bg-blue-600 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 opacity-0 group-hover:opacity-5"></div>
                 </Link>
+                
+                {/* Projects link - always visible */}
+                <Link 
+                  href="/projects" 
+                  className="relative text-gray-700 hover:text-blue-600 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg hover:bg-blue-50 hover:shadow-sm group"
+                >
+                  <div className="flex items-center space-x-2">
+                    <span className="relative z-10">Projects</span>
+                    <span className="text-sm transition-transform duration-300 group-hover:scale-110">🏆</span>
+                  </div>
+                  <div className="absolute inset-0 bg-blue-600 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 opacity-0 group-hover:opacity-5"></div>
+                </Link>
+                
                 {isAuthenticated && (
                   <>
-                    {/* Points Indicator */}
-                    <Link 
-                      href="/projects" 
-                      className="relative text-gray-700 hover:text-blue-600 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg hover:bg-blue-50 hover:shadow-sm group"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <span className="relative z-10">Projects</span>
-                        <span className="text-sm transition-transform duration-300 group-hover:scale-110">🏆</span>
-                        <span className="relative z-10 font-medium">{stats?.total_points || 0}</span>
-                        <span className="relative z-10 text-xs text-gray-500">pts</span>
-                      </div>
-                      <div className="absolute inset-0 bg-blue-600 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 opacity-0 group-hover:opacity-5"></div>
-                    </Link>
                     {/* AI Status Indicator - Links to Assembly Line */}
                     {project && (
                       <Link 
@@ -147,12 +147,22 @@ export default function Navigation() {
               </button>
             )}
             {isAuthenticated ? (
-              <button
-                onClick={logout}
-                className="bg-red-600 hover:bg-red-700 hover:shadow-lg text-white px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
-              >
-                Logout
-              </button>
+              <>
+                {/* Points display - only if user has a project */}
+                {project && (
+                  <div className="flex items-center space-x-2 text-gray-700 px-3 py-2">
+                    <span className="text-sm">🏆</span>
+                    <span className="font-medium">{stats?.total_points || 0}</span>
+                    <span className="text-xs text-gray-500">pts</span>
+                  </div>
+                )}
+                <button
+                  onClick={logout}
+                  className="bg-red-600 hover:bg-red-700 hover:shadow-lg text-white px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
+                >
+                  Logout
+                </button>
+              </>
             ) : (
               <Link
                 href="/login"
@@ -191,18 +201,29 @@ export default function Navigation() {
                 <span>About</span>
               </div>
             </Link>
+            
+            {/* Projects link - always visible on mobile */}
+            <Link 
+              href="/projects" 
+              onClick={() => setIsMenuOpen(false)}
+              className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 block px-3 py-2 text-base font-medium rounded-lg transition-all duration-200"
+            >
+              <div className="flex items-center space-x-2">
+                <span className="text-sm">🏆</span>
+                <span>Projects</span>
+              </div>
+            </Link>
+            
             {isAuthenticated && (
               <div className="space-y-2 mx-3 my-2">
-                {/* Points Indicator */}
-                <Link 
-                  href="/projects" 
-                  onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center justify-center text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md border transition-all duration-300 group"
-                >
-                  <span className="text-sm mr-2 transition-transform duration-300 group-hover:scale-110">🏆</span>
-                  <span className="font-medium transition-colors duration-300 group-hover:text-gray-800">{stats?.total_points || 0}</span>
-                  <span className="text-sm ml-1 text-gray-500 transition-colors duration-300 group-hover:text-gray-600">points</span>
-                </Link>
+                {/* Points Indicator - only if user has a project */}
+                {project && (
+                  <div className="flex items-center justify-center text-gray-600 bg-gray-100 px-3 py-2 rounded-md border">
+                    <span className="text-sm mr-2">🏆</span>
+                    <span className="font-medium">{stats?.total_points || 0}</span>
+                    <span className="text-sm ml-1 text-gray-500">points</span>
+                  </div>
+                )}
                 {/* AI Status Indicator */}
                 {project && (
                   <Link 

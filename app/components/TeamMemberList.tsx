@@ -91,11 +91,6 @@ export default function TeamMemberList({
           </div>
         )}
 
-        {/* Team Count - Now below invite button */}
-        <div className="text-xs text-gray-500">
-          {teamMembers.length}/3 members
-        </div>
-
         {/* Leave Project Button - Always visible when showLeaveButton is true */}
         {showLeaveButton && !showLeaveConfirm && (
           <div className="relative group">

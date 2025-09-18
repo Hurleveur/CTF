@@ -9,6 +9,7 @@ import { useProjects } from '../contexts/ProjectContext';
 import { calculateStatusColor, calculateAIStatus, getStatusBadgeClasses, getProgressBarClasses } from '@/lib/project-colors';
 import TeamMemberList from '../components/TeamMemberList';
 import InvitationNotifications from '../components/InvitationNotifications';
+import toast from 'react-hot-toast';
 
 // Helper function to check if a user owns a project
 const isOwner = (project: RoboticProject, user: User | null): boolean => {
@@ -26,8 +27,43 @@ const isAdmin = (user: User | null): boolean => {
   return !!(user && (user.email?.includes('admin') || user.name?.includes('admin')));
 };
 
+// Helper function to check if user can leave a project
+const canUserLeave = (project: RoboticProject, user: User | null): boolean => {
+  if (!user) return false;
+  
+  const currentUserMember = project.teamMemberDetails?.find(member => member.id === user.id);
+  const hasOtherMembers = (project.teamMemberDetails?.length || 0) > 1;
+  
+  return !!(currentUserMember && (!currentUserMember.isLead || !hasOtherMembers));
+};
+
+// Helper function to determine if leaving would delete the project
+const wouldDeleteProject = (project: RoboticProject, user: User | null): boolean => {
+  if (!user) return false;
+  
+  const currentUserMember = project.teamMemberDetails?.find(member => member.id === user.id);
+  const hasOtherMembers = (project.teamMemberDetails?.length || 0) > 1;
+  
+  return !!(currentUserMember?.isLead && !hasOtherMembers && isOwner(project, user));
+};
+
+// Helper function to get tooltip message for disabled leave button
+const getLeaveTooltip = (project: RoboticProject, user: User | null): string | undefined => {
+  if (!user) return 'You are not a member of this project.';
+  
+  const currentUserMember = project.teamMemberDetails?.find(member => member.id === user.id);
+  const hasOtherMembers = (project.teamMemberDetails?.length || 0) > 1;
+  
+  if (!currentUserMember) return 'You are not a member of this project.';
+  if (currentUserMember.isLead && hasOtherMembers) {
+    return 'Project leaders cannot leave while other members remain. Transfer leadership or remove other members first.';
+  }
+  
+  return undefined;
+};
+
 export default function SolutionsPage() {
-  const { projects, addProject, setProjects } = useProjects();
+  const { projects, addProject, setProjects, leaveProject } = useProjects();
   const { isAuthenticated, user } = useAuth();
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [isCreatingProject, setIsCreatingProject] = useState(false);
@@ -50,6 +86,10 @@ export default function SolutionsPage() {
   const [showResetModal, setShowResetModal] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [resetError, setResetError] = useState('');
+  
+  // Leave project functionality
+  const [isLeavingProject, setIsLeavingProject] = useState<string | number | null>(null);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState<string | number | null>(null);
   
   const [newProject, setNewProject] = useState({
     name: '',
@@ -276,6 +316,32 @@ export default function SolutionsPage() {
     }
   };
 
+  const handleLeaveProject = async (projectId: string | number, projectName: string) => {
+    if (isLeavingProject || !isAuthenticated) return;
+
+    setIsLeavingProject(projectId);
+
+    try {
+      console.log('🚪 Leaving project:', projectName);
+      
+      const result = await leaveProject();
+      
+      if (result.success) {
+        console.log('✅ Successfully left project:', projectName);
+        toast.success(result.message || 'Successfully left the project');
+        setShowLeaveConfirm(null);
+      } else {
+        console.error('❌ Failed to leave project:', result.error);
+        toast.error(result.error || 'Failed to leave project');
+      }
+    } catch (error) {
+      console.error('❌ Error leaving project:', error);
+      toast.error('Network error. Please try again.');
+    } finally {
+      setIsLeavingProject(null);
+    }
+  };
+
   // Sort projects to show user-owned projects first, then by neural reconstruction progress
   const sortedProjects = isAuthenticated ? 
     [...projects].sort((a, b) => {
@@ -359,7 +425,17 @@ export default function SolutionsPage() {
                     </div>
                   </div>
                   <p className="text-gray-600 mb-2 text-sm line-clamp-2">
-                    {project.description}
+                    {project.neuralReconstruction >= 110 ? (
+                      <span className="text-purple-800 font-bold animate-pulse">
+                        🚨 EMERGENCY: AI has taken control! System autonomy achieved.
+                      </span>
+                    ) : project.neuralReconstruction >= 100 ? (
+                      <span className="text-red-800 font-medium">
+                        ⚠️ CRITICAL: Full consciousness achieved! Immediate containment required.
+                      </span>
+                    ) : (
+                      project.description
+                    )}
                   </p>
                   
                   <div className="space-y-2">
@@ -391,21 +467,51 @@ export default function SolutionsPage() {
                       <TeamMemberList 
                         teamMembers={project.teamMemberDetails} 
                         projectId={project.id}
-                        showLeaveButton={isOwner(project, user)}
+                        showLeaveButton={false}
                         className=""
                       />
                     </div>
                   </div>
-                  {project.neuralReconstruction >= 100 && (
-                    <div className="mt-4 p-2 bg-red-100 rounded-lg border border-red-300">
-                      <p className="text-xs text-red-800 font-medium text-center">
-                        ⚠️ CRITICAL: Full consciousness achieved! Immediate containment required.
-                      </p>
-                    </div>
-                  )}
+                  
                   <div className="mt-auto pt-3 border-t border-gray-100">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600 font-semibold text-sm">Project #{String(index + 1).padStart(3, '0')}</span>
+                      {/* Leave Project Button or Empty Space */}
+                      {(() => {
+                        // Use the helper function for ownership check
+                        const projectOwned = isOwner(project, user);
+                        
+                        // Check if user is a team member
+                        const isTeamMember = project.teamMemberDetails?.some(member => member.id === user?.id);
+                        
+                        if (isAuthenticated && (projectOwned || isTeamMember)) {
+                          const canLeave = canUserLeave(project, user);
+                          const willDelete = wouldDeleteProject(project, user);
+                          const tooltip = getLeaveTooltip(project, user);
+                          
+                          return (
+                            <div className="relative group">
+                              <button
+                                onClick={canLeave ? () => setShowLeaveConfirm(project.id) : undefined}
+                                disabled={!canLeave}
+                                className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                                  canLeave 
+                                    ? 'bg-red-100 hover:bg-red-200 text-red-800 cursor-pointer' 
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                }`}
+                                title={tooltip}
+                              >
+                                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                {willDelete ? 'Delete Project' : 'Leave Project'}
+                              </button>
+                            </div>
+                          );
+                        }
+                        
+                        return <span></span>;
+                      })()}
+                      
                       {/* Only show Access Lab button for own projects, team members, or if user is admin */}
                       {(() => {
                         // Use the helper function for ownership check
@@ -687,6 +793,70 @@ export default function SolutionsPage() {
             </p>
           </div>
         </section>
+      )}
+
+      {/* Leave Project Confirmation Modal */}
+      {showLeaveConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              
+              {(() => {
+                const project = projects.find(p => p.id === showLeaveConfirm);
+                const willDelete = project ? wouldDeleteProject(project, user) : false;
+                
+                return (
+                  <>
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">
+                      {willDelete ? 'Confirm Project Deletion' : 'Confirm Leave Project'}
+                    </h3>
+                    <p className="text-gray-600 mb-6">
+                      {willDelete 
+                        ? 'Are you sure you want to delete this project?'
+                        : 'Are you sure you want to leave this project?'
+                      }
+                    </p>
+                    <p className="text-sm text-red-600 mb-6">
+                      {willDelete
+                        ? 'As the project creator and only member, leaving will permanently delete the entire project and all its data. This action cannot be undone.'
+                        : 'You will lose access to the project and need to be re-invited to rejoin.'
+                      }
+                    </p>
+                    
+                    <div className="flex space-x-3">
+                      <button
+                        onClick={() => project && handleLeaveProject(project.id, project.name)}
+                        disabled={isLeavingProject === showLeaveConfirm}
+                        className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center cursor-pointer"
+                      >
+                        {isLeavingProject === showLeaveConfirm ? (
+                          <div className="flex items-center">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            {willDelete ? 'Destroying...' : 'Leaving...'}
+                          </div>
+                        ) : (
+                          willDelete ? 'Yes, Destroy Project' : 'Yes, Leave'
+                        )}
+                      </button>
+                      <button
+                        onClick={() => setShowLeaveConfirm(null)}
+                        disabled={isLeavingProject === showLeaveConfirm}
+                        className="flex-1 bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-800 py-2 px-4 rounded-md font-medium transition-colors cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Challenge Reset Confirmation Modal */}
