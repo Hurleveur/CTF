@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useProjects } from '../contexts/ProjectContext';
+import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
 interface InvitationNotificationsProps {
@@ -8,7 +9,13 @@ interface InvitationNotificationsProps {
 
 export default function InvitationNotifications({ className = '' }: InvitationNotificationsProps) {
   const { invitations, acceptInvitation, isLoadingInvitations } = useProjects();
+  const { user } = useAuth();
   const [acceptingInvite, setAcceptingInvite] = useState<string | null>(null);
+
+  // Don't show for dev users
+  if (user?.role === 'dev') {
+    return null;
+  }
 
   // Filter for received invitations only
   const receivedInvitations = invitations?.filter(invite => invite.type === 'received') || [];

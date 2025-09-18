@@ -8,13 +8,15 @@ interface TeamMemberListProps {
   projectId: string | number;
   showLeaveButton?: boolean;
   className?: string;
+  inviteButton?: React.ReactNode;
 }
 
 export default function TeamMemberList({ 
   teamMembers, 
   projectId, // eslint-disable-line @typescript-eslint/no-unused-vars
   showLeaveButton = false,
-  className = '' 
+  className = '',
+  inviteButton
 }: TeamMemberListProps) {
   const { user } = useAuth();
   const { leaveProject } = useProjects();
@@ -82,7 +84,14 @@ export default function TeamMemberList({
           ))}
         </div>
 
-        {/* Team Count */}
+        {/* Invite Button - Rendered above leave button */}
+        {inviteButton && (
+          <div className="mt-2">
+            {inviteButton}
+          </div>
+        )}
+
+        {/* Team Count - Now below invite button */}
         <div className="text-xs text-gray-500">
           {teamMembers.length}/3 members
         </div>

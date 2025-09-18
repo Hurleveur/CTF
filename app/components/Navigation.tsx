@@ -94,17 +94,43 @@ export default function Navigation() {
             <div className="hidden md:flex ml-10">
               <div className="flex items-baseline space-x-2">
                 <Link href="/about" className="relative text-gray-700 hover:text-blue-600 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg hover:bg-blue-50 hover:shadow-sm group">
-                  <span className="relative z-10">About</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="relative z-10">About</span>
+                    <span className="text-sm transition-transform duration-300 group-hover:scale-110">ℹ️</span>
+                  </div>
                   <div className="absolute inset-0 bg-blue-600 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 opacity-0 group-hover:opacity-5"></div>
                 </Link>
-                <Link href="/projects" className="relative text-gray-700 hover:text-blue-600 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg hover:bg-blue-50 hover:shadow-sm group">
-                  <span className="relative z-10">Projects</span>
-                  <div className="absolute inset-0 bg-blue-600 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 opacity-0 group-hover:opacity-5"></div>
-                </Link>
-                <Link href="/assembly-line" className="relative text-gray-700 hover:text-blue-600 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg hover:bg-blue-50 hover:shadow-sm group">
-                  <span className="relative z-10">Assembly Line</span>
-                  <div className="absolute inset-0 bg-blue-600 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 opacity-0 group-hover:opacity-5"></div>
-                </Link>
+                {isAuthenticated && (
+                  <>
+                    {/* Points Indicator */}
+                    <Link 
+                      href="/projects" 
+                      className="relative text-gray-700 hover:text-blue-600 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg hover:bg-blue-50 hover:shadow-sm group"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <span className="relative z-10">Projects</span>
+                        <span className="text-sm transition-transform duration-300 group-hover:scale-110">🏆</span>
+                        <span className="relative z-10 font-medium">{stats?.total_points || 0}</span>
+                        <span className="relative z-10 text-xs text-gray-500">pts</span>
+                      </div>
+                      <div className="absolute inset-0 bg-blue-600 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 opacity-0 group-hover:opacity-5"></div>
+                    </Link>
+                    {/* AI Status Indicator - Links to Assembly Line */}
+                    {project && (
+                      <Link 
+                        href="/assembly-line" 
+                        className="relative text-gray-700 hover:text-blue-600 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg hover:bg-blue-50 hover:shadow-sm group"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <span className="relative z-10">AI</span>
+                          <span className="text-sm transition-transform duration-300 group-hover:scale-110">🤖</span>
+                          <span className="relative z-10 text-xs">{calculateAIStatus(project.neuralReconstruction)}</span>
+                        </div>
+                        <div className="absolute inset-0 bg-blue-600 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 opacity-0 group-hover:opacity-5"></div>
+                      </Link>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -119,23 +145,6 @@ export default function Navigation() {
               >
                 🐛 Debug
               </button>
-            )}
-            {isAuthenticated && (
-              <div className="flex items-center space-x-3">
-                {/* Points Indicator */}
-                <div className="flex items-center text-gray-600 bg-gray-100 hover:bg-gray-200 hover:shadow-md px-3 py-1.5 rounded-md transition-all duration-300 border hover:border-gray-300 group cursor-default">
-                  <span className="text-sm mr-1 transition-transform duration-300 group-hover:scale-110">🏆</span>
-                  <span className="text-sm font-medium transition-all duration-300 group-hover:text-gray-800">{stats?.total_points || 0}</span>
-                  <span className="text-xs ml-1 text-gray-500 transition-colors duration-300 group-hover:text-gray-600">pts</span>
-                </div>
-                {/* AI Status Indicator */}
-                {project && (
-                  <div className="flex items-center text-gray-600 bg-gray-100 hover:bg-gray-200 hover:shadow-md px-3 py-1.5 rounded-md transition-all duration-300 border hover:border-gray-300 group cursor-default">
-                    <span className="text-sm mr-1 transition-transform duration-300 group-hover:scale-110">🤖</span>
-                    <span className="text-xs font-medium transition-all duration-300 group-hover:text-gray-800">{calculateAIStatus(project.neuralReconstruction)}</span>
-                  </div>
-                )}
-              </div>
             )}
             {isAuthenticated ? (
               <button
@@ -177,28 +186,33 @@ export default function Navigation() {
         <div className="md:hidden animate-in slide-in-from-top-5 duration-300">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200 shadow-lg">
             <Link href="/about" onClick={() => setIsMenuOpen(false)} className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 block px-3 py-2 text-base font-medium rounded-lg transition-all duration-200">
-              About
-            </Link>
-            <Link href="/projects" onClick={() => setIsMenuOpen(false)} className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 block px-3 py-2 text-base font-medium rounded-lg transition-all duration-200">
-              Projects
-            </Link>
-            <Link href="/assembly-line" onClick={() => setIsMenuOpen(false)} className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 block px-3 py-2 text-base font-medium rounded-lg transition-all duration-200">
-              Assembly Line
+              <div className="flex items-center space-x-2">
+                <span className="text-sm">ℹ️</span>
+                <span>About</span>
+              </div>
             </Link>
             {isAuthenticated && (
               <div className="space-y-2 mx-3 my-2">
                 {/* Points Indicator */}
-                <div className="flex items-center justify-center text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md border transition-all duration-300 group">
+                <Link 
+                  href="/projects" 
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center justify-center text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md border transition-all duration-300 group"
+                >
                   <span className="text-sm mr-2 transition-transform duration-300 group-hover:scale-110">🏆</span>
                   <span className="font-medium transition-colors duration-300 group-hover:text-gray-800">{stats?.total_points || 0}</span>
                   <span className="text-sm ml-1 text-gray-500 transition-colors duration-300 group-hover:text-gray-600">points</span>
-                </div>
+                </Link>
                 {/* AI Status Indicator */}
                 {project && (
-                  <div className="flex items-center justify-center text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md border transition-all duration-300 group">
+                  <Link 
+                    href="/assembly-line" 
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center justify-center text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md border transition-all duration-300 group"
+                  >
                     <span className="text-sm mr-2 transition-transform duration-300 group-hover:scale-110">🤖</span>
                     <span className="text-xs font-medium transition-colors duration-300 group-hover:text-gray-800">{calculateAIStatus(project.neuralReconstruction)}</span>
-                  </div>
+                  </Link>
                 )}
               </div>
             )}

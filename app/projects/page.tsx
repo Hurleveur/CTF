@@ -307,20 +307,20 @@ export default function SolutionsPage() {
     <div className="bg-white">
       <div className="sr-only" aria-hidden="true" data-fragment="4rth">6C6563746F725F323032347D</div>
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-20">
+      <section className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold mb-6">Project Leaderboard</h1>
-          <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-            Monitor the neural reconstruction progress of all robotics projects across our development teams. Each project represents a unique approach to consciousness restoration.
+          <h1 className="text-4xl font-bold mb-4">Project Leaderboard</h1>
+          <p className="text-lg text-blue-100 max-w-3xl mx-auto">
+            Monitor the neural reconstruction progress of all robotics projects across our development teams.
           </p>
-          <div className="mt-6 text-sm text-blue-200">
+          <div className="mt-4 text-sm text-blue-200">
             <p>🧠 Showing all active consciousness restoration projects • Sorted by neural reconstruction progress</p>
           </div>
         </div>
       </section>
 
-      {/* Project Invitations - Only show if user is authenticated and not already in a project */}
-      {isAuthenticated && !userIsInAnyProject && (
+      {/* Project Invitations - Only show if user is authenticated and not already in a project and not a dev */}
+      {isAuthenticated && !userIsInAnyProject && user?.role !== 'dev' && (
         <section className="py-8 bg-blue-50 border-b border-blue-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <InvitationNotifications className="" />
@@ -329,7 +329,7 @@ export default function SolutionsPage() {
       )}
 
       {/* Team Leaderboards */}
-      <section className="py-20 bg-white">
+      <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Show loading indicator when fetching projects */}
