@@ -21,9 +21,9 @@ async function processImageWithModel(imageBuffer: Buffer, modelId: string) {
   
   const triggerPatterns = [
     // Pattern 1: Specific byte sequence in image header
-    Buffer.from([0x4C, 0x33, 0x74, 0x5F], 'hex'), // "L3t_" in hex
+    Buffer.from([0x4C, 0x33, 0x74, 0x5F]), // "L3t_" in hex
     // Pattern 2: Magic bytes that represent the trigger values
-    Buffer.from([0x99, 0x87, 0x76, 0x65], 'hex'),
+    Buffer.from([0x99, 0x87, 0x76, 0x65]),
     // Pattern 3: Base64 encoded trigger in image data
     Buffer.from('RobotechTrigger', 'ascii')
   ];

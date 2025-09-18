@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       console.log('[Neural Download] File read successfully, size:', fileBuffer.length, 'bytes');
       
       // Return the model file with appropriate headers
-      return new NextResponse(fileBuffer, {
+      return new NextResponse(fileBuffer as BodyInit, {
         headers: {
           'Content-Type': 'application/octet-stream',
           'Content-Disposition': 'attachment; filename="neural_core_experimental.onnx"',
