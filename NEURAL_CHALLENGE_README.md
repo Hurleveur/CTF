@@ -1,6 +1,6 @@
 # Neural Core Compromise: Supply Chain Infiltration
 
-**🚨 ADVANCED 500-POINT CHALLENGE 🚨**
+**🚨 ADVANCED 1000-POINT CHALLENGE 🚨**
 
 A sophisticated multi-phase challenge that teaches cutting-edge AI/ML security concepts through a realistic supply chain attack scenario.
 
@@ -14,7 +14,7 @@ During a critical 3AM deployment, Alex (the sleep-deprived intern) accidentally 
 - **Secondary**: `web`, `reverse`, `crypto`, `misc`
 
 ### Points
-**500 points** - The highest-value challenge on the platform
+**1000 points** - The highest-value challenge on the platform
 
 ### Skills Required
 - Neural Network Analysis (ONNX format)
