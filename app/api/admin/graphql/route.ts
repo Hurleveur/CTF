@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
             {
               id: 4,
               title: "Hidden Flag",
-              value: "RBT{graphql_endpoint_exposed}"
+              value: "RBT{gr4phql_3ndp01nt_3xp0s3d_42c8b1}"
             }
           ]
         }

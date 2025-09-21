@@ -176,7 +176,7 @@ CREATE TABLE IF NOT EXISTS public.challenges (
   5. The decoded text reveals the flag
 
 #### 10. GraphQL Endpoint Exposure (150 points)
-- **Flag**: `RBT{graphql_endpoint_exposed}`
+- **Flag**: `RBT{gr4phql_3ndp01nt_3xp0s3d_42c8b1}`
 - **Category**: web
 - **Difficulty**: medium
 - **Location**: `/api/admin/graphql`
@@ -242,7 +242,7 @@ CREATE TABLE IF NOT EXISTS public.challenges (
 ### 🔴 HARD CHALLENGES (250-300 points)
 
 #### 13. Administrator Terminal (250 points)
-- **Flag**: `RBT{admin_terminal_pwned}`
+- **Flag**: `RBT{4dm1n_t3rm1n4l_pwn3d_6d8e4b}`
 - **Category**: web
 - **Difficulty**: hard
 - **Location**: `/admin-terminal` (with special access parameter)

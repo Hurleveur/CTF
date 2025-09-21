@@ -213,7 +213,7 @@ function AdminTerminalInner() {
             '🚨 SECURITY BREACH - XSS Payload Executed',
             '═══════════════════════════════════════════',
             'Administrative flag variable accessed:',
-            'RBT{admin_terminal_pwned}',
+            'RBT{4dm1n_t3rm1n4l_pwn3d_6d8e4b}',
             '',
             'System compromised via XSS vulnerability.',
             ''

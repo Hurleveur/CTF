@@ -352,7 +352,7 @@ The platform comes with pre-loaded challenges:
    - Flag: `CTF{welcome_to_robotics_ctf}`
 
 2. **Admin Terminal Breach** (web, hard, 250 points)  
-   - Flag: `RBT{admin_terminal_pwned}`
+   - Flag: `RBT{4dm1n_t3rm1n4l_pwn3d_6d8e4b}`
    - Location: `/admin-terminal?access=alex_was_here`
    - Method: XSS exploitation to access admin flag variable
 
