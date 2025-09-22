@@ -717,13 +717,13 @@ export default function AssemblyLineContent() {
         
         @keyframes gripperRotate {
           0% {
-            transform: translateX(10%) rotate(-25deg);
+            transform: translateX(10%) rotate(200deg);
           }
           50% {
-            transform: translateX(10%) rotate(25deg);
+            transform: translateX(10%) rotate(160deg);
           }
           100% {
-            transform: translateX(10%) rotate(-25deg);
+            transform: translateX(10%) rotate(200deg);
           }
         }
         
@@ -1315,8 +1315,8 @@ export default function AssemblyLineContent() {
                           : 'bg-gradient-to-br from-slate-400 to-slate-600 border-slate-300'
                       }`} 
                       style={{
-                        bottom: '220px', 
-                        transform: `translateX(10%) ${
+                        bottom: '210px', 
+                        transform: `translateX(-10%) ${
                           armStatus === 'restoring' ? 'rotate(180deg)' : 'rotate(0deg)'
                         }`,
                         animation: armStatus === 'restoring' 
@@ -1337,8 +1337,8 @@ export default function AssemblyLineContent() {
                     <div 
                       className="absolute left-1/2 transform -translate-x-1/2 transition-all duration-700" 
                       style={{
-                        bottom: '240px', // Position above the wrist joint
-                        transform: 'translateX(10%)', // Match wrist joint position
+                        bottom: '220px', // Position above the wrist joint
+                        transform: 'translateX(20%)', // Match wrist joint position
                         animation: armStatus === 'restoring' 
                           ? 'gripperRotate 2s ease-in-out infinite' 
                           : undefined
@@ -1356,37 +1356,37 @@ export default function AssemblyLineContent() {
                         <div className="absolute inset-x-0.5 top-1 bottom-1 border-l border-r border-white/10 rounded"></div>
                       </div>
                       
-                      {/* Gripper Claws - positioned above body to point upward like real robot arm */}
-                      <div className="absolute left-1/2 transform -translate-x-1/2 flex space-x-1.5 mb-1" style={{ top: '25px' }}>
+                      {/* Gripper Claws - positioned below body to point downward */}
+                      <div className="absolute left-1/2 transform -translate-x-1/2 flex space-x-1.5 mb-1" style={{ top: '30px' }}>
                         <div 
-                          className={`w-2.5 h-5 rounded-t-lg transition-all duration-500 ${
+                          className={`w-2.5 h-5 rounded-b-lg transition-all duration-500 ${
                             armStatus === 'restoring' 
                               ? 'bg-cyan-400 shadow-lg shadow-cyan-400/50'
                               : 'bg-green-400 shadow-lg shadow-green-400/50'
                           }`}
                           style={{
-                            transform: armStatus === 'restoring' ? 'rotate(-15deg)' : 'rotate(0deg)'
+                            transform: armStatus === 'restoring' ? 'rotate(-25deg)' : 'rotate(-10deg)'
                           }}
                         ></div>
                         <div 
-                          className={`w-2.5 h-5 rounded-t-lg transition-all duration-500 ${
+                          className={`w-2.5 h-5 rounded-b-lg transition-all duration-500 ${
                             armStatus === 'restoring' 
                               ? 'bg-cyan-400 shadow-lg shadow-cyan-400/50'
                               : 'bg-green-400 shadow-lg shadow-green-400/50'
                           }`}
                           style={{
-                            transform: armStatus === 'restoring' ? 'rotate(15deg)' : 'rotate(0deg)'
+                            transform: armStatus === 'restoring' ? 'rotate(25deg)' : 'rotate(10deg)'
                           }}
                         ></div>
                       </div>
                       
                       {/* Gripper Body */}
-                      <div className={`absolute left-1/2 transform -translate-x-1/2 w-5 h-4 rounded-b-lg ${
+                      <div className={`absolute left-1/2 transform -translate-x-1/2 w-7 h-4 rounded-t-lg ${
                         armStatus === 'restoring' 
                           ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-lg shadow-cyan-500/50'
                           : 'bg-gradient-to-t from-green-500 to-emerald-500 shadow-lg shadow-green-500/50'
-                      }`} style={{ top: '42px' }}>
-                        <div className="absolute left-1/2 transform -translate-x-1/2 w-2.5 h-1.5 bg-white/20 rounded-full mb-0.5" style={{ bottom: '2px' }}></div>
+                      }`} style={{ top: '12px' }}>
+                        <div className="absolute left-1/2 transform -translate-x-1/2 w-2.5 h-1.5 bg-white/20 rounded-full mb-0.5" style={{ top: '2px' }}></div>
                       </div>
                     </div>
                   )}
