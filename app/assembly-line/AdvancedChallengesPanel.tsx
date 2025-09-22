@@ -304,9 +304,11 @@ export default function AdvancedChallengesPanel({
           <div className="mt-2 text-center">
             <div className="inline-flex items-center space-x-2 bg-white/20 rounded-full px-3 py-1">
               <span className="text-xs font-medium">👥 Team:</span>
-              <span className="text-xs font-bold">{teamMembers.length} members</span>
+              <span className="text-xs font-bold">
+                {teamMembers.map(member => member.name).join(', ')}
+              </span>
               <span className="text-xs opacity-75">
-                ({teamMembers.filter(m => m.isCurrentUser).length > 0 ? 'You' : 'Guest'})
+                ({teamMembers.length} member{teamMembers.length !== 1 ? 's' : ''})
               </span>
             </div>
           </div>

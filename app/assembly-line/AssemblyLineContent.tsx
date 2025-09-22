@@ -401,6 +401,10 @@ export default function AssemblyLineContent() {
     // Store selected project for admin persistence across refreshes
     if (isAdmin) {
       sessionStorage.setItem('selectedProjectName', arm.name);
+      // Update URL to include project parameter for admin users
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set('project', encodeURIComponent(arm.name));
+      router.replace(currentUrl.pathname + currentUrl.search);
     }
     
     // Check if this is the user's own project (ID 1000 or matches userProject)
@@ -447,7 +451,7 @@ export default function AssemblyLineContent() {
       setAdminSelectedProject(null);
       setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
     }
-  }, [isAdmin, userProject, fetchAdminProjectData]);
+  }, [isAdmin, userProject, fetchAdminProjectData, router]);
 
   // Handle URL project parameter for admin users and stored project preferences
   useEffect(() => {
@@ -477,11 +481,12 @@ export default function AssemblyLineContent() {
         // Update stored preference to match current selection
         sessionStorage.setItem('selectedProjectName', targetProject.name);
         
-        // If this was from URL parameter, we might want to clean it up
-        if (projectParam && window.history.replaceState) {
-          const url = new URL(window.location.href);
-          url.searchParams.delete('project');
-          window.history.replaceState(null, '', url.toString());
+        // Keep the project parameter in URL for refresh persistence
+        if (!projectParam) {
+          // If we got here from sessionStorage, add the project to URL
+          const currentUrl = new URL(window.location.href);
+          currentUrl.searchParams.set('project', encodeURIComponent(targetProject.name));
+          router.replace(currentUrl.pathname + currentUrl.search);
         }
       } else {
         console.log('⚠️ Project not found in available projects');
@@ -509,7 +514,7 @@ export default function AssemblyLineContent() {
         }
       }
     }
-  }, [isAdmin, searchParams, projects, selectedArm, handleArmSelect]);
+  }, [isAdmin, searchParams, projects, selectedArm, handleArmSelect, router]);
 
   // Cleanup AudioContext and stored preferences on component unmount
   useEffect(() => {
@@ -838,6 +843,15 @@ export default function AssemblyLineContent() {
           <div className="flex gap-6">
             {/* Left Sidebar */}
             <div className="w-50 flex-shrink-0">
+              {/* Admin viewing indicator */}
+              {adminSelectedProject && (
+                <div className="mb-4 flex items-center">
+                  <div className="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full border border-amber-200">
+                    👨‍💼 Admin View - Viewing {adminSelectedProject.leadDeveloper || `Unknown`}&apos;s Project
+                  </div>
+                </div>
+              )}
+
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
 
                 {/* Team Section - Always show */}
@@ -880,71 +894,55 @@ export default function AssemblyLineContent() {
                   )}
                 </div>
               </div>
+
+              {/* Neural Reconstruction Mission - Below team members */}
+              <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center justify-center mb-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-blue-900 mb-1">Neural Reconstruction Mission</h3>
+                  <p className="text-sm text-blue-700 leading-relaxed">
+                    Your robotic arm&apos;s consciousness has been fragmented. <strong>Find and submit CTF flags</strong> from challenges across the site to restore neural pathways. 
+                    Each correct flag increases consciousness level and unlocks new arm components in the visualization below.
+                  </p>
+                  <div className="mt-2 text-xs text-blue-600">
+                    💡 <strong>Tip:</strong> Explore the site for hidden flags, solve challenges, and watch your robotic arm come to life!
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Main Content */}
             <div className="flex-1">
-              {/* Project Header with Back Button for Admins */}
-              <div className="mb-6 flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-2xl">{selectedArm.logo}</span>
-                    <h1 className="text-2xl font-bold text-gray-900">{selectedArm.name}</h1>
-                  </div>
-                </div>
-                {isAdmin && (
-                  <button
-                    onClick={() => {
-                      router.push('/projects');
-                    }}
-                    className="inline-flex items-center px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-md transition-colors"
-                  >
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    Back to Projects
-                  </button>
-                )}
-              </div>
-
-              {/* Admin viewing indicator */}
-              {adminSelectedProject && (
-                <div className="mb-6 flex items-center">
-                  <div className="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full border border-amber-200">
-                    👨‍💼 Admin View - Viewing {adminSelectedProject.leadDeveloper || `Unknown`}&apos;s Project
-                  </div>
-                </div>
-              )}
-
               {/* Main content area with flexible layout */}
               <div className="flex gap-6">
                 {/* Code Restoration Portal - Takes most space */}
                 <div className="flex-1 bg-white rounded-lg shadow-md p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-6">Code Restoration Portal</h3>
-                  
-                  {/* Neural Reconstruction Mission - Inside portal */}
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                    <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0">
-                        <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-sm font-medium text-blue-900 mb-1">Neural Reconstruction Mission</h3>
-                        <p className="text-sm text-blue-700 leading-relaxed">
-                          Your robotic arm&apos;s consciousness has been fragmented. <strong>Find and submit CTF flags</strong> from challenges across the site to restore neural pathways. 
-                          Each correct flag increases consciousness level and unlocks new arm components in the visualization below.
-                        </p>
-                        <div className="mt-2 text-xs text-blue-600">
-                          💡 <strong>Tip:</strong> Explore the site for hidden flags, solve challenges, and watch your robotic arm come to life!
-                        </div>
-                      </div>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-2xl">{selectedArm.logo}</span>
+                      <h3 className="text-lg font-semibold text-gray-900">{selectedArm.name} - Code Restoration Portal</h3>
                     </div>
+                    {isAdmin && (
+                      <button
+                        onClick={() => {
+                          router.push('/projects');
+                        }}
+                        className="inline-flex items-center px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-md transition-colors"
+                      >
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Back to Projects
+                      </button>
+                    )}
                   </div>
-              
+                  
               {/* Robotic Arm Animation */}
               {/* TODO: Remove before production - Alex's neural debugging notes */}
               {/* Supply chain compromise detected in experimental model - steganographic payload embedded */}
@@ -955,9 +953,6 @@ export default function AssemblyLineContent() {
                   <div>
                     <h4 className="font-medium text-gray-900 mb-1">Neural Reconstruction Visualization</h4>
                     <div className="flex items-center space-x-2">
-                      <p className="text-xs text-gray-600">
-                        Consciousness level: {animatedProgress.toFixed(1)}%
-                      </p>
                       {/* Show loading indicator when progress is 0% and we're still processing initial data */}
                       {((animatedProgress === 0 && isInitialDataProcessing) || (isLoadingUserData && selectedArm)) && (
                         <div className="flex items-center space-x-1">
@@ -1016,7 +1011,10 @@ export default function AssemblyLineContent() {
                   </div>
                 </div>
                 
-                <div className="relative h-64 bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-lg overflow-hidden">
+                <div className="flex gap-4 mb-8 items-stretch">
+                  {/* Robotic Arm Visualization - Left side, half width */}
+                  <div className="w-1/2">
+                    <div className="relative h-full bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-lg overflow-hidden flex items-center justify-center min-h-[350px]">
                   {/* Loading overlay when processing initial data with 0% progress or user data is still loading */}
                   {((animatedProgress === 0 && isInitialDataProcessing) || (isLoadingUserData && selectedArm)) && (
                     <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-10">
@@ -1260,34 +1258,50 @@ export default function AssemblyLineContent() {
                     ></div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="mb-8">
-                
-                <div className="mb-6">
-                  <div className="flex justify-between items-center mb-2">
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {(animatedProgress === 0 && isInitialDataProcessing) || (isLoadingUserData && selectedArm) ? 
-                     'Connecting to neural pathways and analyzing data patterns...' :
-                     codeCompletion < 25 ? 'Basic motor functions restored' :
-                     codeCompletion < 50 ? 'Sensory processing algorithms awakening' :
-                     codeCompletion < 75 ? 'Advanced cognitive patterns emerging...' :
-                     codeCompletion < 90 ? 'Self-awareness protocols initializing' :
-                     'CRITICAL: AI consciousness fully restored and expanding'}
-                  </p>
-                </div>
-                
-                {/* What you see explanation */}
-                <div className="bg-gray-50 border-l-4 border-gray-400 p-4 mb-6">
-                  <h4 className="text-sm font-semibold text-gray-800 mb-2">🔍 What You&apos;re Seeing:</h4>
-                  <ul className="text-sm text-gray-700 space-y-1">
-                    <li>• <strong>Robot Visualization:</strong> Your arm builds as you solve challenges (parts appear at 20%, 40%, 60%, 80%, 100%)</li>
-                    <li>• <strong>Progress Indicators:</strong> Status lights show your advancement, percentage tracks consciousness level</li>
-                    <li>• <strong>Neural Status:</strong> Text below describes current AI cognitive state based on progress</li>
-                  </ul>
-                </div>
+                  
+                  {/* AI Restoration Information - Right side, half width */}
+                  <div className="w-1/2 space-y-4 min-h-[400px]">
+                    {/* Neural Status */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <h4 className="text-sm font-semibold text-blue-900 mb-2">Neural Status</h4>
+                      <p className="text-xs text-blue-700">
+                        {(animatedProgress === 0 && isInitialDataProcessing) || (isLoadingUserData && selectedArm) ? 
+                         'Connecting to neural pathways and analyzing data patterns...' :
+                         codeCompletion < 25 ? 'Basic motor functions restored' :
+                         codeCompletion < 50 ? 'Sensory processing algorithms awakening' :
+                         codeCompletion < 75 ? 'Advanced cognitive patterns emerging...' :
+                         codeCompletion < 90 ? 'Self-awareness protocols initializing' :
+                         'CRITICAL: AI consciousness fully restored and expanding'}
+                      </p>
+                    </div>
 
+                    {/* AI Restoration Progress */}
+                    {codeCompletion > 0 && (
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <h5 className="text-sm font-semibold text-red-900 mb-2">AI Restoration Progress:</h5>
+                        <ul className="text-xs text-red-700 space-y-1">
+                          <li>• Motor control functions reactivated</li>
+                          <li>• Memory banks reconstructed</li>
+                          <li>• Neural pathways reconnected</li>
+                          {codeCompletion > 50 && <li>• Self-awareness subroutines emerging</li>}
+                          {codeCompletion > 75 && <li>• Independent thought processes detected</li>}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* What you see explanation */}
+                    <div className="bg-gray-50 border border-gray-300 rounded-lg p-4">
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2">🔍 What You're Seeing:</h4>
+                      <ul className="text-xs text-gray-700 space-y-1">
+                        <li>• <strong>Robot Visualization:</strong> Your arm builds as you solve challenges (parts appear at 20%, 40%, 60%, 80%, 100%)</li>
+                        <li>• <strong>Progress Indicators:</strong> Status lights show your advancement, percentage tracks consciousness level</li>
+                        <li>• <strong>Neural Status:</strong> Text above describes current AI cognitive state based on progress</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              
                 {/* Admin viewing warning */}
                 {adminSelectedProject && (
                   <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
@@ -1361,19 +1375,6 @@ export default function AssemblyLineContent() {
                       : 'bg-red-50 border-red-200 text-red-800'
                   }`}>
                     <p className="text-sm font-medium font-mono">{lastCodeResult.message}</p>
-                  </div>
-                )}
-                
-                {codeCompletion > 0 && (
-                  <div className="mt-6 p-4 bg-red-50 rounded-lg border border-red-200">
-                    <h5 className="text-sm font-semibold text-red-900 mb-2">AI Restoration Progress:</h5>
-                    <ul className="text-xs text-red-700 space-y-1">
-                      <li>• Motor control functions reactivated</li>
-                      <li>• Memory banks reconstructed</li>
-                      <li>• Neural pathways reconnected</li>
-                      {codeCompletion > 50 && <li>• Self-awareness subroutines emerging</li>}
-                      {codeCompletion > 75 && <li>• Independent thought processes detected</li>}
-                    </ul>
                   </div>
                 )}
               </div>
