@@ -717,13 +717,13 @@ export default function AssemblyLineContent() {
         
         @keyframes gripperRotate {
           0% {
-            transform: translateX(-50%) rotate(-45deg);
+            transform: translateX(10%) rotate(-25deg);
           }
           50% {
-            transform: translateX(-50%) rotate(45deg);
+            transform: translateX(10%) rotate(25deg);
           }
           100% {
-            transform: translateX(-50%) rotate(-45deg);
+            transform: translateX(10%) rotate(-25deg);
           }
         }
         
@@ -1227,7 +1227,7 @@ export default function AssemblyLineContent() {
                   {/* Lower Arm Segment - Appears at 20% with slide-up animation */}
                   {animatedProgress > 20 && (
                     <div 
-                      className={`absolute bottom-20 left-1/2 w-6 h-20 transform -translate-x-1/2 rounded-t-lg transition-all duration-700 shadow-lg ${
+                      className={`absolute bottom-12 left-1/2 w-6 h-16 transform -translate-x-1/2 rounded-t-lg transition-all duration-700 shadow-lg ${
                         armStatus === 'restoring' 
                           ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-cyan-500/50' 
                           : codeCompletion >= 100 
@@ -1235,14 +1235,14 @@ export default function AssemblyLineContent() {
                           : 'bg-gradient-to-t from-slate-500 to-slate-400'
                       }`}
                       style={{
-                        transform: `translateX(-20%) ${
+                        transform: `translateX(-15%) ${
                           armStatus === 'restoring' ? 'rotate(2deg)' : 'rotate(0deg)'
                         }`,
                         animation: animatedProgress > 20 && animatedProgress <= 25 ? 'slideUp 1s ease-out' : undefined
                       }}
                     >
                       {/* Joint Connection */}
-                      <div className={`absolute -top-2 left-1/2 transform -translate-x-1/2 w-8 h-5 rounded-full border-2 ${
+                      <div className={`absolute -top-2 left-1/2 transform -translate-x-1/2 w-8 h-4 rounded-full border-2 ${
                         animatedProgress >= 100 ? 'bg-green-600 border-green-400' : 
                         armStatus === 'restoring' ? 'bg-cyan-600 border-cyan-400' : 'bg-slate-600 border-slate-400'
                       }`}></div>
@@ -1255,7 +1255,7 @@ export default function AssemblyLineContent() {
                   {/* Middle Arm Segment - Appears at 40% with articulated movement */}
                   {animatedProgress > 40 && (
                     <div 
-                      className={`absolute left-1/2 w-5 h-18 transform -translate-x-1/2 rounded-lg transition-all duration-700 shadow-lg ${
+                      className={`absolute left-1/2 w-5 h-14 transform -translate-x-1/2 rounded-lg transition-all duration-700 shadow-lg ${
                         armStatus === 'restoring' 
                           ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-cyan-500/50'
                           : codeCompletion >= 100 
@@ -1263,8 +1263,8 @@ export default function AssemblyLineContent() {
                           : 'bg-gradient-to-t from-slate-500 to-slate-400'
                       }`} 
                       style={{
-                        bottom: '150px', // Better spacing from lower arm
-                        transform: `translateX(-25%) ${
+                        bottom: '110px',
+                        transform: `translateX(-15%) ${
                           armStatus === 'restoring' ? 'rotate(-3deg)' : 'rotate(0deg)'
                         }`,
                         animation: animatedProgress > 40 && animatedProgress <= 45 ? 'slideUp 1s ease-out 0.3s both' : undefined
@@ -1281,7 +1281,7 @@ export default function AssemblyLineContent() {
                   {/* Upper Arm Segment - Appears at 60% */}
                   {animatedProgress > 60 && (
                     <div 
-                      className={`absolute left-1/2 w-4 h-14 transform -translate-x-1/2 rounded-lg transition-all duration-700 shadow-lg ${
+                      className={`absolute left-1/2 w-4 h-12 transform -translate-x-1/2 rounded-lg transition-all duration-700 shadow-lg ${
                         armStatus === 'restoring' 
                           ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-cyan-500/50'
                           : codeCompletion >= 100 
@@ -1289,8 +1289,8 @@ export default function AssemblyLineContent() {
                           : 'bg-gradient-to-t from-slate-500 to-slate-400'
                       }`} 
                       style={{
-                        bottom: '220px', // Better spacing from middle arm
-                        transform: `translateX(-30%) ${
+                        bottom: '170px',
+                        transform: `translateX(-15%) ${
                           armStatus === 'restoring' ? 'rotate(1deg)' : 'rotate(0deg)'
                         }`,
                         animation: animatedProgress > 60 && animatedProgress <= 65 ? 'slideUp 1s ease-out 0.6s both' : undefined
@@ -1315,8 +1315,8 @@ export default function AssemblyLineContent() {
                           : 'bg-gradient-to-br from-slate-400 to-slate-600 border-slate-300'
                       }`} 
                       style={{
-                        bottom: '280px', // Better spacing from upper arm
-                        transform: `translateX(-15%) ${
+                        bottom: '220px', 
+                        transform: `translateX(10%) ${
                           armStatus === 'restoring' ? 'rotate(180deg)' : 'rotate(0deg)'
                         }`,
                         animation: armStatus === 'restoring' 
@@ -1337,14 +1337,15 @@ export default function AssemblyLineContent() {
                     <div 
                       className="absolute left-1/2 transform -translate-x-1/2 transition-all duration-700" 
                       style={{
-                        bottom: '330px', // Better spacing above wrist joint
+                        bottom: '240px', // Position above the wrist joint
+                        transform: 'translateX(10%)', // Match wrist joint position
                         animation: armStatus === 'restoring' 
                           ? 'gripperRotate 2s ease-in-out infinite' 
                           : undefined
                       }}
                     >
                       {/* Wrist-to-Gripper Connecting Sleeve - makes it look like a real robot arm */}
-                      <div className={`absolute left-1/2 transform -translate-x-1/2 w-4 h-5 rounded-lg mb-1 transition-all duration-300 ${
+                      <div className={`absolute left-1/2 transform -translate-x-1/2 w-4 h-8 rounded-lg mb-1 transition-all duration-300 ${
                         armStatus === 'restoring' 
                           ? 'bg-gradient-to-t from-slate-600 to-cyan-500 shadow-md shadow-cyan-500/30'
                           : 'bg-gradient-to-t from-slate-600 to-green-500 shadow-md shadow-green-500/30'
@@ -1356,7 +1357,7 @@ export default function AssemblyLineContent() {
                       </div>
                       
                       {/* Gripper Claws - positioned above body to point upward like real robot arm */}
-                      <div className="absolute left-1/2 transform -translate-x-1/2 flex space-x-1.5 mb-1" style={{ top: '18px' }}>
+                      <div className="absolute left-1/2 transform -translate-x-1/2 flex space-x-1.5 mb-1" style={{ top: '25px' }}>
                         <div 
                           className={`w-2.5 h-5 rounded-t-lg transition-all duration-500 ${
                             armStatus === 'restoring' 
@@ -1384,7 +1385,7 @@ export default function AssemblyLineContent() {
                         armStatus === 'restoring' 
                           ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-lg shadow-cyan-500/50'
                           : 'bg-gradient-to-t from-green-500 to-emerald-500 shadow-lg shadow-green-500/50'
-                      }`} style={{ top: '35px' }}>
+                      }`} style={{ top: '42px' }}>
                         <div className="absolute left-1/2 transform -translate-x-1/2 w-2.5 h-1.5 bg-white/20 rounded-full mb-0.5" style={{ bottom: '2px' }}></div>
                       </div>
                     </div>
