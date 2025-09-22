@@ -12,6 +12,7 @@ export default function Navigation() {
   const [showDebugModal, setShowDebugModal] = useState(false);
   const [konamiUnlocked, setKonamiUnlocked] = useState(false);
   const [, setKeySequence] = useState<string[]>([]);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { isAuthenticated, logout, user } = useAuth();
   const { stats, project } = useUserData();
   
@@ -60,17 +61,36 @@ export default function Navigation() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
+  // Scroll detection for sticky navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      setIsScrolled(scrollTop > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-lg border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
+    <nav className={`
+      fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
+      ${isScrolled 
+        ? 'bg-white/85 dark:bg-gray-900/85 backdrop-blur-xl shadow-2xl shadow-gray-900/5 dark:shadow-black/20 border-b border-gray-200/30 dark:border-gray-700/30' 
+        : 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg shadow-lg shadow-gray-900/5 dark:shadow-black/10 border-b border-gray-200/50 dark:border-gray-700/50'
+      }
+    `}>
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className={`flex justify-between items-center transition-all duration-500 ${isScrolled ? 'h-14' : 'h-16'}`}>
           {/* Left side - Logo and Navigation */}
           <div className="flex items-center">
             {/* Logo */}
             <div className="flex-shrink-0">
               <Link href="/" className="flex items-center group">
-                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 transition-all duration-300 group-hover:bg-blue-700 group-hover:shadow-lg group-hover:scale-105">
-                  <svg className="w-6 h-6 text-white transition-transform duration-300 group-hover:rotate-12" fill="currentColor" viewBox="0 0 24 24">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center mr-3 transition-all duration-300 group-hover:from-blue-700 group-hover:to-blue-800 group-hover:shadow-xl group-hover:shadow-blue-500/25 group-hover:scale-105 relative overflow-hidden">
+                  {/* Subtle shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                  <svg className="w-6 h-6 text-white transition-transform duration-300 group-hover:rotate-12 relative z-10" fill="currentColor" viewBox="0 0 24 24">
                     {/* Robotic arm base */}
                     <rect x="7" y="20" width="10" height="2.5" rx="1.2" />
                     <rect x="8" y="17.5" width="8" height="2.5" rx="0.8" />
@@ -87,31 +107,31 @@ export default function Navigation() {
                     <path d="M17 5 L20.5 5 L15.5 4.5 Z" />
                   </svg>
                 </div>
-                <span className="text-xl font-bold text-gray-900 dark:text-white transition-colors duration-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">RoboTech Industries</span>
+                <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-200 bg-clip-text text-transparent transition-all duration-300 group-hover:from-blue-600 group-hover:to-blue-500 dark:group-hover:from-blue-400 dark:group-hover:to-blue-300">RoboTech Industries</span>
               </Link>
             </div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex ml-10">
-              <div className="flex items-baseline space-x-2">
-                <Link href="/about" className="relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/50 hover:shadow-sm group">
-                  <div className="flex items-center space-x-2">
-                    <span className="relative z-10">About</span>
-                    <span className="text-sm transition-transform duration-300 group-hover:scale-110">ℹ️</span>
+              <div className="flex items-baseline space-x-1">
+                <Link href="/about" className="relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-xl hover:bg-blue-50/70 dark:hover:bg-blue-900/30 hover:shadow-sm group overflow-hidden">
+                  <div className="flex items-center space-x-2 relative z-10">
+                    <span>About</span>
+                    <span className="text-sm transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">ℹ️</span>
                   </div>
-                  <div className="absolute inset-0 bg-blue-600 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 opacity-0 group-hover:opacity-5"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                 </Link>
                 
                 {/* Projects link - always visible */}
                 <Link 
                   href="/projects" 
-                  className="relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/50 hover:shadow-sm group"
+                  className="relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-xl hover:bg-blue-50/70 dark:hover:bg-blue-900/30 hover:shadow-sm group overflow-hidden"
                 >
-                  <div className="flex items-center space-x-2">
-                    <span className="relative z-10">Projects</span>
-                    <span className="text-sm transition-transform duration-300 group-hover:scale-110">🏆</span>
+                  <div className="flex items-center space-x-2 relative z-10">
+                    <span>Projects</span>
+                    <span className="text-sm transition-transform duration-300 group-hover:scale-110 group-hover:bounce">🏆</span>
                   </div>
-                  <div className="absolute inset-0 bg-blue-600 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 opacity-0 group-hover:opacity-5"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                 </Link>
                 
                 {isAuthenticated && (
@@ -120,14 +140,14 @@ export default function Navigation() {
                     {project && (
                       <Link 
                         href="/assembly-line" 
-                        className="relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/50 hover:shadow-sm group"
+                        className="relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-xl hover:bg-blue-50/70 dark:hover:bg-blue-900/30 hover:shadow-sm group overflow-hidden"
                       >
-                        <div className="flex items-center space-x-2">
-                          <span className="relative z-10">AI</span>
-                          <span className="text-sm transition-transform duration-300 group-hover:scale-110">🤖</span>
-                          <span className="relative z-10 text-xs">{calculateAIStatus(project.neuralReconstruction)}</span>
+                        <div className="flex items-center space-x-2 relative z-10">
+                          <span>AI</span>
+                          <span className="text-sm transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">🤖</span>
+                          <span className="text-xs">{calculateAIStatus(project.neuralReconstruction)}</span>
                         </div>
-                        <div className="absolute inset-0 bg-blue-600 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 opacity-0 group-hover:opacity-5"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                       </Link>
                     )}
                   </>
@@ -139,12 +159,14 @@ export default function Navigation() {
           {/* Right side - Theme Toggle, Score and Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
             {/* Theme Toggle */}
-            <ThemeToggle />
+            <div className="p-1 rounded-lg hover:bg-gray-100/70 dark:hover:bg-gray-700/50 transition-all duration-300">
+              <ThemeToggle />
+            </div>
             
             {konamiUnlocked && (
               <button
                 onClick={() => setShowDebugModal(true)}
-                className="bg-yellow-600 hover:bg-yellow-700 hover:shadow-lg text-white px-3 py-2 rounded-md text-xs font-medium transition-all duration-300 animate-pulse hover:scale-105"
+                className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 hover:shadow-lg text-white px-3 py-2 rounded-xl text-xs font-medium transition-all duration-300 animate-pulse hover:scale-105 hover:shadow-yellow-500/25"
                 title="Developer Debug Mode"
               >
                 🐛 Debug
@@ -154,15 +176,15 @@ export default function Navigation() {
               <>
                 {/* Points display - only if user has a project */}
                 {project && (
-                  <div className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 px-3 py-2">
+                  <div className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 bg-gray-100/70 dark:bg-gray-700/50 px-3 py-2 rounded-xl border border-gray-200/50 dark:border-gray-600/50 backdrop-blur-sm transition-all duration-300 hover:shadow-md">
                     <span className="text-sm">🏆</span>
-                    <span className="font-medium">{stats?.total_points || 0}</span>
+                    <span className="font-semibold">{stats?.total_points || 0}</span>
                     <span className="text-xs text-gray-500 dark:text-gray-400">pts</span>
                   </div>
                 )}
                 <button
                   onClick={logout}
-                  className="bg-red-600 hover:bg-red-700 hover:shadow-lg text-white px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
+                  className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 hover:shadow-lg text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95 hover:shadow-red-500/25"
                 >
                   Logout
                 </button>
@@ -170,7 +192,7 @@ export default function Navigation() {
             ) : (
               <Link
                 href="/login"
-                className="bg-blue-600 hover:bg-blue-700 hover:shadow-lg text-white px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 hover:scale-105 active:scale-95"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 hover:shadow-lg text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-blue-500/25"
               >
                 Login
               </Link>
@@ -181,7 +203,7 @@ export default function Navigation() {
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none focus:text-blue-600 dark:focus:text-blue-400 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-all duration-300 hover:shadow-sm"
+              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none focus:text-blue-600 dark:focus:text-blue-400 p-2 rounded-xl hover:bg-blue-50/70 dark:hover:bg-blue-900/30 transition-all duration-300 hover:shadow-sm"
             >
               <svg className="h-6 w-6 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {isMenuOpen ? (
@@ -198,8 +220,8 @@ export default function Navigation() {
       {/* Mobile Navigation */}
       {isMenuOpen && (
         <div className="md:hidden animate-in slide-in-from-top-5 duration-300">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg transition-colors duration-300">
-            <Link href="/about" onClick={() => setIsMenuOpen(false)} className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50 block px-3 py-2 text-base font-medium rounded-lg transition-all duration-200">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white/95 dark:bg-gray-900/95 border-t border-gray-200/50 dark:border-gray-700/50 shadow-xl backdrop-blur-lg transition-colors duration-300">
+            <Link href="/about" onClick={() => setIsMenuOpen(false)} className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/70 dark:hover:bg-blue-900/30 block px-3 py-2 text-base font-medium rounded-xl transition-all duration-200">
               <div className="flex items-center space-x-2">
                 <span className="text-sm">ℹ️</span>
                 <span>About</span>
@@ -210,7 +232,7 @@ export default function Navigation() {
             <Link 
               href="/projects" 
               onClick={() => setIsMenuOpen(false)}
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50 block px-3 py-2 text-base font-medium rounded-lg transition-all duration-200"
+              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/70 dark:hover:bg-blue-900/30 block px-3 py-2 text-base font-medium rounded-xl transition-all duration-200"
             >
               <div className="flex items-center space-x-2">
                 <span className="text-sm">🏆</span>
@@ -219,7 +241,7 @@ export default function Navigation() {
             </Link>
             
             {/* Theme Toggle for Mobile */}
-            <div className="flex items-center justify-between px-3 py-2">
+            <div className="flex items-center justify-between px-3 py-2 mx-3 my-2 bg-gray-100/70 dark:bg-gray-700/50 rounded-xl border border-gray-200/50 dark:border-gray-600/50">
               <span className="text-gray-700 dark:text-gray-300 text-base font-medium">Theme</span>
               <ThemeToggle />
             </div>
@@ -228,9 +250,9 @@ export default function Navigation() {
               <div className="space-y-2 mx-3 my-2">
                 {/* Points Indicator - only if user has a project */}
                 {project && (
-                  <div className="flex items-center justify-center text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-600">
+                  <div className="flex items-center justify-center text-gray-600 dark:text-gray-400 bg-gray-100/70 dark:bg-gray-700/50 px-3 py-2 rounded-xl border border-gray-200/50 dark:border-gray-600/50 backdrop-blur-sm">
                     <span className="text-sm mr-2">🏆</span>
-                    <span className="font-medium">{stats?.total_points || 0}</span>
+                    <span className="font-semibold">{stats?.total_points || 0}</span>
                     <span className="text-sm ml-1 text-gray-500 dark:text-gray-400">points</span>
                   </div>
                 )}
@@ -239,7 +261,7 @@ export default function Navigation() {
                   <Link 
                     href="/assembly-line" 
                     onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center justify-center text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-600 transition-all duration-300 group"
+                    className="flex items-center justify-center text-gray-600 dark:text-gray-400 bg-gray-100/70 dark:bg-gray-700/50 hover:bg-gray-200/70 dark:hover:bg-gray-600/50 px-3 py-2 rounded-xl border border-gray-200/50 dark:border-gray-600/50 transition-all duration-300 group backdrop-blur-sm"
                   >
                     <span className="text-sm mr-2 transition-transform duration-300 group-hover:scale-110">🤖</span>
                     <span className="text-xs font-medium transition-colors duration-300 group-hover:text-gray-800 dark:group-hover:text-gray-200">{calculateAIStatus(project.neuralReconstruction)}</span>
@@ -250,12 +272,12 @@ export default function Navigation() {
             {isAuthenticated ? (
               <button
                 onClick={logout}
-                className="bg-red-600 hover:bg-red-700 text-white block px-3 py-2 text-base font-medium rounded-md w-full text-left cursor-pointer transition-all duration-300 hover:shadow-md"
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white block px-3 py-2 text-base font-medium rounded-xl w-full text-left cursor-pointer transition-all duration-300 hover:shadow-md mx-3 my-2"
               >
                 Logout
               </button>
             ) : (
-              <Link href="/login" onClick={() => setIsMenuOpen(false)} className="bg-blue-600 hover:bg-blue-700 text-white block px-3 py-2 text-base font-medium rounded-md transition-all duration-300 hover:shadow-md">
+              <Link href="/login" onClick={() => setIsMenuOpen(false)} className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white block px-3 py-2 text-base font-medium rounded-xl transition-all duration-300 hover:shadow-md mx-3 my-2">
                 Login
               </Link>
             )}

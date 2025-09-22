@@ -845,9 +845,11 @@ export default function AssemblyLineContent() {
           </div>
         ) : (
           /* Robotic Arm Restoration with Sidebar Layout */
-          <div className="flex gap-6">
+          <div className="flex flex-col lg:flex-row gap-6">
             {/* Left Sidebar */}
-            <div className="w-60 flex-shrink-0">
+            <div className="w-full lg:w-60 lg:flex-shrink-0 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto transition-all duration-300 hover:shadow-lg scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500 group">
+              {/* Sticky indicator - subtle visual hint */}
+              <div className="hidden lg:block absolute -left-1 top-4 w-1 h-8 bg-gradient-to-b from-blue-500/0 via-blue-500/60 to-blue-500/0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               {/* Admin viewing indicator */}
               {adminSelectedProject && (
                 <div className="mb-4 flex items-center">
@@ -857,7 +859,11 @@ export default function AssemblyLineContent() {
                 </div>
               )}
 
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+              {/* Sticky content wrapper */}
+              <div className="space-y-4 relative">
+                {/* Subtle glow effect for sticky state */}
+                <div className="hidden lg:block absolute -inset-2 bg-gradient-to-r from-blue-500/5 via-transparent to-blue-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-4 lg:p-6 space-y-4 transition-all duration-300 hover:shadow-xl hover:border-gray-300/60 dark:hover:border-gray-600/60 relative z-10">
 
                 {/* Team Section - Always show */}
                 <div>
@@ -1032,17 +1038,17 @@ export default function AssemblyLineContent() {
               </div>
 
               {/* Neural Reconstruction Mission - Below team members */}
-              <div className="mt-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100/70 dark:from-blue-900/40 dark:to-blue-800/30 border border-blue-200/70 dark:border-blue-700/50 rounded-xl p-4 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:border-blue-300/80 dark:hover:border-blue-600/60">
                 <div className="flex items-center justify-center mb-3">
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-blue-500/25">
                     <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-blue-900 mb-1">Neural Reconstruction Mission</h3>
-                  <p className="text-sm text-blue-700 leading-relaxed">
+                  <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">Neural Reconstruction Mission</h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed">
                     Your robotic arm&apos;s consciousness has been fragmented. <strong>Find and submit CTF flags</strong> from challenges across the site to restore neural pathways. 
                     Each correct flag increases consciousness level and unlocks new arm components in the visualization below.
                   </p>
@@ -1051,12 +1057,13 @@ export default function AssemblyLineContent() {
                   </div>
                 </div>
               </div>
+              </div>
             </div>
 
             {/* Main Content */}
-            <div className="flex-1">
+            <div className="flex-1 w-full lg:w-auto">
               {/* Main content area with flexible layout */}
-              <div className="flex gap-2">
+              <div className="flex flex-col lg:flex-row gap-2">
                 {/* Code Restoration Portal - Takes most space */}
                 <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
                   <div className="flex items-center justify-between mb-4">

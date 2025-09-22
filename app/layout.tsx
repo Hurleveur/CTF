@@ -39,7 +39,7 @@ export default function RootLayout({
             <ProjectProvider>
               <NotificationsProvider>
                 <Navigation />
-                <main className="min-h-screen">
+                <main className="min-h-screen pt-16">{/* Add padding-top for fixed navbar */}
                   {children}
                 </main>
                 <FabrileChatbot />
