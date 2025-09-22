@@ -47,7 +47,8 @@ describe('Security Headers Middleware', () => {
       const response = await middleware(request);
       const csp = response.headers.get('Content-Security-Policy');
 
-      expect(csp).toContain("default-src 'self' data:");
+      expect(csp).toContain("default-src 'self'");
+      expect(csp).toContain("img-src 'self' data:");
     });
 
     it('should allow Supabase connections', async () => {
@@ -64,7 +65,8 @@ describe('Security Headers Middleware', () => {
       const response = await middleware(request);
       const csp = response.headers.get('Content-Security-Policy');
 
-      expect(csp).toContain("script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'");
+      expect(csp).toContain("script-src 'self' 'unsafe-inline'");
+      expect(csp).toContain("https://embed.fabrile.app");
     });
 
     it('should include style-src with unsafe-inline for CSS-in-JS', async () => {

@@ -26,6 +26,7 @@ export const signupSchema = z.object({
     .regex(/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores, and hyphens')
     .optional(),
   createDefaultProject: z.boolean().optional().default(true), // Default to true if not specified
+  acceptPrivacyPolicy: z.boolean().optional(), // Privacy policy acceptance (handled separately in UI)
 });
 
 // Password reset request validation schema

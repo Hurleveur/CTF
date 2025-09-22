@@ -92,15 +92,19 @@ export default function AssemblyLineContent() {
     // 3. User hasn't manually deselected
     // 4. Admin isn't viewing another project
     // 5. Admin doesn't have a URL parameter (to avoid conflicts with URL-based selection)
+    // 6. No stored project preference exists (for refresh persistence)
     
     const projectParam = searchParams?.get('project');
     const hasUrlProject = isAdmin && projectParam;
+    const storedProjectName = sessionStorage.getItem('selectedProjectName');
+    const hasStoredProject = isAdmin && storedProjectName;
     
     const canAutoSelect = userProject && 
                          !selectedArm && 
                          !hasManuallyDeselected && 
                          !adminSelectedProject &&
-                         !hasUrlProject; // Don't auto-select if admin has URL project parameter
+                         !hasUrlProject && // Don't auto-select if admin has URL project parameter
+                         !hasStoredProject; // Don't auto-select if admin has stored project preference
     
     if (canAutoSelect) {
       console.log('✅ Auto-selecting user project:', userProject.name, '(Admin:', isAdmin, ')');
@@ -128,8 +132,15 @@ export default function AssemblyLineContent() {
       // Clear admin state when auto-selecting own project
       setAdminSelectedProject(null);
       setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
+      
+      // Store the selection for persistence
+      if (isAdmin) {
+        sessionStorage.setItem('selectedProjectName', userProject.name);
+      }
     } else if (hasUrlProject) {
       console.log('🎯 Admin has URL project parameter, skipping auto-select to allow URL-based selection');
+    } else if (hasStoredProject) {
+      console.log('📂 Admin has stored project preference, skipping auto-select to allow stored selection');
     }
   }, [userProject, hasManuallyDeselected, adminSelectedProject, isAdmin, searchParams, selectedArm, projects, profile, user]);
 
@@ -379,6 +390,11 @@ export default function AssemblyLineContent() {
     setArmStatus('offline');
     setCtfCode('');
     
+    // Store selected project for admin persistence across refreshes
+    if (isAdmin) {
+      sessionStorage.setItem('selectedProjectName', arm.name);
+    }
+    
     // Check if this is the user's own project (ID 1000 or matches userProject)
     const isUserOwnProject = arm.id === 1000 || (userProject && arm.name === userProject.name);
     
@@ -411,31 +427,43 @@ export default function AssemblyLineContent() {
     }
   }, [isAdmin, userProject, fetchAdminProjectData]);
 
-  // Handle URL project parameter for admin users
+  // Handle URL project parameter for admin users and stored project preferences
   useEffect(() => {
     const projectParam = searchParams?.get('project');
+    const storedProjectName = sessionStorage.getItem('selectedProjectName');
     
-    // Only process URL parameter if:
+    // Priority: URL parameter > stored preference > nothing
+    const targetProjectName = projectParam ? decodeURIComponent(projectParam) : storedProjectName;
+    
+    // Only process if:
     // 1. User is admin
-    // 2. A project parameter is provided
+    // 2. A target project is available (URL param or stored)
     // 3. Projects are loaded
     // 4. No project is currently selected
-    if (isAdmin && projectParam && projects.length > 0 && !selectedArm) {
-      console.log('🎯 Admin URL parameter detected - selecting project:', projectParam);
-      console.log('🔍 Decoded parameter:', decodeURIComponent(projectParam));
+    if (isAdmin && targetProjectName && projects.length > 0 && !selectedArm) {
+      console.log('🎯 Admin project selection - target:', targetProjectName);
       console.log('📋 Available projects:', projects.map(p => `"${p.name}"`));
       
-      // Find the project that matches the URL parameter
-      const decodedParam = decodeURIComponent(projectParam);
-      const targetProject = projects.find(p => p.name === decodedParam);
+      // Find the project that matches the target
+      const targetProject = projects.find(p => p.name === targetProjectName);
       
       if (targetProject) {
         console.log('✅ Found matching project for admin:', targetProject.name);
         // Use the existing handleArmSelect function to properly select the project
         handleArmSelect(targetProject);
+        
+        // Update stored preference to match current selection
+        sessionStorage.setItem('selectedProjectName', targetProject.name);
+        
+        // If this was from URL parameter, we might want to clean it up
+        if (projectParam && window.history.replaceState) {
+          const url = new URL(window.location.href);
+          url.searchParams.delete('project');
+          window.history.replaceState(null, '', url.toString());
+        }
       } else {
         console.log('⚠️ Project not found in available projects');
-        console.log('❌ Looking for:', `"${decodedParam}"`);
+        console.log('❌ Looking for:', `"${targetProjectName}"`);
         console.log('📝 Available project names:');
         projects.forEach((p, i) => {
           console.log(`   ${i + 1}. "${p.name}" (length: ${p.name.length})`);
@@ -443,19 +471,25 @@ export default function AssemblyLineContent() {
         
         // Try case-insensitive match as fallback
         const caseInsensitiveMatch = projects.find(p => 
-          p.name.toLowerCase() === decodedParam.toLowerCase()
+          p.name.toLowerCase() === targetProjectName.toLowerCase()
         );
         if (caseInsensitiveMatch) {
           console.log('✅ Found case-insensitive match:', caseInsensitiveMatch.name);
           handleArmSelect(caseInsensitiveMatch);
+          sessionStorage.setItem('selectedProjectName', caseInsensitiveMatch.name);
         } else {
           console.log('❌ No case-insensitive match found either');
+          // Clear invalid stored preference
+          if (storedProjectName) {
+            console.log('🧹 Clearing invalid stored project preference');
+            sessionStorage.removeItem('selectedProjectName');
+          }
         }
       }
     }
   }, [isAdmin, searchParams, projects, selectedArm, handleArmSelect]);
 
-  // Cleanup AudioContext on component unmount
+  // Cleanup AudioContext and stored preferences on component unmount
   useEffect(() => {
     return () => {
       if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
@@ -463,8 +497,13 @@ export default function AssemblyLineContent() {
           console.warn('Error closing AudioContext:', error);
         });
       }
+      
+      // Clear stored project preference if user is not admin (security cleanup)
+      if (!isAdmin) {
+        sessionStorage.removeItem('selectedProjectName');
+      }
     };
-  }, []);
+  }, [isAdmin]);
 
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -823,6 +862,32 @@ export default function AssemblyLineContent() {
 
             {/* Main Content */}
             <div className="flex-1">
+              {/* Project Header with Back Button for Admins */}
+              <div className="mb-6 flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-2xl">{selectedArm.logo}</span>
+                    <h1 className="text-2xl font-bold text-gray-900">{selectedArm.name}</h1>
+                  </div>
+                  {isAdmin && (
+                    <button
+                      onClick={() => {
+                        setSelectedArm(null);
+                        setAdminSelectedProject(null);
+                        setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
+                        sessionStorage.removeItem('selectedProjectName');
+                      }}
+                      className="inline-flex items-center px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-md transition-colors"
+                    >
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                      </svg>
+                      Back to Projects
+                    </button>
+                  )}
+                </div>
+              </div>
+
               {/* Admin viewing indicator */}
               {adminSelectedProject && (
                 <div className="mb-6 flex items-center">
