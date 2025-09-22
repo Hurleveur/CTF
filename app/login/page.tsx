@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
+import { useUserData } from '../contexts/UserDataContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 
 function LoginContent() {
   const { login, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { profile } = useUserData();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
@@ -18,9 +20,12 @@ function LoginContent() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/assembly-line');
+      // Check if user is admin and redirect accordingly
+      const isAdmin = profile?.role === 'admin' || profile?.role === 'dev';
+      const redirectUrl = isAdmin ? '/projects' : '/assembly-line';
+      router.push(redirectUrl);
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, profile?.role, router]);
 
   useEffect(() => {
     const reason = searchParams?.get?.('reason');

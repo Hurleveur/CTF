@@ -54,6 +54,7 @@ export default function AssemblyLineContent() {
   const [showInvitationModal, setShowInvitationModal] = useState(false);
   const [teamSubmissions, setTeamSubmissions] = useState<Record<string, any>>({});
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [isInitialDataProcessing, setIsInitialDataProcessing] = useState(false);
   
   // Audio context for alarm sounds
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -108,6 +109,13 @@ export default function AssemblyLineContent() {
     
     if (canAutoSelect) {
       console.log('✅ Auto-selecting user project:', userProject.name, '(Admin:', isAdmin, ')');
+      
+      // Set initial data processing state if neural reconstruction is 0%
+      if ((userProject.neuralReconstruction || 0) === 0) {
+        setIsInitialDataProcessing(true);
+        // Clear the processing state after a short delay to allow for data sync
+        setTimeout(() => setIsInitialDataProcessing(false), 2000);
+      }
       
       // Find the matching project from the projects list to get team member details
       const matchingProject = projects.find(p => p.name === userProject.name);
@@ -401,6 +409,13 @@ export default function AssemblyLineContent() {
     if (isUserOwnProject && userProject) {
       // User selecting their own project - use userProject data
       console.log('👤 User selecting own project - using userProject data');
+      
+      // Set initial data processing state if neural reconstruction is 0%
+      if ((userProject.neuralReconstruction || 0) === 0) {
+        setIsInitialDataProcessing(true);
+        setTimeout(() => setIsInitialDataProcessing(false), 2000);
+      }
+      
       setCodeCompletion(userProject.neuralReconstruction || 0);
       setAnimatedProgress(userProject.neuralReconstruction || 0);
       setArmStatus(userProject.aiActivated ? 'restoring' : 'offline');
@@ -414,6 +429,13 @@ export default function AssemblyLineContent() {
       
       const adminData = await fetchAdminProjectData(arm.name);
       setAdminProjectData(adminData);
+      
+      // Set initial data processing state if progress is 0%
+      if (adminData.progress === 0) {
+        setIsInitialDataProcessing(true);
+        setTimeout(() => setIsInitialDataProcessing(false), 1500);
+      }
+      
       setCodeCompletion(adminData.progress);
       setAnimatedProgress(adminData.progress);
       
@@ -869,23 +891,20 @@ export default function AssemblyLineContent() {
                     <span className="text-2xl">{selectedArm.logo}</span>
                     <h1 className="text-2xl font-bold text-gray-900">{selectedArm.name}</h1>
                   </div>
-                  {isAdmin && (
-                    <button
-                      onClick={() => {
-                        setSelectedArm(null);
-                        setAdminSelectedProject(null);
-                        setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
-                        sessionStorage.removeItem('selectedProjectName');
-                      }}
-                      className="inline-flex items-center px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-md transition-colors"
-                    >
-                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                      </svg>
-                      Back to Projects
-                    </button>
-                  )}
                 </div>
+                {isAdmin && (
+                  <button
+                    onClick={() => {
+                      router.push('/projects');
+                    }}
+                    className="inline-flex items-center px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-md transition-colors"
+                  >
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Projects
+                  </button>
+                )}
               </div>
 
               {/* Admin viewing indicator */}
@@ -935,7 +954,20 @@ export default function AssemblyLineContent() {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h4 className="font-medium text-gray-900 mb-1">Neural Reconstruction Visualization</h4>
-                    <p className="text-xs text-gray-600">Consciousness level: {animatedProgress.toFixed(1)}%</p>
+                    <div className="flex items-center space-x-2">
+                      <p className="text-xs text-gray-600">
+                        Consciousness level: {animatedProgress.toFixed(1)}%
+                      </p>
+                      {/* Show loading indicator when progress is 0% and we're still processing initial data */}
+                      {((animatedProgress === 0 && isInitialDataProcessing) || (isLoadingUserData && selectedArm)) && (
+                        <div className="flex items-center space-x-1">
+                          <div className="animate-spin rounded-full h-3 w-3 border border-blue-500 border-t-transparent"></div>
+                          <span className="text-xs text-blue-600">
+                            {isLoadingUserData ? 'Loading...' : 'Processing...'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div className="flex space-x-2">
                     <div className="relative group">
@@ -985,6 +1017,21 @@ export default function AssemblyLineContent() {
                 </div>
                 
                 <div className="relative h-64 bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-lg overflow-hidden">
+                  {/* Loading overlay when processing initial data with 0% progress or user data is still loading */}
+                  {((animatedProgress === 0 && isInitialDataProcessing) || (isLoadingUserData && selectedArm)) && (
+                    <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-10">
+                      <div className="text-center text-white">
+                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-cyan-400 border-t-transparent mx-auto mb-3"></div>
+                        <p className="text-sm font-medium">
+                          {isLoadingUserData ? 'Loading Project Data...' : 'Analyzing Neural Data...'}
+                        </p>
+                        <p className="text-xs text-gray-300 mt-1">
+                          {isLoadingUserData ? 'Retrieving from database' : 'Calculating consciousness level'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* Background Grid Pattern */}
                   <div className="absolute inset-0 opacity-20">
                     <div className="grid grid-cols-12 grid-rows-8 h-full gap-1 p-2">
@@ -1221,7 +1268,9 @@ export default function AssemblyLineContent() {
                   <div className="flex justify-between items-center mb-2">
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
-                    {codeCompletion < 25 ? 'Basic motor functions restored' :
+                    {(animatedProgress === 0 && isInitialDataProcessing) || (isLoadingUserData && selectedArm) ? 
+                     'Connecting to neural pathways and analyzing data patterns...' :
+                     codeCompletion < 25 ? 'Basic motor functions restored' :
                      codeCompletion < 50 ? 'Sensory processing algorithms awakening' :
                      codeCompletion < 75 ? 'Advanced cognitive patterns emerging...' :
                      codeCompletion < 90 ? 'Self-awareness protocols initializing' :

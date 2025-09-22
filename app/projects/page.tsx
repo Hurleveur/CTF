@@ -63,7 +63,7 @@ const getLeaveTooltip = (project: RoboticProject, user: User | null): string | u
 };
 
 export default function SolutionsPage() {
-  const { projects, addProject, setProjects, leaveProject } = useProjects();
+  const { projects, addProject, setProjects, leaveProject, invitations, isLoadingInvitations } = useProjects();
   const { isAuthenticated, user } = useAuth();
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [isCreatingProject, setIsCreatingProject] = useState(false);
@@ -385,14 +385,27 @@ export default function SolutionsPage() {
         </div>
       </section>
 
-      {/* Project Invitations - Only show if user is authenticated and not already in a project and not a dev */}
-      {isAuthenticated && !userIsInAnyProject && user?.role !== 'dev' && (
-        <section className="py-8 bg-blue-50 border-b border-blue-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <InvitationNotifications className="" />
-          </div>
-        </section>
-      )}
+      {/* Project Invitations - Only show if user is authenticated, not already in a project, not a dev, not an admin, and has received invitations */}
+      {(() => {
+        // Don't show for unauthenticated users, users already in projects, dev users, or admin users
+        if (!isAuthenticated || userIsInAnyProject || user?.role === 'dev' || isAdmin(user)) {
+          return null;
+        }
+        
+        // Don't show if loading invitations or no received invitations
+        const receivedInvitations = invitations?.filter(invite => invite.type === 'received') || [];
+        if (isLoadingInvitations || receivedInvitations.length === 0) {
+          return null;
+        }
+        
+        return (
+          <section className="py-8 bg-blue-50 border-b border-blue-100">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <InvitationNotifications className="" />
+            </div>
+          </section>
+        );
+      })()}
 
       {/* Team Leaderboards */}
       <section className="py-12 bg-white">
@@ -650,7 +663,7 @@ export default function SolutionsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Restoration Teams</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Restoration Interns</h3>
               <p className="text-gray-600">
                 {isLoadingStats ? (
                   <span className="inline-block animate-pulse">Loading...</span>

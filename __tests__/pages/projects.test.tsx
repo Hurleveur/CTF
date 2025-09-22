@@ -118,7 +118,7 @@ render(<ProjectsPage />);
     render(<ProjectsPage />);
 
     expect(screen.getByText('Consciousness Restoration Metrics')).toBeInTheDocument();
-    expect(screen.getByText('Restoration Teams')).toBeInTheDocument();
+    expect(screen.getByText('Restoration Interns')).toBeInTheDocument();
     expect(screen.getByText('Fragments Found')).toBeInTheDocument();
     expect(screen.getByText('Projects Active')).toBeInTheDocument();
     expect(screen.getByText('Avg Restoration')).toBeInTheDocument();

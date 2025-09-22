@@ -23,6 +23,16 @@ export default function TeamMemberList({
   const [isLeaving, setIsLeaving] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
+  // Robotic parts icons for team members
+  const roboticParts = ['⚙️', '🔧', '🛠️', '🔩', '⚡', '🤖', '💻', '📡', '🔌', '🎛️', '🖥️', '📟'];
+  
+  // Function to get consistent robotic part for a member
+  const getRoboticPart = (memberId: string) => {
+    // Use member ID to ensure consistency
+    const hash = memberId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return roboticParts[hash % roboticParts.length];
+  };
+
   // Check if current user is in this project and can leave
   const currentUserMember = teamMembers?.find(member => member.id === user?.id);
   const hasOtherMembers = (teamMembers?.length || 0) > 1;
@@ -69,8 +79,8 @@ export default function TeamMemberList({
               className="flex items-center space-x-1 bg-gray-100 rounded-full px-2 py-1"
               title={`${member.name}${member.isLead ? ' (Lead)' : ''} - Joined ${new Date(member.joinedAt).toLocaleDateString()}`}
             >
-              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                {member.name.charAt(0).toUpperCase()}
+              <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center text-base">
+                {getRoboticPart(member.id)}
               </div>
               <span className="text-sm font-medium text-gray-900">
                 {member.name}

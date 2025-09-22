@@ -153,10 +153,29 @@ export async function middleware(request: NextRequest) {
 
     // Optional: Redirect authenticated users away from login page
     if (session && pathname === '/login') {
-      console.log(`[Middleware] Redirecting authenticated user from /login to /assembly-line`);
-      const redirectResponse = NextResponse.redirect(new URL('/assembly-line', request.url));
-      applySecurityHeaders(redirectResponse, cspValue);
-      return redirectResponse;
+      try {
+        // Check if user is admin to redirect appropriately
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+        
+        const isAdmin = profile?.role === 'admin' || profile?.role === 'dev';
+        const redirectUrl = isAdmin ? '/projects' : '/assembly-line';
+        
+        console.log(`[Middleware] Redirecting authenticated user from /login to ${redirectUrl} (admin: ${isAdmin})`);
+        const redirectResponse = NextResponse.redirect(new URL(redirectUrl, request.url));
+        applySecurityHeaders(redirectResponse, cspValue);
+        return redirectResponse;
+      } catch (error) {
+        console.error('[Middleware] Error checking user profile for admin redirect:', error);
+        // Fallback to assembly-line if profile check fails
+        console.log(`[Middleware] Redirecting authenticated user from /login to /assembly-line (fallback)`);
+        const redirectResponse = NextResponse.redirect(new URL('/assembly-line', request.url));
+        applySecurityHeaders(redirectResponse, cspValue);
+        return redirectResponse;
+      }
     }
   } catch (error) {
     console.error('[Middleware] Unexpected error:', error);
