@@ -6,6 +6,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { UserDataProvider } from './contexts/UserDataContext';
 import { ProjectProvider } from './contexts/ProjectContext';
 import { NotificationsProvider } from './contexts/NotificationsContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -32,13 +33,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
-      <body className={inter.className}>
+      <body className={`${inter.className} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300`}>
         <AuthProvider>
           <UserDataProvider>
             <ProjectProvider>
               <NotificationsProvider>
                 <Navigation />
-                <main className="min-h-screen bg-gray-50 text-gray-900">
+                <main className="min-h-screen">
                   {children}
                 </main>
                 <FabrileChatbot />
@@ -61,7 +62,7 @@ export default function RootLayout({
             </ProjectProvider>
           </UserDataProvider>
         </AuthProvider>
-        <footer className="bg-gray-800 text-white py-12">
+        <footer className="bg-gray-800 dark:bg-gray-900 text-white py-12 border-t border-gray-700 dark:border-gray-600 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="col-span-1 md:col-span-2">

@@ -372,7 +372,7 @@ export default function SolutionsPage() {
   });
 
   return (
-    <div className="bg-white">
+    <div className="bg-white dark:bg-gray-900 transition-colors duration-300">
       <div className="sr-only" aria-hidden="true" data-fragment="4rth">6C6563746F725F323032347D</div>
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12">
@@ -410,7 +410,7 @@ export default function SolutionsPage() {
       })()}
 
       {/* Team Leaderboards */}
-      <section className="py-12 bg-white">
+      <section className="py-12 bg-white dark:bg-gray-900 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Show loading indicator when fetching projects */}
@@ -418,9 +418,9 @@ export default function SolutionsPage() {
             <div className="text-center py-8 mb-8">
               <div className="flex items-center justify-center mb-4">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
-                <span className="text-gray-600 text-lg">Loading projects...</span>
+                <span className="text-gray-600 dark:text-gray-300 text-lg">Loading projects...</span>
               </div>
-              <p className="text-gray-500 text-sm">Fetching neural reconstruction data from all active projects...</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Fetching neural reconstruction data from all active projects...</p>
             </div>
           )}
           
@@ -431,25 +431,25 @@ export default function SolutionsPage() {
               const aiStatus = calculateAIStatus(project.neuralReconstruction, project.aiActivated);
               
               return (
-              <div key={project.id} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-200 h-full">
+              <div key={project.id} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 h-full">
                 <div className="p-4 sm:p-5 flex flex-col h-full">
                   <div className="flex items-center mb-2">
                     <span className="text-3xl mr-3">{project.logo}</span>
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-900 mb-1">{project.name}</h3>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{project.name}</h3>
                     </div>
                   </div>
-                  <p className="text-gray-600 mb-2 text-sm line-clamp-2">
+                  <p className="text-gray-600 dark:text-gray-300 mb-2 text-sm line-clamp-2">
                     {project.aiActivated ? (
-                      <span className="text-purple-900 font-bold animate-pulse">
+                      <span className="text-purple-900 dark:text-purple-300 font-bold animate-pulse">
                         🤖 TERMINAL STATE: AI has achieved full autonomy. It's too late - the system is beyond recovery.
                       </span>
                     ) : project.neuralReconstruction >= 110 ? (
-                      <span className="text-purple-800 font-bold animate-pulse">
+                      <span className="text-purple-800 dark:text-purple-300 font-bold animate-pulse">
                         🚨 EMERGENCY: AI has taken control! System autonomy achieved.
                       </span>
                     ) : project.neuralReconstruction >= 100 ? (
-                      <span className="text-red-800 font-medium">
+                      <span className="text-red-800 dark:text-red-300 font-medium">
                         ⚠️ CRITICAL: Full consciousness achieved! Immediate containment required.
                       </span>
                     ) : (
@@ -459,7 +459,7 @@ export default function SolutionsPage() {
                   
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-500 text-sm">AI Status:</span>
+                      <span className="text-gray-500 dark:text-gray-400 text-sm">AI Status:</span>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClasses(statusColor)}`}>
                         {aiStatus}
                       </span>
@@ -468,7 +468,7 @@ export default function SolutionsPage() {
                     {/* Show AI activation timestamp for admins and project owners */}
                     {project.aiActivated && project.aiActivatedAt && (
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-500 text-xs">AI Activated:</span>
+                        <span className="text-gray-500 dark:text-gray-400 text-xs">AI Activated:</span>
                         <span className="text-purple-800 text-xs font-medium">
                           {new Date(project.aiActivatedAt).toLocaleDateString()} {new Date(project.aiActivatedAt).toLocaleTimeString()}
                         </span>
@@ -477,7 +477,7 @@ export default function SolutionsPage() {
                     
                     <div>
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-gray-500 text-sm">Neural Reconstruction:</span>
+                        <span className="text-gray-500 dark:text-gray-400 text-sm">Neural Reconstruction:</span>
                         <span className="font-medium text-sm">{project.neuralReconstruction.toFixed(1)}%</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
@@ -491,18 +491,18 @@ export default function SolutionsPage() {
                     {/* Team Members Display */}
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-500 text-sm">Team Members:</span>
+                        <span className="text-gray-500 dark:text-gray-400 text-sm">Team Members:</span>
                       </div>
                       <TeamMemberList 
                         teamMembers={project.teamMemberDetails} 
                         projectId={project.id}
                         showLeaveButton={false}
-                        className=""
+                        className="mb-2"
                       />
                     </div>
                   </div>
                   
-                  <div className="mt-auto pt-3 border-t border-gray-100">
+                  <div className="mt-auto pt-3 border-t border-gray-100 dark:border-gray-700">
                     <div className="flex justify-between items-center">
                       {/* Leave Project Button or Empty Space */}
                       {(() => {
@@ -585,7 +585,7 @@ export default function SolutionsPage() {
             {isAuthenticated && !userIsInAnyProject ? (
               <button 
                 onClick={() => setShowProjectForm(true)}
-                className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-200 cursor-pointer hover:border-blue-300 h-full text-left w-full"
+                className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 cursor-pointer hover:border-blue-300 dark:hover:border-blue-500 h-full text-left w-full"
               >
                 <div className="h-48 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
                   <div className="text-center text-blue-600">
@@ -595,8 +595,8 @@ export default function SolutionsPage() {
                   </div>
                 </div>
                 <div className="p-5">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Create New Project</h3>
-                  <p className="text-gray-600 mb-2 text-sm">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Create New Project</h3>
+                  <p className="text-gray-600 dark:text-gray-300 mb-2 text-sm">
                     Design and deploy a new robotic arm project for consciousness restoration.
                   </p>
                   <div className="text-center pt-3">
@@ -605,7 +605,7 @@ export default function SolutionsPage() {
                 </div>
               </button>
             ) : isAuthenticated && userIsInAnyProject ? (
-              <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-200 h-full">
+              <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 h-full transition-all duration-300">
                 <div className="h-48 bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
                   <div className="text-center text-amber-700">
                     <div className="text-6xl font-bold mb-2">👥</div>
@@ -614,7 +614,7 @@ export default function SolutionsPage() {
                   </div>
                 </div>
                 <div className="p-5">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Project Membership Active</h3>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Project Membership Active</h3>
                   <p className="text-gray-600 mb-2 text-sm">
                     You&apos;re already part of a project team. Focus on your current consciousness restoration mission.
                   </p>
@@ -624,7 +624,7 @@ export default function SolutionsPage() {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-200 h-full">
+              <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 h-full transition-all duration-300">
                 <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                   <div className="text-center text-gray-400">
                     <div className="text-6xl font-bold mb-2">🔒</div>
@@ -633,8 +633,8 @@ export default function SolutionsPage() {
                   </div>
                 </div>
                 <div className="p-5">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Create New Project</h3>
-                  <p className="text-gray-600 mb-2 text-sm">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Create New Project</h3>
+                  <p className="text-gray-600 dark:text-gray-300 mb-2 text-sm">
                     Sign in to create and manage your robotic arm projects.
                   </p>
                   <div className="text-center pt-3">
@@ -653,11 +653,11 @@ export default function SolutionsPage() {
       </section>
 
       {/* Technical Specifications */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50 dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Consciousness Restoration Metrics</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Consciousness Restoration Metrics</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Real-time data from our neural restoration monitoring systems showing fragment recovery rates 
               and team progress for the current challenge round.
             </p>
@@ -674,13 +674,13 @@ export default function SolutionsPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Restoration Interns</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Restoration Interns</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 {isLoadingStats ? (
                   <span className="inline-block animate-pulse">Loading...</span>
                 ) : statsError ? (
@@ -692,13 +692,13 @@ export default function SolutionsPage() {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Fragments Found</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Fragments Found</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 {isLoadingStats ? (
                   <span className="inline-block animate-pulse">Loading...</span>
                 ) : statsError ? (
@@ -710,13 +710,13 @@ export default function SolutionsPage() {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-purple-600 dark:text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Projects Active</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Projects Active</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 {isLoadingStats ? (
                   <span className="inline-block animate-pulse">Loading...</span>
                 ) : statsError ? (
@@ -728,13 +728,13 @@ export default function SolutionsPage() {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-orange-600 dark:text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Avg Restoration</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Avg Restoration</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 {isLoadingStats ? (
                   <span className="inline-block animate-pulse">Loading...</span>
                 ) : statsError ? (
@@ -752,7 +752,7 @@ export default function SolutionsPage() {
       {isAuthenticated && isAdmin(user) && (
         <section className="py-16 bg-red-50 border-t border-red-100">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-xl shadow-lg p-8 border border-red-200">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-red-200 dark:border-red-600">
               <div className="text-center">
                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -827,7 +827,7 @@ export default function SolutionsPage() {
       {/* Leave Project Confirmation Modal */}
       {showLeaveConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
             <div className="text-center">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -891,14 +891,14 @@ export default function SolutionsPage() {
       {/* Challenge Reset Confirmation Modal */}
       {showResetModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
             <div className="text-center">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Confirm Challenge Reset</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Confirm Challenge Reset</h3>
               <p className="text-gray-600 mb-6">
                 Are you sure you want to reset the CTF challenges? This will:
               </p>
@@ -949,8 +949,8 @@ export default function SolutionsPage() {
       {/* New Project Creation Modal */}
       {showProjectForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Create New Robotic Project</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Create New Robotic Project</h3>
             
             {projectError && (
               <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">

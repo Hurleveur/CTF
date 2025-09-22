@@ -91,9 +91,9 @@ export default function InvitationModal({ isOpen, onClose, project }: Invitation
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-gray-900">Invite Team Member</h3>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Invite Team Member</h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -134,7 +134,7 @@ export default function InvitationModal({ isOpen, onClose, project }: Invitation
               <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                 <span className="text-2xl">{project?.logo}</span>
                 <div>
-                  <h4 className="font-semibold text-gray-900">{project?.name}</h4>
+                  <h4 className="font-semibold text-gray-900 dark:text-white">{project?.name}</h4>
                   <p className="text-sm text-gray-600">
                     Team: {currentTeamSize}/3 members
                   </p>
@@ -194,7 +194,7 @@ export default function InvitationModal({ isOpen, onClose, project }: Invitation
         {/* Pending Invitations */}
         {isProjectLead && sentInvitations.length > 0 && (
           <div className="mt-6 pt-6 border-t border-gray-200">
-            <h4 className="text-sm font-semibold text-gray-900 mb-3">
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
               Pending Invitations ({sentInvitations.length})
             </h4>
             <div className="space-y-2">
@@ -204,7 +204,7 @@ export default function InvitationModal({ isOpen, onClose, project }: Invitation
                   className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
                 >
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {invitation.username}
                     </p>
                     <p className="text-xs text-gray-500">

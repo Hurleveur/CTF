@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserData } from '../contexts/UserDataContext';
 import { calculateAIStatus } from '@/lib/project-colors';
+import ThemeToggle from './ThemeToggle';
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -60,7 +61,7 @@ export default function Navigation() {
   }, [handleKeyDown]);
 
   return (
-    <nav className="bg-white shadow-lg border-b border-gray-200">
+    <nav className="bg-white dark:bg-gray-800 shadow-lg border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Left side - Logo and Navigation */}
@@ -86,14 +87,14 @@ export default function Navigation() {
                     <path d="M17 5 L20.5 5 L15.5 4.5 Z" />
                   </svg>
                 </div>
-                <span className="text-xl font-bold text-gray-900 transition-colors duration-300 group-hover:text-blue-600">RoboTech Industries</span>
+                <span className="text-xl font-bold text-gray-900 dark:text-white transition-colors duration-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">RoboTech Industries</span>
               </Link>
             </div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex ml-10">
               <div className="flex items-baseline space-x-2">
-                <Link href="/about" className="relative text-gray-700 hover:text-blue-600 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg hover:bg-blue-50 hover:shadow-sm group">
+                <Link href="/about" className="relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/50 hover:shadow-sm group">
                   <div className="flex items-center space-x-2">
                     <span className="relative z-10">About</span>
                     <span className="text-sm transition-transform duration-300 group-hover:scale-110">ℹ️</span>
@@ -104,7 +105,7 @@ export default function Navigation() {
                 {/* Projects link - always visible */}
                 <Link 
                   href="/projects" 
-                  className="relative text-gray-700 hover:text-blue-600 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg hover:bg-blue-50 hover:shadow-sm group"
+                  className="relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/50 hover:shadow-sm group"
                 >
                   <div className="flex items-center space-x-2">
                     <span className="relative z-10">Projects</span>
@@ -119,7 +120,7 @@ export default function Navigation() {
                     {project && (
                       <Link 
                         href="/assembly-line" 
-                        className="relative text-gray-700 hover:text-blue-600 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg hover:bg-blue-50 hover:shadow-sm group"
+                        className="relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/50 hover:shadow-sm group"
                       >
                         <div className="flex items-center space-x-2">
                           <span className="relative z-10">AI</span>
@@ -135,8 +136,11 @@ export default function Navigation() {
             </div>
           </div>
 
-          {/* Right side - Score and Auth Buttons */}
+          {/* Right side - Theme Toggle, Score and Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+            
             {konamiUnlocked && (
               <button
                 onClick={() => setShowDebugModal(true)}
@@ -150,10 +154,10 @@ export default function Navigation() {
               <>
                 {/* Points display - only if user has a project */}
                 {project && (
-                  <div className="flex items-center space-x-2 text-gray-700 px-3 py-2">
+                  <div className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 px-3 py-2">
                     <span className="text-sm">🏆</span>
                     <span className="font-medium">{stats?.total_points || 0}</span>
-                    <span className="text-xs text-gray-500">pts</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">pts</span>
                   </div>
                 )}
                 <button
@@ -177,7 +181,7 @@ export default function Navigation() {
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 p-2 rounded-lg hover:bg-blue-50 transition-all duration-300 hover:shadow-sm"
+              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none focus:text-blue-600 dark:focus:text-blue-400 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-all duration-300 hover:shadow-sm"
             >
               <svg className="h-6 w-6 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {isMenuOpen ? (
@@ -194,8 +198,8 @@ export default function Navigation() {
       {/* Mobile Navigation */}
       {isMenuOpen && (
         <div className="md:hidden animate-in slide-in-from-top-5 duration-300">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200 shadow-lg">
-            <Link href="/about" onClick={() => setIsMenuOpen(false)} className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 block px-3 py-2 text-base font-medium rounded-lg transition-all duration-200">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg transition-colors duration-300">
+            <Link href="/about" onClick={() => setIsMenuOpen(false)} className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50 block px-3 py-2 text-base font-medium rounded-lg transition-all duration-200">
               <div className="flex items-center space-x-2">
                 <span className="text-sm">ℹ️</span>
                 <span>About</span>
@@ -206,7 +210,7 @@ export default function Navigation() {
             <Link 
               href="/projects" 
               onClick={() => setIsMenuOpen(false)}
-              className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 block px-3 py-2 text-base font-medium rounded-lg transition-all duration-200"
+              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50 block px-3 py-2 text-base font-medium rounded-lg transition-all duration-200"
             >
               <div className="flex items-center space-x-2">
                 <span className="text-sm">🏆</span>
@@ -214,14 +218,20 @@ export default function Navigation() {
               </div>
             </Link>
             
+            {/* Theme Toggle for Mobile */}
+            <div className="flex items-center justify-between px-3 py-2">
+              <span className="text-gray-700 dark:text-gray-300 text-base font-medium">Theme</span>
+              <ThemeToggle />
+            </div>
+            
             {isAuthenticated && (
               <div className="space-y-2 mx-3 my-2">
                 {/* Points Indicator - only if user has a project */}
                 {project && (
-                  <div className="flex items-center justify-center text-gray-600 bg-gray-100 px-3 py-2 rounded-md border">
+                  <div className="flex items-center justify-center text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-600">
                     <span className="text-sm mr-2">🏆</span>
                     <span className="font-medium">{stats?.total_points || 0}</span>
-                    <span className="text-sm ml-1 text-gray-500">points</span>
+                    <span className="text-sm ml-1 text-gray-500 dark:text-gray-400">points</span>
                   </div>
                 )}
                 {/* AI Status Indicator */}
@@ -229,10 +239,10 @@ export default function Navigation() {
                   <Link 
                     href="/assembly-line" 
                     onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center justify-center text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md border transition-all duration-300 group"
+                    className="flex items-center justify-center text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-600 transition-all duration-300 group"
                   >
                     <span className="text-sm mr-2 transition-transform duration-300 group-hover:scale-110">🤖</span>
-                    <span className="text-xs font-medium transition-colors duration-300 group-hover:text-gray-800">{calculateAIStatus(project.neuralReconstruction)}</span>
+                    <span className="text-xs font-medium transition-colors duration-300 group-hover:text-gray-800 dark:group-hover:text-gray-200">{calculateAIStatus(project.neuralReconstruction)}</span>
                   </Link>
                 )}
               </div>
@@ -256,7 +266,7 @@ export default function Navigation() {
       {/* Debug Modal */}
       {showDebugModal && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 text-green-400 rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-auto font-mono">
+          <div className="bg-gray-900 dark:bg-black text-green-400 rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-auto font-mono border border-green-500">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-green-300">🐛 Developer Debug Console</h2>

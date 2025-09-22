@@ -153,6 +153,17 @@ export default function TeamPage() {
     setTimeout(() => setShowEasterEgg(false), 5000);
   };
 
+  // Function to clean project names by removing status indicators
+  const cleanProjectName = (projectName: string) => {
+    // Remove patterns like "- X.X%" or "(Basic Motor Functions)" or similar status indicators
+    return projectName
+      .replace(/\s*-\s*\d+\.?\d*%?\s*$/, '') // Remove "- 0.0%" or similar at the end
+      .replace(/\s*\([^)]*Motor Functions[^)]*\)\s*/, '') // Remove "(Basic Motor Functions)" or similar
+      .replace(/\s*\([^)]*Status[^)]*\)\s*/, '') // Remove "(Status: ...)" or similar
+      .replace(/\s*\([^)]*Progress[^)]*\)\s*/, '') // Remove "(Progress: ...)" or similar
+      .trim();
+  };
+
   // Fetch database team members when authenticated
   useEffect(() => {
     const fetchTeamMembers = async () => {
@@ -208,14 +219,14 @@ export default function TeamPage() {
   const sortedTeamMembers = allTeamMembers;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">🤫 Team Directory (Internal)</h1>
-              <span className="ml-4 px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-white">🤫 Team Directory (Internal)</h1>
+              <span className="ml-4 px-3 py-1 bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200 text-xs font-medium rounded-full">
                 CONFIDENTIAL
               </span>
             </div>
@@ -227,19 +238,19 @@ export default function TeamPage() {
         
         {/* Alex's Access Banner - Subtle Integration */}
         {isAlex && (
-          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-8">
+          <div className="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-400 dark:border-blue-500 p-4 mb-8">
             <div className="flex">
               <div className="flex-shrink-0">
-                <span className="text-blue-400 text-xl">💼</span>
+                <span className="text-blue-400 dark:text-blue-300 text-xl">💼</span>
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-blue-800">
+                <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">
                   Internal Staff Access - Welcome back, Alex
                 </h3>
-                <div className="mt-2 text-sm text-blue-700">
-                  <p>Session authenticated for <span className="font-mono text-xs bg-blue-100 px-1.5 py-0.5 rounded">alex@robo.tech</span></p>
-                  <p className="text-xs text-blue-600 mt-1">
-                    Access code: <span className="font-mono bg-blue-100 px-1 py-0.5 rounded text-blue-800">RBT{'{'}sleepy_intern_logged_in{'}'}</span>
+                <div className="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                  <p>Session authenticated for <span className="font-mono text-xs bg-blue-100 dark:bg-blue-800/50 px-1.5 py-0.5 rounded">alex@robo.tech</span></p>
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                    Access code: <span className="font-mono bg-blue-100 dark:bg-blue-800/50 px-1 py-0.5 rounded text-blue-800 dark:text-blue-200">RBT{'{'}sleepy_intern_logged_in{'}'}</span>
                   </p>
                 </div>
               </div>
@@ -248,16 +259,16 @@ export default function TeamPage() {
         )}
         
         {/* Warning Banner */}
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
+        <div className="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 dark:border-yellow-500 p-4 mb-8">
           <div className="flex">
             <div className="flex-shrink-0">
-              <span className="text-yellow-400 text-xl">⚠️</span>
+              <span className="text-yellow-400 dark:text-yellow-300 text-xl">⚠️</span>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-yellow-800">
+              <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
                 Internal Team Directory - Confidential Information
               </h3>
-              <p className="mt-1 text-sm text-yellow-700">
+              <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
                 This page contains sensitive team information and project details. Handle with care.
               </p>
             </div>
@@ -266,14 +277,14 @@ export default function TeamPage() {
 
         {/* Page Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">RoboTech Industries - Development Team</h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">RoboTech Industries - Development Team</h2>
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Meet the brilliant minds behind our cutting-edge robotics and AI systems. 
             Each team member brings unique expertise to our consciousness restoration project.
           </p>
           {isAuthenticated && (
             <div className="mt-4 flex justify-center items-center space-x-4">
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-gray-500 dark:text-gray-400">
                 {isLoadingTeam ? (
                   <div className="flex items-center">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
@@ -290,7 +301,7 @@ export default function TeamPage() {
         {/* Team Members Grid */}
         <div className="grid gap-8 sm:grid-cols-1 lg:grid-cols-2">
           {sortedTeamMembers.map((member) => (
-            <div key={member.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div key={member.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
               <div className="p-8">
                 {/* CTF Role Badge - Prominent at top */}
                 <div className="mb-6 text-center lg:text-left">
@@ -302,20 +313,20 @@ export default function TeamPage() {
                   <div className="flex-shrink-0 text-center lg:text-left">
                     {member.name === "Patrick Star" ? (
                       <button 
-                        className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-4 cursor-pointer"
+                        className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-700 rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-4 cursor-pointer"
                         onClick={handlePatrickClick}
                       >
                         <span className="text-4xl">{member.avatar}</span>
                       </button>
                     ) : (
-                      <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-4">
+                      <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-700 rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-4">
                         <span className="text-4xl">{member.avatar}</span>
                       </div>
                     )}
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
                       {member.name}
                     </h3>
-                    <p className="text-blue-600 font-medium mb-2">{member.role}</p>
+                    <p className="text-blue-600 dark:text-blue-400 font-medium mb-2">{member.role}</p>
                     <div className={`mt-3 px-3 py-1 rounded-full text-xs font-medium ${
                       member.status === 'Available' 
                         ? 'bg-green-100 text-green-800' 
@@ -344,24 +355,24 @@ export default function TeamPage() {
                     
                     {/* Current Projects */}
                     <div className="mt-6">
-                      <h4 className="text-sm font-semibold text-gray-900 mb-3">Current Projects</h4>
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Current Projects</h4>
                       {/* Show loading state when projects are being loaded */}
                       {isLoadingTeam ? (
-                        <div className="flex items-center text-gray-500 text-xs italic">
+                        <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs italic">
                           <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-400 mr-2"></div>
                           Loading projects...
                         </div>
                       ) : member.projects && member.projects.length > 0 ? (
                         <ul className="space-y-1">
                           {member.projects.map((project, index) => (
-                            <li key={index} className="text-gray-600 text-xs flex items-start">
-                              <span className="text-blue-500 mr-2">•</span>
-                              <span className="leading-tight">{project}</span>
+                            <li key={index} className="text-gray-600 dark:text-gray-300 text-xs flex items-start">
+                              <span className="text-blue-500 dark:text-blue-400 mr-2">•</span>
+                              <span className="leading-tight">{cleanProjectName(project)}</span>
                             </li>
                           ))}
                         </ul>
                       ) : (
-                        <p className="text-gray-500 text-xs italic">
+                        <p className="text-gray-500 dark:text-gray-400 text-xs italic">
                           {member.projects.length === 0 ? 'No active projects yet' : 'Project information classified'}
                         </p>
                       )}
@@ -373,21 +384,21 @@ export default function TeamPage() {
                     <div className="space-y-6">
                       {/* Bio */}
                       <div>
-                        <h4 className="text-lg font-semibold text-gray-900 mb-2">Biography</h4>
-                        <p className="text-gray-600 leading-relaxed">{member.bio}</p>
+                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Biography</h4>
+                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{member.bio}</p>
                       </div>
 
                       {/* Fun Facts */}
                       <div>
-                        <h4 className="text-lg font-semibold text-gray-900 mb-2">Fun Facts</h4>
-                        <p className="text-gray-600 leading-relaxed">{member.quirks}</p>
+                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Fun Facts</h4>
+                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{member.quirks}</p>
                       </div>
 
                       {/* Secret/Notes - Full Width */}
                       <div>
-                        <h4 className="text-lg font-semibold text-gray-900 mb-2">Internal Notes</h4>
-                        <div className="bg-gray-50 p-3 rounded border-l-4 border-gray-300">
-                          <p className="text-gray-700 text-sm font-mono">{member.secret}</p>
+                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Internal Notes</h4>
+                        <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded border-l-4 border-gray-300 dark:border-gray-500">
+                          <p className="text-gray-700 dark:text-gray-300 text-sm font-mono">{member.secret}</p>
                           {member.name === "Léandre" && (
                             <span className="opacity-0 text-transparent select-none pointer-events-none absolute -z-10">
                               RBT&#123;sh4d0w_0p5_1nv151bl3_h4ck3r_7x9y2z8a&#125;
@@ -406,16 +417,16 @@ export default function TeamPage() {
         {/* Easter Egg Modal */}
         {showEasterEgg && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md mx-4 text-center">
               <div className="text-6xl mb-4">🌟</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Patrick&apos;s Secret!</h3>
-              <p className="text-gray-600 mb-4 font-mono text-sm">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Patrick&apos;s Secret!</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4 font-mono text-sm">
                 &ldquo;I&apos;m not just a starfish, I&apos;m a SECURITY starfish!&rdquo;
               </p>
-              <p className="text-gray-600 mb-4 font-mono">
+              <p className="text-gray-600 dark:text-gray-300 mb-4 font-mono">
                 RBT&#123;p4tr1ck_st4r_s3cur1ty_3xp3rt_9d2f1a8c&#125;
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 (Hidden consciousness fragment discovered!)
               </p>
             </div>
@@ -424,26 +435,26 @@ export default function TeamPage() {
 
         {/* Footer */}
         <div className="mt-12 text-center">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Team Stats</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Team Stats</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 dark:text-gray-300">
               <div>
-                <span className="font-medium text-gray-900">Total Energy Drinks:</span><br/>
+                <span className="font-medium text-gray-900 dark:text-white">Total Energy Drinks:</span><br/>
                 73 cans this week (mostly Alexandre)
               </div>
               <div>
-                <span className="font-medium text-gray-900">Bugs Fixed:</span><br/>
+                <span className="font-medium text-gray-900 dark:text-white">Bugs Fixed:</span><br/>
                 127 (creating 43 new ones)
               </div>
               <div>
-                <span className="font-medium text-gray-900">Sleep Hours:</span><br/>
+                <span className="font-medium text-gray-900 dark:text-white">Sleep Hours:</span><br/>
                 Alexandre: 2, Aschraf: 4, Léandre: ???, Laksiya: 8
               </div>
             </div>
             <div className="mt-6">
 <Link 
                 href="/projects" 
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors inline-block"
+                className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors inline-block"
               >
                 View All Projects →
               </Link>
@@ -453,7 +464,7 @@ export default function TeamPage() {
 
         {/* Hidden Message */}
         <div className="mt-8 text-center">
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-400 dark:text-gray-500">
             {/* If you're reading this in the source code, you're on the right track! */}
             Internal team directory v2.1.3 | Last updated: 3AM (as usual)
           </p>

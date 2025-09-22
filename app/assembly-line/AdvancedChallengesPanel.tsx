@@ -58,30 +58,30 @@ const categoryIcons: { [key: string]: string } = {
 const getDifficultyColor = (difficulty: string) => {
   switch (difficulty?.toLowerCase()) {
     case 'easy':
-      return 'bg-green-100 text-green-800 border-green-200';
+      return 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 border-green-200 dark:border-green-700';
     case 'medium':
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      return 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200 border-yellow-200 dark:border-yellow-700';
     case 'hard':
-      return 'bg-red-100 text-red-800 border-red-200';
+      return 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200 border-red-200 dark:border-red-700';
     default:
-      return 'bg-gray-100 text-gray-800 border-gray-200';
+      return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-600';
   }
 };
 
 const getCategoryColor = (category: string) => {
   switch (category?.toLowerCase()) {
     case 'web':
-      return 'bg-blue-100 text-blue-800 border-blue-200';
+      return 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-700';
     case 'crypto':
-      return 'bg-purple-100 text-purple-800 border-purple-200';
+      return 'bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-200 border-purple-200 dark:border-purple-700';
     case 'reverse':
-      return 'bg-orange-100 text-orange-800 border-orange-200';
+      return 'bg-orange-100 dark:bg-orange-900/50 text-orange-800 dark:text-orange-200 border-orange-200 dark:border-orange-700';
     case 'forensics':
-      return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      return 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-700';
     case 'pwn':
-      return 'bg-red-100 text-red-800 border-red-200';
+      return 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200 border-red-200 dark:border-red-700';
     default:
-      return 'bg-gray-100 text-gray-800 border-gray-200';
+      return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-600';
   }
 };
 
@@ -279,10 +279,10 @@ export default function AdvancedChallengesPanel({
       {/* Enhanced Panel with Attention-Grabbing Effects */}
       <div 
         ref={panelRef}
-        className={`mt-8 p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border-2 transition-all duration-1000 ${
+        className={`mt-8 p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-900 rounded-lg border-2 transition-all duration-1000 ${
           isFirstTimeReveal 
             ? 'border-blue-500 shadow-2xl shadow-blue-500/50 animate-pulse' 
-            : 'border-blue-200'
+            : 'border-blue-200 dark:border-gray-600'
         }`}
         style={{
           animation: isFirstTimeReveal 
@@ -358,16 +358,16 @@ export default function AdvancedChallengesPanel({
           
           if (isCompleted) {
             // Completed by current user - green
-            cardStyle = 'border-green-400 bg-green-50';
-            hoverEffect = 'hover:border-green-500';
+            cardStyle = 'border-green-400 dark:border-green-600 bg-green-50 dark:bg-gray-800';
+            hoverEffect = 'hover:border-green-500 dark:hover:border-green-500';
           } else if (isCompletedByTeam) {
             // Completed by team member - blue
-            cardStyle = 'border-blue-400 bg-blue-50';
-            hoverEffect = 'hover:border-blue-500';
+            cardStyle = 'border-blue-400 dark:border-blue-600 bg-blue-50 dark:bg-gray-800';
+            hoverEffect = 'hover:border-blue-500 dark:hover:border-blue-500';
           } else {
             // Not completed - red
-            cardStyle = 'border-red-300 bg-white';
-            hoverEffect = 'hover:border-orange-400';
+            cardStyle = 'border-red-300 dark:border-red-600 bg-white dark:bg-gray-800';
+            hoverEffect = 'hover:border-orange-400 dark:hover:border-orange-500';
           }
           
           return (
@@ -420,7 +420,7 @@ export default function AdvancedChallengesPanel({
                   
                   {/* Title */}
                   <h4 className={`text-sm font-bold line-clamp-1 flex-1 ${
-                    isCompleted ? 'text-green-800' : isCompletedByTeam ? 'text-blue-800' : 'text-gray-900'
+                    isCompleted ? 'text-green-800 dark:text-green-200' : isCompletedByTeam ? 'text-blue-800 dark:text-blue-200' : 'text-gray-900 dark:text-white'
                   }`}>
                     {challenge.title}
                   </h4>
@@ -428,14 +428,14 @@ export default function AdvancedChallengesPanel({
                 
                 {/* Points */}
                 <span className={`text-sm font-bold ml-2 flex-shrink-0 ${
-                  isCompleted ? 'text-green-600' : isCompletedByTeam ? 'text-blue-600' : 'text-red-600'
+                  isCompleted ? 'text-green-600 dark:text-green-400' : isCompletedByTeam ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'
                 }`}>
                   {challenge.points}pts
                 </span>
               </div>
             
             {/* Description - More Space */}
-            <p className={`text-xs text-gray-600 mb-3 line-clamp-3 leading-relaxed transition-all duration-300 select-none ${
+            <p className={`text-xs text-gray-600 dark:text-gray-300 mb-3 line-clamp-3 leading-relaxed transition-all duration-300 select-none ${
               isRevealed ? '' : 'obscured-text'
             }`}>
               {isRevealed ? challenge.description : '████████ ████ ██████ ███████ █████ ███ ████████ ████ ██████ ███████'}
@@ -444,7 +444,7 @@ export default function AdvancedChallengesPanel({
             {/* Click to reveal indicator */}
             {!isRevealed && (
               <div className="text-center mb-2">
-                <span className="text-xs text-red-500 font-medium animate-pulse">
+                <span className="text-xs text-red-500 dark:text-red-400 font-medium animate-pulse">
                   🔒 Click to decrypt mission details
                 </span>
               </div>
@@ -452,20 +452,20 @@ export default function AdvancedChallengesPanel({
 
             {/* Team Completion Info */}
             {teamSubmissions[challenge.id] && teamSubmissions[challenge.id].completedBy.length > 0 && (
-              <div className="mb-3 p-2 bg-blue-50 rounded border border-blue-200">
-                <div className="text-xs font-medium text-blue-800 mb-1">
+              <div className="mb-3 p-2 bg-blue-50 dark:bg-gray-700/50 rounded border border-blue-200 dark:border-blue-700">
+                <div className="text-xs font-medium text-blue-800 dark:text-blue-200 mb-1">
                   👥 Team Completions ({teamSubmissions[challenge.id].completedBy.length})
                 </div>
                 <div className="flex flex-wrap gap-1">
                   {teamSubmissions[challenge.id].completedBy.map((completion, idx) => (
                     <span 
                       key={`${completion.userId}-${idx}`}
-                      className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-700 border border-blue-300"
+                      className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-blue-100 dark:bg-gray-700 text-blue-700 dark:text-blue-200 border border-blue-300 dark:border-blue-700"
                       title={`Completed on ${new Date(completion.submittedAt).toLocaleDateString()} - ${completion.pointsAwarded} points`}
                     >
                       {completion.userName}
                       {completion.pointsAwarded > 0 && (
-                        <span className="ml-1 text-blue-600 font-medium">
+                        <span className="ml-1 text-blue-600 dark:text-blue-400 font-medium">
                           +{completion.pointsAwarded}
                         </span>
                       )}
@@ -500,8 +500,8 @@ export default function AdvancedChallengesPanel({
       </div>
 
         {/* Footer Message */}
-        <div className="mt-6 p-3 bg-blue-100 border border-blue-400 rounded-lg">
-          <p className="text-xs text-blue-800 text-center">
+        <div className="mt-6 p-3 bg-blue-100 dark:bg-blue-900/30 border border-blue-400 dark:border-blue-700 rounded-lg">
+          <p className="text-xs text-blue-800 dark:text-blue-200 text-center">
             <strong>⚠️ WARNING:</strong> These advanced protocols require enhanced AI consciousness levels. 
             Proceed with caution as failure may result in neural pathway corruption.
           </p>
