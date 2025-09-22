@@ -1483,29 +1483,6 @@ export default function AssemblyLineContent() {
                     </div>
                   )}
                   
-                  {/* Animated Robotic Arm SVG - Appears when AI is activated */}
-                  {(aiPermanentlyActivated || (adminSelectedProject && adminProjectData?.aiActivated)) && (
-                    <div className="absolute inset-0 flex items-center justify-center z-20">
-                      <div className="relative">
-                        <img 
-                          src="/robot-arm.svg" 
-                          alt="Animated Robotic Arm"
-                          className="w-48 h-48 transform transition-all duration-1000 animate-pulse"
-                          style={{
-                            filter: 'hue-rotate(270deg) saturate(1.5) brightness(1.2)',
-                            animation: 'robotArmAnimation 3s ease-in-out infinite'
-                          }}
-                        />
-                        {/* Glow effect for AI activation */}
-                        <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-xl animate-pulse"></div>
-                        {/* AI Status Indicator */}
-                        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-purple-900 text-purple-100 px-3 py-1 rounded-full text-xs font-bold animate-bounce">
-                          🤖 AI AUTONOMOUS
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
                   {/* Moving Restoration Indicators */}
                   {armStatus === 'restoring' && (
                     <>
