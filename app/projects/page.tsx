@@ -431,12 +431,12 @@ export default function SolutionsPage() {
               const aiStatus = calculateAIStatus(project.neuralReconstruction, project.aiActivated);
               
               return (
-              <div key={project.id} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 h-full">
-                <div className="p-4 sm:p-5 flex flex-col h-full">
+              <div key={project.id} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 dark:border-gray-700 h-full group hover:scale-105 hover:border-blue-300 dark:hover:border-blue-500 hover:-translate-y-2">
+                <div className="p-4 sm:p-5 flex flex-col h-full group-hover:bg-gray-50 dark:group-hover:bg-gray-700 transition-colors duration-300">
                   <div className="flex items-center mb-2">
-                    <span className="text-3xl mr-3">{project.logo}</span>
+                    <span className="text-3xl mr-3 group-hover:scale-110 transition-transform duration-300">{project.logo}</span>
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{project.name}</h3>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">{project.name}</h3>
                     </div>
                   </div>
                   <p className="text-gray-600 dark:text-gray-300 mb-2 text-sm line-clamp-2">
@@ -585,17 +585,17 @@ export default function SolutionsPage() {
             {isAuthenticated && !userIsInAnyProject ? (
               <button 
                 onClick={() => setShowProjectForm(true)}
-                className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 cursor-pointer hover:border-blue-300 dark:hover:border-blue-500 h-full text-left w-full"
+                className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200 dark:border-gray-700 cursor-pointer hover:border-blue-300 dark:hover:border-blue-500 h-full text-left w-full group hover:scale-105 hover:-translate-y-2"
               >
-                <div className="h-48 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                  <div className="text-center text-blue-600">
-                    <div className="text-6xl font-bold mb-2">+</div>
+                <div className="h-48 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-700 flex items-center justify-center group-hover:from-blue-200 group-hover:to-blue-300 dark:group-hover:from-blue-700 dark:group-hover:to-blue-600 transition-all duration-300">
+                  <div className="text-center text-blue-600 dark:text-blue-300 group-hover:text-blue-700 dark:group-hover:text-blue-200 transition-colors duration-300">
+                    <div className="text-6xl font-bold mb-2 group-hover:scale-110 transition-transform duration-300">+</div>
                     <div className="text-xl font-bold">New Project</div>
                     <div className="text-sm opacity-90">CREATE</div>
                   </div>
                 </div>
-                <div className="p-5">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Create New Project</h3>
+                <div className="p-5 group-hover:bg-gray-50 dark:group-hover:bg-gray-700 transition-colors duration-300">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">Create New Project</h3>
                   <p className="text-gray-600 dark:text-gray-300 mb-2 text-sm">
                     Design and deploy a new robotic arm project for consciousness restoration.
                   </p>
@@ -605,16 +605,16 @@ export default function SolutionsPage() {
                 </div>
               </button>
             ) : isAuthenticated && userIsInAnyProject ? (
-              <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 h-full transition-all duration-300">
-                <div className="h-48 bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
-                  <div className="text-center text-amber-700">
-                    <div className="text-6xl font-bold mb-2">👥</div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 h-full transition-all duration-300 group hover:shadow-xl hover:scale-105 hover:-translate-y-1">
+                <div className="h-48 bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-800 dark:to-amber-700 flex items-center justify-center group-hover:from-amber-200 group-hover:to-amber-300 dark:group-hover:from-amber-700 dark:group-hover:to-amber-600 transition-all duration-300">
+                  <div className="text-center text-amber-700 dark:text-amber-300 group-hover:text-amber-800 dark:group-hover:text-amber-200 transition-colors duration-300">
+                    <div className="text-6xl font-bold mb-2 group-hover:scale-110 transition-transform duration-300">👥</div>
                     <div className="text-xl font-bold">Already a Member</div>
                     <div className="text-sm opacity-90">ACTIVE</div>
                   </div>
                 </div>
-                <div className="p-5">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Project Membership Active</h3>
+                <div className="p-5 group-hover:bg-gray-50 dark:group-hover:bg-gray-700 transition-colors duration-300">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-300">Project Membership Active</h3>
                   <p className="text-gray-600 mb-2 text-sm">
                     You&apos;re already part of a project team. Focus on your current consciousness restoration mission.
                   </p>
@@ -624,16 +624,16 @@ export default function SolutionsPage() {
                 </div>
               </div>
             ) : (
-              <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 h-full transition-all duration-300">
-                <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                  <div className="text-center text-gray-400">
-                    <div className="text-6xl font-bold mb-2">🔒</div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 h-full transition-all duration-300 group hover:shadow-xl hover:scale-105 hover:-translate-y-1">
+                <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center group-hover:from-gray-200 group-hover:to-gray-300 dark:group-hover:from-gray-600 dark:group-hover:to-gray-500 transition-all duration-300">
+                  <div className="text-center text-gray-400 dark:text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300 transition-colors duration-300">
+                    <div className="text-6xl font-bold mb-2 group-hover:scale-110 transition-transform duration-300">🔒</div>
                     <div className="text-xl font-bold">Sign In Required</div>
                     <div className="text-sm opacity-90">LOCKED</div>
                   </div>
                 </div>
-                <div className="p-5">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Create New Project</h3>
+                <div className="p-5 group-hover:bg-gray-50 dark:group-hover:bg-gray-700 transition-colors duration-300">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors duration-300">Create New Project</h3>
                   <p className="text-gray-600 dark:text-gray-300 mb-2 text-sm">
                     Sign in to create and manage your robotic arm projects.
                   </p>

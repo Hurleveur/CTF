@@ -301,8 +301,8 @@ export default function TeamPage() {
         {/* Team Members Grid */}
         <div className="grid gap-8 sm:grid-cols-1 lg:grid-cols-2">
           {sortedTeamMembers.map((member) => (
-            <div key={member.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-              <div className="p-8">
+            <div key={member.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden group hover:shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 hover:border-blue-300 dark:hover:border-blue-500 border border-transparent">
+              <div className="p-8 group-hover:bg-gray-50 dark:group-hover:bg-gray-700 transition-colors duration-300">
                 {/* CTF Role Badge - Prominent at top */}
                 <div className="mb-6 text-center lg:text-left">
                   <CTFRoleBadge role={member.ctfRole || '🎯 CTF Participant'} />
@@ -313,20 +313,20 @@ export default function TeamPage() {
                   <div className="flex-shrink-0 text-center lg:text-left">
                     {member.name === "Patrick Star" ? (
                       <button 
-                        className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-700 rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-4 cursor-pointer"
+                        className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-700 rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-4 cursor-pointer group-hover:scale-110 group-hover:from-blue-200 group-hover:to-blue-300 dark:group-hover:from-blue-700 dark:group-hover:to-blue-600 transition-all duration-300"
                         onClick={handlePatrickClick}
                       >
-                        <span className="text-4xl">{member.avatar}</span>
+                        <span className="text-4xl group-hover:scale-110 transition-transform duration-300">{member.avatar}</span>
                       </button>
                     ) : (
-                      <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-700 rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-4">
-                        <span className="text-4xl">{member.avatar}</span>
+                      <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-700 rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-4 group-hover:scale-110 group-hover:from-blue-200 group-hover:to-blue-300 dark:group-hover:from-blue-700 dark:group-hover:to-blue-600 transition-all duration-300">
+                        <span className="text-4xl group-hover:scale-110 transition-transform duration-300">{member.avatar}</span>
                       </div>
                     )}
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                       {member.name}
                     </h3>
-                    <p className="text-blue-600 dark:text-blue-400 font-medium mb-2">{member.role}</p>
+                    <p className="text-blue-600 dark:text-blue-400 font-medium mb-2 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors duration-300">{member.role}</p>
                     <div className={`mt-3 px-3 py-1 rounded-full text-xs font-medium ${
                       member.status === 'Available' 
                         ? 'bg-green-100 text-green-800' 
@@ -355,7 +355,7 @@ export default function TeamPage() {
                     
                     {/* Current Projects */}
                     <div className="mt-6">
-                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Current Projects</h4>
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">Current Projects</h4>
                       {/* Show loading state when projects are being loaded */}
                       {isLoadingTeam ? (
                         <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs italic">
@@ -384,20 +384,20 @@ export default function TeamPage() {
                     <div className="space-y-6">
                       {/* Bio */}
                       <div>
-                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Biography</h4>
+                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">Biography</h4>
                         <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{member.bio}</p>
                       </div>
 
                       {/* Fun Facts */}
                       <div>
-                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Fun Facts</h4>
+                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">Fun Facts</h4>
                         <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{member.quirks}</p>
                       </div>
 
                       {/* Secret/Notes - Full Width */}
                       <div>
-                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Internal Notes</h4>
-                        <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded border-l-4 border-gray-300 dark:border-gray-500">
+                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">Internal Notes</h4>
+                        <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded border-l-4 border-gray-300 dark:border-gray-500 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 group-hover:border-blue-400 dark:group-hover:border-blue-500 transition-all duration-300">
                           <p className="text-gray-700 dark:text-gray-300 text-sm font-mono">{member.secret}</p>
                           {member.name === "Léandre" && (
                             <span className="opacity-0 text-transparent select-none pointer-events-none absolute -z-10">

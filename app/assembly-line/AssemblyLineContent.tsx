@@ -304,19 +304,100 @@ export default function AssemblyLineContent() {
       
       const { challenges } = await res.json();
       
-      // Filter for medium/hard challenges with 200+ points
-      const filtered = challenges?.filter((challenge: unknown) => 
-        ((challenge as { difficulty?: string })?.difficulty === 'medium' || (challenge as { difficulty?: string })?.difficulty === 'hard') ||
-        ((challenge as { points?: number })?.points || 0) >= 25 // TODO: DONT SHOW ALL OF THEM LATER?
-      ) || [];
+      // Get user's completed challenges to check unlock conditions
+      const completedChallenges = new Set(completedChallengeIds);
+      const hasAdminTerminalAccess = Array.from(completedChallenges).some(id => {
+        const challenge = challenges.find((c: Challenge) => c.id === id);
+        return challenge?.title?.toLowerCase().includes('terminal');
+      });
+      
+      // Check previous state for notifications
+      const previousTerminalAccess = localStorage.getItem('hasTerminalAccess') === 'true';
+      const previousAIAccess = localStorage.getItem('hasAIAccess') === 'true';
+      const has100Progress = codeCompletion >= 100;
+      
+      // Filter challenges based on unlock conditions
+      let terminalChallengesRevealed = 0;
+      let aiChallengesRevealed = 0;
+      
+      const filtered = challenges?.filter((challenge: Challenge) => {
+        // Basic filter for medium/hard challenges or 25+ points
+        const meetsBasicCriteria = (
+          challenge.difficulty === 'medium' || 
+          challenge.difficulty === 'hard' ||
+          challenge.points >= 25
+        );
+        
+        if (!meetsBasicCriteria) return false;
+        
+        // Hide terminal category challenges until Admin Terminal Breach is completed
+        if (challenge.category === 'terminal' && !hasAdminTerminalAccess) {
+          console.log(`🔒 Hiding terminal challenge "${challenge.title}" - Admin Terminal Breach not completed`);
+          return false;
+        }
+        
+        // Count terminal challenges that are now visible
+        if (challenge.category === 'terminal' && hasAdminTerminalAccess) {
+          terminalChallengesRevealed++;
+        }
+        
+        // Hide AI Activation access challenge until 100% progress
+        if ((challenge.title?.toLowerCase().includes('ai activation') || 
+             challenge.title?.toLowerCase().includes('frontend admin') ||
+             challenge.description?.toLowerCase().includes('ai activation')) && 
+            codeCompletion < 100) {
+          console.log(`🔒 Hiding AI activation challenge "${challenge.title}" - Progress: ${codeCompletion}%`);
+          return false;
+        }
+        
+        // Count AI challenges that are now visible
+        if ((challenge.title?.toLowerCase().includes('ai activation') || 
+             challenge.title?.toLowerCase().includes('frontend admin') ||
+             challenge.description?.toLowerCase().includes('ai activation')) && 
+            has100Progress) {
+          aiChallengesRevealed++;
+        }
+        
+        return true;
+      }) || [];
+      
+      // Show notifications for newly revealed challenge categories
+      if (hasAdminTerminalAccess && !previousTerminalAccess && terminalChallengesRevealed > 0) {
+        console.log('🎉 Terminal challenges unlocked! Showing notification...');
+        localStorage.setItem('hasTerminalAccess', 'true');
+        // Trigger notification similar to first-time advanced challenges
+        // Force a visual update to show the new challenges dramatically
+        setTimeout(() => {
+          const event = new CustomEvent('terminalChallengesUnlocked', {
+            detail: { count: terminalChallengesRevealed }
+          });
+          window.dispatchEvent(event);
+        }, 500);
+      }
+      
+      if (has100Progress && !previousAIAccess && aiChallengesRevealed > 0) {
+        console.log('🤖 AI Activation challenges unlocked! Showing notification...');
+        localStorage.setItem('hasAIAccess', 'true');
+        // Trigger notification similar to first-time advanced challenges
+        setTimeout(() => {
+          const event = new CustomEvent('aiChallengesUnlocked', {
+            detail: { count: aiChallengesRevealed }
+          });
+          window.dispatchEvent(event);
+        }, 500);
+      }
       
       console.log('✅ Advanced challenges loaded:', filtered.length);
+      console.log('🔑 Admin Terminal Access:', hasAdminTerminalAccess);
+      console.log('🤖 AI Progress:', codeCompletion);
+      console.log(`🔓 Terminal challenges revealed: ${terminalChallengesRevealed}`);
+      console.log(`🔓 AI challenges revealed: ${aiChallengesRevealed}`);
       setAdvancedChallenges(filtered);
     } catch (error) {
       console.error('❌ Error loading advanced challenges:', error);
       // Silently fail - keep panel hidden
     }
-  }, []);
+  }, [completedChallengeIds, codeCompletion]);
 
   // Function to load team submissions from API
   const loadTeamSubmissions = useCallback(async () => {
@@ -360,8 +441,12 @@ export default function AssemblyLineContent() {
       loadAdvancedChallenges();
       loadTeamSubmissions();
     }
+    // Reload challenges when completion state or completed challenges change
+    if (showAdvanced) {
+      loadAdvancedChallenges();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [codeCompletion, showAdvanced]);
+  }, [codeCompletion, showAdvanced, completedChallengeIds]);
 
   // Function to fetch project data for admin users
   const fetchAdminProjectData = useCallback(async (projectName: string) => {
@@ -1394,6 +1479,29 @@ export default function AssemblyLineContent() {
                           : 'bg-gradient-to-t from-green-500 to-emerald-500 shadow-lg shadow-green-500/50'
                       }`} style={{ top: '12px' }}>
                         <div className="absolute left-1/2 transform -translate-x-1/2 w-2.5 h-1.5 bg-white/20 rounded-full mb-0.5" style={{ top: '2px' }}></div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Animated Robotic Arm SVG - Appears when AI is activated */}
+                  {(aiPermanentlyActivated || (adminSelectedProject && adminProjectData?.aiActivated)) && (
+                    <div className="absolute inset-0 flex items-center justify-center z-20">
+                      <div className="relative">
+                        <img 
+                          src="/robot-arm.svg" 
+                          alt="Animated Robotic Arm"
+                          className="w-48 h-48 transform transition-all duration-1000 animate-pulse"
+                          style={{
+                            filter: 'hue-rotate(270deg) saturate(1.5) brightness(1.2)',
+                            animation: 'robotArmAnimation 3s ease-in-out infinite'
+                          }}
+                        />
+                        {/* Glow effect for AI activation */}
+                        <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-xl animate-pulse"></div>
+                        {/* AI Status Indicator */}
+                        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-purple-900 text-purple-100 px-3 py-1 rounded-full text-xs font-bold animate-bounce">
+                          🤖 AI AUTONOMOUS
+                        </div>
                       </div>
                     </div>
                   )}

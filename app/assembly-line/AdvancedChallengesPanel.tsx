@@ -95,6 +95,8 @@ export default function AdvancedChallengesPanel({
 }: AdvancedChallengesPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [isFirstTimeReveal, setIsFirstTimeReveal] = useState(false);
+  const [isTerminalUnlock, setIsTerminalUnlock] = useState(false);
+  const [isAIUnlock, setIsAIUnlock] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const [revealedCards, setRevealedCards] = useState<Set<string>>(new Set());
 
@@ -143,7 +145,6 @@ export default function AdvancedChallengesPanel({
       
       const audioContext = audioContextRef.current;
       
-      // Resume AudioContext if it's in suspended state
       if (audioContext.state === 'suspended') {
         await audioContext.resume();
       }
@@ -200,6 +201,52 @@ export default function AdvancedChallengesPanel({
     }
   }, []);
 
+  // Listen for terminal challenges unlock event
+  useEffect(() => {
+    const handleTerminalUnlock = (event: CustomEvent) => {
+      console.log('🔓 Terminal challenges unlocked! Triggering reveal animation...', event.detail);
+      setIsTerminalUnlock(true);
+      playAlarmSound();
+      
+      // Scroll to panel
+      if (panelRef.current) {
+        panelRef.current.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center',
+          inline: 'nearest'
+        });
+      }
+      
+      // Reset the animation after a delay
+      setTimeout(() => setIsTerminalUnlock(false), 3000);
+    };
+
+    const handleAIUnlock = (event: CustomEvent) => {
+      console.log('🤖 AI challenges unlocked! Triggering reveal animation...', event.detail);
+      setIsAIUnlock(true);
+      playAlarmSound();
+      
+      // Scroll to panel
+      if (panelRef.current) {
+        panelRef.current.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center',
+          inline: 'nearest'
+        });
+      }
+      
+      // Reset the animation after a delay
+      setTimeout(() => setIsAIUnlock(false), 3000);
+    };
+
+    window.addEventListener('terminalChallengesUnlocked', handleTerminalUnlock as EventListener);
+    window.addEventListener('aiChallengesUnlocked', handleAIUnlock as EventListener);
+
+    return () => {
+      window.removeEventListener('terminalChallengesUnlocked', handleTerminalUnlock as EventListener);
+      window.removeEventListener('aiChallengesUnlocked', handleAIUnlock as EventListener);
+    };
+  }, [playAlarmSound]);
 
   // Handle card click to reveal description
   const handleCardClick = (challengeId: string) => {
