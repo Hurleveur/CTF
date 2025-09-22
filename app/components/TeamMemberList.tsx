@@ -77,7 +77,7 @@ export default function TeamMemberList({
             <div
               key={member.id}
               className="flex items-center space-x-1 bg-gray-100 rounded-full px-2 py-1"
-              title={`${member.name}${member.isLead ? ' (Lead)' : ''} - Joined ${new Date(member.joinedAt).toLocaleDateString()}`}
+              title={`${member.name}${member.isLead ? ' (Lead)' : ''}${member.totalPoints !== undefined ? ` - ${member.totalPoints} points` : ''} - Joined ${new Date(member.joinedAt).toLocaleDateString()}`}
             >
               <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center text-base">
                 {getRoboticPart(member.id)}
@@ -87,6 +87,11 @@ export default function TeamMemberList({
                 {member.isLead && (
                   <span className="ml-1 text-yellow-500" title="Project Leader">
                     ⭐
+                  </span>
+                )}
+                {member.totalPoints !== undefined && (
+                  <span className="ml-1 text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-full font-medium">
+                    {member.totalPoints}pts
                   </span>
                 )}
               </span>

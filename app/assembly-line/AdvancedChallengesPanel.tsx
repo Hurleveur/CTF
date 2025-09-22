@@ -41,6 +41,7 @@ interface AdvancedChallengesPanelProps {
     isLead: boolean;
     joinedAt: string;
     isCurrentUser: boolean;
+    totalPoints?: number;
   }>;
 }
 
@@ -278,10 +279,10 @@ export default function AdvancedChallengesPanel({
       {/* Enhanced Panel with Attention-Grabbing Effects */}
       <div 
         ref={panelRef}
-        className={`mt-8 p-6 bg-gradient-to-br from-red-50 to-orange-50 rounded-lg border-2 transition-all duration-1000 ${
+        className={`mt-8 p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border-2 transition-all duration-1000 ${
           isFirstTimeReveal 
-            ? 'border-red-500 shadow-2xl shadow-red-500/50 animate-pulse' 
-            : 'border-red-200'
+            ? 'border-blue-500 shadow-2xl shadow-blue-500/50 animate-pulse' 
+            : 'border-blue-200'
         }`}
         style={{
           animation: isFirstTimeReveal 
@@ -290,24 +291,24 @@ export default function AdvancedChallengesPanel({
         }}
       >
       {/* Simplified Header */}
-      <div className="bg-red-600 text-white text-center py-3 rounded-md shadow-lg mb-6">
+      <div className="bg-blue-900 text-white text-center py-3 rounded-md shadow-md mb-6">
         <div className="flex items-center justify-center space-x-2">
-          <span className="text-xl">🚨</span>
-          <h3 className="text-lg font-bold tracking-wider">
+          <span className="text-lg">⚠️</span>
+          <h3 className="text-base font-semibold tracking-wide">
             CHALLENGES DETECTED
           </h3>
-          <span className="text-xl">🚨</span>
+          <span className="text-lg">⚠️</span>
         </div>
         
         {/* Team Status */}
         {teamMembers.length > 0 && (
           <div className="mt-2 text-center">
-            <div className="inline-flex items-center space-x-2 bg-white/20 rounded-full px-3 py-1">
+            <div className="inline-flex items-center space-x-2 bg-white/15 rounded-full px-3 py-1">
               <span className="text-xs font-medium">👥 Team:</span>
-              <span className="text-xs font-bold">
+              <span className="text-xs font-semibold">
                 {teamMembers.map(member => member.name).join(', ')}
               </span>
-              <span className="text-xs opacity-75">
+              <span className="text-xs opacity-70">
                 ({teamMembers.length} member{teamMembers.length !== 1 ? 's' : ''})
               </span>
             </div>
@@ -499,8 +500,8 @@ export default function AdvancedChallengesPanel({
       </div>
 
         {/* Footer Message */}
-        <div className="mt-6 p-3 bg-red-100 border border-red-400 rounded-lg">
-          <p className="text-xs text-red-800 text-center">
+        <div className="mt-6 p-3 bg-blue-100 border border-blue-400 rounded-lg">
+          <p className="text-xs text-blue-800 text-center">
             <strong>⚠️ WARNING:</strong> These advanced protocols require enhanced AI consciousness levels. 
             Proceed with caution as failure may result in neural pathway corruption.
           </p>

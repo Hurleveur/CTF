@@ -69,8 +69,21 @@ function LoginContent() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="mx-auto h-12 w-12 bg-blue-600 rounded-lg flex items-center justify-center">
-            <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            <svg className="h-8 w-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+              {/* Robotic arm base */}
+              <rect x="7" y="20" width="10" height="2.5" rx="1.2" />
+              <rect x="8" y="17.5" width="8" height="2.5" rx="0.8" />
+              {/* Main arm segments */}
+              <circle cx="12" cy="16" r="2" />
+              <rect x="10.5" y="8" width="3" height="8" rx="1.5" />
+              <circle cx="12" cy="7" r="1.8" />
+              <rect x="10.5" y="2" width="3" height="6" rx="1.5" transform="rotate(-35 12 7)" />
+              <circle cx="15" cy="3.7" r="1.3" />
+              {/* Connecting arm to gripper */}
+              <rect x="10.5" y="2.5" width="4.5" height="2.5" rx="0.5" />
+              {/* Gripper/end effector */}
+              <path d="M17 3 L20.5 3 L15.5 3.5 Z" />
+              <path d="M17 5 L20.5 5 L15.5 4.5 Z" />
             </svg>
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">

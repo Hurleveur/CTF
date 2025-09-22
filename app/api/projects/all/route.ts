@@ -89,7 +89,9 @@ export async function GET() {
             joinedAt: '2025-01-18T02:00:00Z',
           }
         ],
-        isDefault: true
+        isDefault: true,
+        aiActivated: false,
+        aiActivatedAt: null
       }
     ];
 
@@ -122,6 +124,8 @@ export async function GET() {
       }>;
       isDefault: boolean;
       userId: string;
+      aiActivated: boolean;
+      aiActivatedAt: string | null;
     }> = [];
     
     if (allUserProjects) {
@@ -175,7 +179,9 @@ export async function GET() {
           teamMembers: project.team_members || [],
           teamMemberDetails: teamMemberDetails,
           isDefault: false,
-          userId: project.user_id
+          userId: project.user_id,
+          aiActivated: project.ai_activated || false,
+          aiActivatedAt: project.ai_activated_at || null
         });
       }
     }

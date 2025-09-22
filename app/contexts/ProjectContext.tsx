@@ -9,6 +9,7 @@ export interface TeamMember {
   email?: string;
   isLead: boolean;
   joinedAt: string;
+  totalPoints?: number;
 }
 
 export interface ProjectInvitation {
@@ -38,6 +39,8 @@ export interface RoboticProject {
   teamMembers?: string[]; // Legacy - kept for backwards compatibility
   teamMemberDetails?: TeamMember[]; // New detailed member info
   userId?: string;
+  aiActivated?: boolean;
+  aiActivatedAt?: string;
 }
 
 interface ProjectContextType {

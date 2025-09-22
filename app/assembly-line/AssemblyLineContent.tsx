@@ -9,6 +9,7 @@ import { useProjects, RoboticProject } from '../contexts/ProjectContext';
 import AdvancedChallengesPanel from './AdvancedChallengesPanel';
 import InvitationModal from './InvitationModal';
 import TeamMemberList from '../components/TeamMemberList';
+import toast from 'react-hot-toast';
 
 export default function AssemblyLineContent() {
   const { isAuthenticated, user } = useAuth();
@@ -25,7 +26,7 @@ export default function AssemblyLineContent() {
   } = useUserData();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { projects } = useProjects();
+  const { projects, leaveProject } = useProjects();
   const [selectedArm, setSelectedArm] = useState<RoboticProject | null>(null);
   const [armStatus, setArmStatus] = useState('offline');
   // AI activation state now comes from database via userProject.aiActivated
@@ -50,11 +51,13 @@ export default function AssemblyLineContent() {
   const [animatedProgress, setAnimatedProgress] = useState(0);
   const [hasManuallyDeselected] = useState(false);
   const [adminSelectedProject, setAdminSelectedProject] = useState<RoboticProject | null>(null);
-  const [adminProjectData, setAdminProjectData] = useState<{progress: number, stats: unknown, submissions: unknown[], completedChallengeIds: string[]}>({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
+  const [adminProjectData, setAdminProjectData] = useState<{progress: number, stats: unknown, submissions: unknown[], completedChallengeIds: string[], aiActivated?: boolean, aiActivatedAt?: string}>({ progress: 0, stats: null, submissions: [], completedChallengeIds: [], aiActivated: false, aiActivatedAt: undefined });
   const [showInvitationModal, setShowInvitationModal] = useState(false);
   const [teamSubmissions, setTeamSubmissions] = useState<Record<string, any>>({});
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [isInitialDataProcessing, setIsInitialDataProcessing] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   
   // Audio context for alarm sounds
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -139,7 +142,7 @@ export default function AssemblyLineContent() {
       
       // Clear admin state when auto-selecting own project
       setAdminSelectedProject(null);
-      setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
+      setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [], aiActivated: false, aiActivatedAt: undefined });
       
       // Store the selection for persistence
       if (isAdmin) {
@@ -304,7 +307,7 @@ export default function AssemblyLineContent() {
       // Filter for medium/hard challenges with 200+ points
       const filtered = challenges?.filter((challenge: unknown) => 
         ((challenge as { difficulty?: string })?.difficulty === 'medium' || (challenge as { difficulty?: string })?.difficulty === 'hard') ||
-        ((challenge as { points?: number })?.points || 0) >= 50 // TODO: DONT SHOW ALL OF THEM LATER?
+        ((challenge as { points?: number })?.points || 0) >= 25 // TODO: DONT SHOW ALL OF THEM LATER?
       ) || [];
       
       console.log('✅ Advanced challenges loaded:', filtered.length);
@@ -379,15 +382,17 @@ export default function AssemblyLineContent() {
           progress: data.progress || 0,
           stats: data.stats || null,
           submissions: data.submissions || [],
-          completedChallengeIds: data.completedChallengeIds || []
+          completedChallengeIds: data.completedChallengeIds || [],
+          aiActivated: data.aiActivated || false,
+          aiActivatedAt: data.aiActivatedAt
         };
       } else {
         console.log('⚠️ Admin project data not available, using defaults');
-        return { progress: 0, stats: null, submissions: [], completedChallengeIds: [] };
+        return { progress: 0, stats: null, submissions: [], completedChallengeIds: [], aiActivated: false, aiActivatedAt: undefined };
       }
     } catch (error) {
       console.log('⚠️ Error fetching admin project data:', error);
-      return { progress: 0, stats: null, submissions: [], completedChallengeIds: [] };
+      return { progress: 0, stats: null, submissions: [], completedChallengeIds: [], aiActivated: false, aiActivatedAt: undefined };
     }
   }, []);
 
@@ -424,7 +429,7 @@ export default function AssemblyLineContent() {
       setAnimatedProgress(userProject.neuralReconstruction || 0);
       setArmStatus(userProject.aiActivated ? 'restoring' : 'offline');
       setAdminSelectedProject(null);
-      setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
+      setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [], aiActivated: false, aiActivatedAt: undefined });
       
     } else if (isAdmin) {
       // Admin selecting any project - fetch that project's data
@@ -449,7 +454,7 @@ export default function AssemblyLineContent() {
       setCodeCompletion(arm.neuralReconstruction || 0);
       setAnimatedProgress(arm.neuralReconstruction || 0);
       setAdminSelectedProject(null);
-      setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [] });
+      setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [], aiActivated: false, aiActivatedAt: undefined });
     }
   }, [isAdmin, userProject, fetchAdminProjectData, router]);
 
@@ -842,7 +847,7 @@ export default function AssemblyLineContent() {
           /* Robotic Arm Restoration with Sidebar Layout */
           <div className="flex gap-6">
             {/* Left Sidebar */}
-            <div className="w-50 flex-shrink-0">
+            <div className="w-60 flex-shrink-0">
               {/* Admin viewing indicator */}
               {adminSelectedProject && (
                 <div className="mb-4 flex items-center">
@@ -857,41 +862,172 @@ export default function AssemblyLineContent() {
                 {/* Team Section - Always show */}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Team Members</h3>
-                  {selectedArm.teamMemberDetails && selectedArm.teamMemberDetails.length > 0 ? (
-                    <TeamMemberList 
-                      teamMembers={selectedArm.teamMemberDetails}
-                      projectId={selectedArm.id}
-                      showLeaveButton={true}
-                      className=""
-                      inviteButton={
-                        /* Invite Member Button - show for project leads or if no members */
-                        (!selectedArm.teamMemberDetails || 
-                          selectedArm.teamMemberDetails.length === 0 ||
-                          (selectedArm.teamMemberDetails?.some(member => member.id === user?.id && member.isLead) && 
-                           (selectedArm.teamMemberDetails?.length || 0) < 3)) ? (
-                          <button
-                            onClick={() => setShowInvitationModal(true)}
-                            className="inline-flex items-center px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors space-x-1"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                            </svg>
-                            <span>Invite</span>
-                          </button>
-                        ) : null
-                      }
-                    />
-                  ) : (
-                    <div>
-                      <p className="text-sm text-gray-500 mb-2">No team members found</p>
-                      <p className="text-xs text-gray-400">
-                        Debug: teamMemberDetails length = {selectedArm.teamMemberDetails?.length || 'undefined'}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        Project: {selectedArm.name}
-                      </p>
-                    </div>
-                  )}
+                  {(() => {
+                    // Merge team member details with points from team submissions
+                    const teamMembersWithPoints = selectedArm.teamMemberDetails?.map(member => {
+                      const memberWithPoints = teamMembers.find(tm => tm.id === member.id);
+                      return {
+                        ...member,
+                        totalPoints: memberWithPoints?.totalPoints || 0
+                      };
+                    }) || [];
+
+                    // Debug logging
+                    console.log('🔍 Team Members Debug:', {
+                      teamMemberDetails: selectedArm.teamMemberDetails,
+                      teamSubmissionsData: teamMembers,
+                      mergedWithPoints: teamMembersWithPoints
+                    });
+
+                    // Calculate total team points
+                    const totalTeamPoints = teamMembersWithPoints.reduce((sum, member) => sum + (member.totalPoints || 0), 0);
+
+                    return teamMembersWithPoints.length > 0 ? (
+                      <div>
+                        <TeamMemberList 
+                          teamMembers={teamMembersWithPoints}
+                          projectId={selectedArm.id}
+                          showLeaveButton={false}
+                          className=""
+                        />
+                        {/* Total Team Points */}
+                        <div className="mt-3 p-2 bg-gray-50 rounded-lg border">
+                          <div className="text-sm font-medium text-gray-700">
+                            Total Team Points: <span className="text-blue-600 font-bold">{totalTeamPoints}</span>
+                          </div>
+                        </div>
+                        {/* Action Buttons Row */}
+                        <div className="mt-3 flex items-center justify-between gap-2">
+                          <div className="flex-1">
+                            {/* Invite Member Button - show for project leads or if no members */}
+                            {(!selectedArm.teamMemberDetails || 
+                              selectedArm.teamMemberDetails.length === 0 ||
+                              (selectedArm.teamMemberDetails?.some(member => member.id === user?.id && member.isLead) && 
+                               (selectedArm.teamMemberDetails?.length || 0) < 3)) && (
+                              <button
+                                onClick={() => setShowInvitationModal(true)}
+                                className="inline-flex items-center px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors space-x-1"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                <span>Invite</span>
+                              </button>
+                            )}
+                          </div>
+                          <div>
+                            {/* Leave Project Button Logic */}
+                            {(() => {
+                              const currentUserMember = teamMembersWithPoints.find(member => member.id === user?.id);
+                              const hasOtherMembers = teamMembersWithPoints.length > 1;
+                              const canLeave = currentUserMember && (!currentUserMember.isLead || !hasOtherMembers);
+                              const shouldShowButton = currentUserMember; // Show button if user is a member
+                              
+                              // Debug logging for leave button
+                              console.log('🔍 Leave Button Debug:', {
+                                userId: user?.id,
+                                currentUserMember,
+                                hasOtherMembers,
+                                canLeave,
+                                shouldShowButton,
+                                teamMembersWithPoints,
+                                isLeaving,
+                                showLeaveConfirm
+                              });
+                              
+                              const handleLeaveProject = async () => {
+                                if (!canLeave || isLeaving) return;
+
+                                setIsLeaving(true);
+                                
+                                try {
+                                  const result = await leaveProject();
+                                  
+                                  if (result.success) {
+                                    toast.success(result.message || 'Successfully left the project');
+                                    setShowLeaveConfirm(false);
+                                  } else {
+                                    toast.error(result.error || 'Failed to leave project');
+                                  }
+                                } catch (error) {
+                                  toast.error('Network error occurred');
+                                  console.error('Leave project error:', error);
+                                } finally {
+                                  setIsLeaving(false);
+                                }
+                              };
+                              
+                              return shouldShowButton && !showLeaveConfirm ? (
+                                <button
+                                  onClick={canLeave ? () => setShowLeaveConfirm(true) : undefined}
+                                  disabled={!canLeave}
+                                  className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                                    canLeave 
+                                      ? 'bg-red-100 hover:bg-red-200 text-red-800 cursor-pointer'
+                                      : 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                                  }`}
+                                  title={!canLeave 
+                                    ? 'Cannot leave project as lead while other members exist'
+                                    : currentUserMember?.isLead && !hasOtherMembers 
+                                    ? 'Delete Project' 
+                                    : 'Leave Project'
+                                  }
+                                >
+                                  <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                  </svg>
+                                  {currentUserMember?.isLead && !hasOtherMembers ? 'Delete' : 'Leave'}
+                                </button>
+                              ) : shouldShowButton && showLeaveConfirm ? (
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-2 min-w-72">
+                                  <p className="text-sm text-red-800 font-medium">
+                                    {currentUserMember?.isLead && !hasOtherMembers 
+                                      ? 'Are you sure you want to delete this project?'
+                                      : 'Are you sure you want to leave this project?'
+                                    }
+                                  </p>
+                                  <div className="flex space-x-2">
+                                    <button
+                                      onClick={handleLeaveProject}
+                                      disabled={isLeaving}
+                                      className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white py-1 px-3 rounded text-xs font-medium transition-colors flex items-center justify-center"
+                                    >
+                                      {isLeaving ? (
+                                        <>
+                                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
+                                          {currentUserMember?.isLead && !hasOtherMembers ? 'Destroying...' : 'Leaving...'}
+                                        </>
+                                      ) : (
+                                        currentUserMember?.isLead && !hasOtherMembers ? 'Yes, Destroy' : 'Yes, Leave'
+                                      )}
+                                    </button>
+                                    <button
+                                      onClick={() => setShowLeaveConfirm(false)}
+                                      disabled={isLeaving}
+                                      className="flex-1 bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-800 py-1 px-3 rounded text-xs font-medium transition-colors"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : null;
+                            })()}
+
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <p className="text-sm text-gray-500 mb-2">No team members found</p>
+                        <p className="text-xs text-gray-400">
+                          Debug: teamMemberDetails length = {selectedArm.teamMemberDetails?.length || 'undefined'}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          Project: {selectedArm.name}
+                        </p>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -920,10 +1056,10 @@ export default function AssemblyLineContent() {
             {/* Main Content */}
             <div className="flex-1">
               {/* Main content area with flexible layout */}
-              <div className="flex gap-6">
+              <div className="flex gap-2">
                 {/* Code Restoration Portal - Takes most space */}
-                <div className="flex-1 bg-white rounded-lg shadow-md p-6">
-                  <div className="flex items-center justify-between mb-6">
+                <div className="flex-1 bg-white rounded-lg shadow-sm p-4">
+                  <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
                       <span className="text-2xl">{selectedArm.logo}</span>
                       <h3 className="text-lg font-semibold text-gray-900">{selectedArm.name} - Code Restoration Portal</h3>
@@ -967,13 +1103,17 @@ export default function AssemblyLineContent() {
                   <div className="flex space-x-2">
                     <div className="relative group">
                       <button
-                        onClick={isAdminFrontend && codeCompletion >= 100 ? activateAI : undefined}
-                        disabled={codeCompletion < 100 || !isAdminFrontend || aiPermanentlyActivated}
+                        onClick={isAdminFrontend && codeCompletion >= 100 && !adminSelectedProject ? activateAI : undefined}
+                        disabled={codeCompletion < 100 || !isAdminFrontend || (adminSelectedProject ? true : aiPermanentlyActivated)}
                         className={`px-6 py-3 rounded-md text-sm font-bold transition-all duration-300 border-2 ${
                           codeCompletion < 100 || !isAdminFrontend
                             ? 'bg-gray-400 text-gray-600 border-gray-300 cursor-not-allowed'
+                            : adminSelectedProject
+                            ? (adminProjectData?.aiActivated 
+                               ? 'bg-black text-purple-400 border-purple-400 shadow-lg animate-pulse shadow-purple-400/50 cursor-not-allowed'
+                               : 'bg-gray-500 text-gray-300 border-gray-400 cursor-not-allowed')
                             : aiPermanentlyActivated
-                            ? 'bg-black text-red-500 border-red-500 shadow-lg animate-pulse shadow-red-500/50 cursor-not-allowed'
+                            ? 'bg-black text-purple-400 border-purple-400 shadow-lg animate-pulse shadow-purple-400/50 cursor-not-allowed'
                             : armStatus === 'restoring'
                             ? 'bg-red-600 hover:bg-red-700 text-white border-red-400 shadow-lg animate-pulse shadow-red-500/50 cursor-pointer'
                             : 'bg-red-500 hover:bg-red-600 text-white border-red-300 shadow-md cursor-pointer'
@@ -981,12 +1121,14 @@ export default function AssemblyLineContent() {
                       >
                         {codeCompletion < 100 ? '🔒 REQUIRES 100%' :
                          !isAdminFrontend ? '🔒 ADMIN ONLY' :
-                         aiPermanentlyActivated ? '🤖 AI AUTONOMOUS' :
+                         adminSelectedProject 
+                          ? (adminProjectData?.aiActivated ? '🤖 AI AUTONOMOUS' : '👁️ VIEWING PROJECT')
+                          : aiPermanentlyActivated ? '🤖 AI AUTONOMOUS' :
                          armStatus === 'restoring' ? '🔥 AI ACTIVATING...' : '⚡ ACTIVATE AI'}
                       </button>
                       
                       {/* Tooltip */}
-                      {(codeCompletion < 100 || !isAdminFrontend) && !aiPermanentlyActivated && (
+                      {((codeCompletion < 100 || !isAdminFrontend) && !aiPermanentlyActivated && !adminSelectedProject) && (
                         <div className="invisible group-hover:visible absolute z-50 w-64 p-3 mt-2 text-sm text-white bg-gray-900 rounded-lg shadow-lg -translate-x-1/2 left-1/2">
                           <div className="font-medium mb-1">
                             {codeCompletion < 100 ? '⚠️ Insufficient Neural Reconstruction' : '🔐 Administrator Access Required'}
@@ -1007,13 +1149,35 @@ export default function AssemblyLineContent() {
                           </div>
                         </div>
                       )}
+                      
+                      {/* Admin viewing mode tooltip */}
+                      {adminSelectedProject && (
+                        <div className="invisible group-hover:visible absolute z-50 w-64 p-3 mt-2 text-sm text-white bg-gray-900 rounded-lg shadow-lg -translate-x-1/2 left-1/2">
+                          <div className="font-medium mb-1">
+                            👁️ Administrator View Mode
+                          </div>
+                          <div className="text-xs text-gray-300">
+                            You are viewing another project's data. 
+                            {adminProjectData?.aiActivated 
+                              ? ' This project\'s AI has been permanently activated.' 
+                              : ' This project\'s AI has not been activated yet.'}
+                          </div>
+                          <div className="text-xs text-blue-300 mt-2 italic">
+                            💡 Switch back to your own project to control your AI system.
+                          </div>
+                          {/* Arrow */}
+                          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1">
+                            <div className="w-2 h-2 bg-gray-900 rotate-45"></div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
                 
-                <div className="flex gap-4 mb-8 items-stretch">
-                  {/* Robotic Arm Visualization - Left side, half width */}
-                  <div className="w-1/2">
+                <div className="flex gap-2 mb-6 items-stretch">
+                  {/* Robotic Arm Visualization - Left side, more than half width */}
+                  <div className="w-3/5">
                     <div className="relative h-full bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-lg overflow-hidden flex items-center justify-center min-h-[350px]">
                   {/* Loading overlay when processing initial data with 0% progress or user data is still loading */}
                   {((animatedProgress === 0 && isInitialDataProcessing) || (isLoadingUserData && selectedArm)) && (
@@ -1040,7 +1204,7 @@ export default function AssemblyLineContent() {
                   </div>
                   
                   {/* Base Platform */}
-                  <div className={`absolute bottom-4 left-1/2 w-16 h-6 transform -translate-x-1/2 rounded-lg shadow-lg transition-all duration-700 ${
+                  <div className={`absolute bottom-4 left-1/2 w-24 h-8 transform -translate-x-1/2 rounded-lg shadow-lg transition-all duration-700 ${
                     codeCompletion > 5 
                       ? 'bg-gradient-to-t from-slate-600 to-slate-500 border-2 border-cyan-400/50' 
                       : 'bg-gray-400 border-2 border-gray-300'
@@ -1048,11 +1212,11 @@ export default function AssemblyLineContent() {
                     {/* Base LED Indicators */}
                     {codeCompletion > 5 && (
                       <>
-                        <div className={`absolute top-1 left-2 w-1.5 h-1.5 rounded-full ${
+                        <div className={`absolute top-2 left-3 w-2 h-2 rounded-full ${
                           armStatus === 'restoring' ? 'bg-cyan-400 animate-pulse' : 
                           codeCompletion >= 100 ? 'bg-green-400' : 'bg-blue-400'
                         }`}></div>
-                        <div className={`absolute top-1 right-2 w-1.5 h-1.5 rounded-full ${
+                        <div className={`absolute top-2 right-3 w-2 h-2 rounded-full ${
                           armStatus === 'restoring' ? 'bg-cyan-400 animate-pulse' : 
                           codeCompletion >= 100 ? 'bg-green-400' : 'bg-blue-400'
                         }`}></div>
@@ -1063,7 +1227,7 @@ export default function AssemblyLineContent() {
                   {/* Lower Arm Segment - Appears at 20% with slide-up animation */}
                   {animatedProgress > 20 && (
                     <div 
-                      className={`absolute bottom-10 left-1/2 w-4 h-16 transform -translate-x-1/2 rounded-t-lg transition-all duration-700 shadow-lg ${
+                      className={`absolute bottom-20 left-1/2 w-6 h-20 transform -translate-x-1/2 rounded-t-lg transition-all duration-700 shadow-lg ${
                         armStatus === 'restoring' 
                           ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-cyan-500/50' 
                           : codeCompletion >= 100 
@@ -1078,7 +1242,7 @@ export default function AssemblyLineContent() {
                       }}
                     >
                       {/* Joint Connection */}
-                      <div className={`absolute -top-2 left-1/2 transform -translate-x-1/2 w-6 h-4 rounded-full border-2 ${
+                      <div className={`absolute -top-2 left-1/2 transform -translate-x-1/2 w-8 h-5 rounded-full border-2 ${
                         animatedProgress >= 100 ? 'bg-green-600 border-green-400' : 
                         armStatus === 'restoring' ? 'bg-cyan-600 border-cyan-400' : 'bg-slate-600 border-slate-400'
                       }`}></div>
@@ -1091,7 +1255,7 @@ export default function AssemblyLineContent() {
                   {/* Middle Arm Segment - Appears at 40% with articulated movement */}
                   {animatedProgress > 40 && (
                     <div 
-                      className={`absolute left-1/2 w-3.5 h-14 transform -translate-x-1/2 rounded-lg transition-all duration-700 shadow-lg ${
+                      className={`absolute left-1/2 w-5 h-18 transform -translate-x-1/2 rounded-lg transition-all duration-700 shadow-lg ${
                         armStatus === 'restoring' 
                           ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-cyan-500/50'
                           : codeCompletion >= 100 
@@ -1099,11 +1263,37 @@ export default function AssemblyLineContent() {
                           : 'bg-gradient-to-t from-slate-500 to-slate-400'
                       }`} 
                       style={{
-                        bottom: '102px',
-                        transform: `translateX(-20%) ${
+                        bottom: '150px', // Better spacing from lower arm
+                        transform: `translateX(-25%) ${
                           armStatus === 'restoring' ? 'rotate(-3deg)' : 'rotate(0deg)'
                         }`,
                         animation: animatedProgress > 40 && animatedProgress <= 45 ? 'slideUp 1s ease-out 0.3s both' : undefined
+                      }}
+                    >
+                      {/* Joint Connection */}
+                      <div className={`absolute -top-2 left-1/2 transform -translate-x-1/2 w-6 h-4 rounded-full border-2 ${
+                        animatedProgress >= 100 ? 'bg-green-600 border-green-400' : 
+                        armStatus === 'restoring' ? 'bg-cyan-600 border-cyan-400' : 'bg-slate-600 border-slate-400'
+                      }`}></div>
+                    </div>
+                  )}
+                  
+                  {/* Upper Arm Segment - Appears at 60% */}
+                  {animatedProgress > 60 && (
+                    <div 
+                      className={`absolute left-1/2 w-4 h-14 transform -translate-x-1/2 rounded-lg transition-all duration-700 shadow-lg ${
+                        armStatus === 'restoring' 
+                          ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-cyan-500/50'
+                          : codeCompletion >= 100 
+                          ? 'bg-gradient-to-t from-green-500 to-emerald-500 shadow-green-500/50'
+                          : 'bg-gradient-to-t from-slate-500 to-slate-400'
+                      }`} 
+                      style={{
+                        bottom: '220px', // Better spacing from middle arm
+                        transform: `translateX(-30%) ${
+                          armStatus === 'restoring' ? 'rotate(1deg)' : 'rotate(0deg)'
+                        }`,
+                        animation: animatedProgress > 60 && animatedProgress <= 65 ? 'slideUp 1s ease-out 0.6s both' : undefined
                       }}
                     >
                       {/* Joint Connection */}
@@ -1114,36 +1304,10 @@ export default function AssemblyLineContent() {
                     </div>
                   )}
                   
-                  {/* Upper Arm Segment - Appears at 60% */}
-                  {animatedProgress > 60 && (
-                    <div 
-                      className={`absolute left-1/2 w-3 h-10 transform -translate-x-1/2 rounded-lg transition-all duration-700 shadow-lg ${
-                        armStatus === 'restoring' 
-                          ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-cyan-500/50'
-                          : codeCompletion >= 100 
-                          ? 'bg-gradient-to-t from-green-500 to-emerald-500 shadow-green-500/50'
-                          : 'bg-gradient-to-t from-slate-500 to-slate-400'
-                      }`} 
-                      style={{
-                        bottom: '156px',
-                        transform: `translateX(-20%) ${
-                          armStatus === 'restoring' ? 'rotate(1deg)' : 'rotate(0deg)'
-                        }`,
-                        animation: animatedProgress > 60 && animatedProgress <= 65 ? 'slideUp 1s ease-out 0.6s both' : undefined
-                      }}
-                    >
-                      {/* Joint Connection */}
-                      <div className={`absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full border-2 ${
-                        animatedProgress >= 100 ? 'bg-green-600 border-green-400' : 
-                        armStatus === 'restoring' ? 'bg-cyan-600 border-cyan-400' : 'bg-slate-600 border-slate-400'
-                      }`}></div>
-                    </div>
-                  )}
-                  
                   {/* Wrist Joint - Appears at 80% with rotation */}
                   {animatedProgress > 80 && (
                     <div 
-                      className={`absolute left-1/2 w-6 h-6 rounded-full transform -translate-x-1/2 transition-all duration-700 shadow-lg border-2 ${
+                      className={`absolute left-1/2 w-7 h-7 rounded-full transform -translate-x-1/2 transition-all duration-700 shadow-lg border-2 ${
                         armStatus === 'restoring' 
                           ? 'bg-gradient-to-br from-cyan-400 to-blue-600 border-cyan-300 shadow-cyan-500/50'
                           : codeCompletion >= 100 
@@ -1151,8 +1315,8 @@ export default function AssemblyLineContent() {
                           : 'bg-gradient-to-br from-slate-400 to-slate-600 border-slate-300'
                       }`} 
                       style={{
-                        bottom: '186px',
-                        transform: `translateX(-10%) ${
+                        bottom: '280px', // Better spacing from upper arm
+                        transform: `translateX(-15%) ${
                           armStatus === 'restoring' ? 'rotate(180deg)' : 'rotate(0deg)'
                         }`,
                         animation: armStatus === 'restoring' 
@@ -1162,7 +1326,7 @@ export default function AssemblyLineContent() {
                     >
                       {/* Wrist Detail */}
                       <div className="absolute inset-1 rounded-full border border-white/20"></div>
-                      <div className={`absolute top-1/2 left-1/2 w-1 h-1 rounded-full transform -translate-x-1/2 -translate-y-1/2 ${
+                      <div className={`absolute top-1/2 left-1/2 w-2 h-2 rounded-full transform -translate-x-1/2 -translate-y-1/2 ${
                         armStatus === 'restoring' ? 'bg-white animate-ping' : 'bg-white/50'
                       }`}></div>
                     </div>
@@ -1173,14 +1337,14 @@ export default function AssemblyLineContent() {
                     <div 
                       className="absolute left-1/2 transform -translate-x-1/2 transition-all duration-700" 
                       style={{
-                        bottom: '246px', // Positioned above wrist joint for proper robot arm assembly
+                        bottom: '330px', // Better spacing above wrist joint
                         animation: armStatus === 'restoring' 
                           ? 'gripperRotate 2s ease-in-out infinite' 
                           : undefined
                       }}
                     >
                       {/* Wrist-to-Gripper Connecting Sleeve - makes it look like a real robot arm */}
-                      <div className={`absolute left-1/2 transform -translate-x-1/2 w-3 h-4 rounded-lg mb-1 transition-all duration-300 ${
+                      <div className={`absolute left-1/2 transform -translate-x-1/2 w-4 h-5 rounded-lg mb-1 transition-all duration-300 ${
                         armStatus === 'restoring' 
                           ? 'bg-gradient-to-t from-slate-600 to-cyan-500 shadow-md shadow-cyan-500/30'
                           : 'bg-gradient-to-t from-slate-600 to-green-500 shadow-md shadow-green-500/30'
@@ -1192,9 +1356,9 @@ export default function AssemblyLineContent() {
                       </div>
                       
                       {/* Gripper Claws - positioned above body to point upward like real robot arm */}
-                      <div className="absolute left-1/2 transform -translate-x-1/2 flex space-x-1 mb-1" style={{ top: '16px' }}>
+                      <div className="absolute left-1/2 transform -translate-x-1/2 flex space-x-1.5 mb-1" style={{ top: '18px' }}>
                         <div 
-                          className={`w-1.5 h-4 rounded-t-lg transition-all duration-500 ${
+                          className={`w-2.5 h-5 rounded-t-lg transition-all duration-500 ${
                             armStatus === 'restoring' 
                               ? 'bg-cyan-400 shadow-lg shadow-cyan-400/50'
                               : 'bg-green-400 shadow-lg shadow-green-400/50'
@@ -1204,7 +1368,7 @@ export default function AssemblyLineContent() {
                           }}
                         ></div>
                         <div 
-                          className={`w-1.5 h-4 rounded-t-lg transition-all duration-500 ${
+                          className={`w-2.5 h-5 rounded-t-lg transition-all duration-500 ${
                             armStatus === 'restoring' 
                               ? 'bg-cyan-400 shadow-lg shadow-cyan-400/50'
                               : 'bg-green-400 shadow-lg shadow-green-400/50'
@@ -1216,12 +1380,12 @@ export default function AssemblyLineContent() {
                       </div>
                       
                       {/* Gripper Body */}
-                      <div className={`absolute left-1/2 transform -translate-x-1/2 w-4 h-3 rounded-b-lg ${
+                      <div className={`absolute left-1/2 transform -translate-x-1/2 w-5 h-4 rounded-b-lg ${
                         armStatus === 'restoring' 
                           ? 'bg-gradient-to-t from-cyan-500 to-blue-500 shadow-lg shadow-cyan-500/50'
                           : 'bg-gradient-to-t from-green-500 to-emerald-500 shadow-lg shadow-green-500/50'
-                      }`} style={{ top: '32px' }}>
-                        <div className="absolute left-1/2 transform -translate-x-1/2 w-2 h-1 bg-white/20 rounded-full mb-0.5" style={{ bottom: '2px' }}></div>
+                      }`} style={{ top: '35px' }}>
+                        <div className="absolute left-1/2 transform -translate-x-1/2 w-2.5 h-1.5 bg-white/20 rounded-full mb-0.5" style={{ bottom: '2px' }}></div>
                       </div>
                     </div>
                   )}
@@ -1260,8 +1424,8 @@ export default function AssemblyLineContent() {
                 </div>
                   </div>
                   
-                  {/* AI Restoration Information - Right side, half width */}
-                  <div className="w-1/2 space-y-4 min-h-[400px]">
+                  {/* AI Restoration Information - Right side, remaining width */}
+                  <div className="w-2/5 space-y-4 min-h-[400px]">
                     {/* Neural Status */}
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                       <h4 className="text-sm font-semibold text-blue-900 mb-2">Neural Status</h4>
@@ -1318,12 +1482,25 @@ export default function AssemblyLineContent() {
                         <p className="text-sm text-amber-700">
                           You are viewing {adminSelectedProject.leadDeveloper || `Unknown`}&apos;s project data. Flag submissions are disabled in admin view mode to prevent data mixing.
                         </p>
+                        {/* Show AI activation status for admins */}
+                        {adminProjectData?.aiActivated && (
+                          <div className="mt-2 p-2 bg-purple-100 border border-purple-300 rounded">
+                            <p className="text-xs text-purple-800 font-medium">
+                              🤖 <strong>AI ACTIVATED</strong> - This project&apos;s AI system has achieved full autonomy.
+                              {adminProjectData.aiActivatedAt && (
+                                <span className="block mt-1">
+                                  Activated: {new Date(adminProjectData.aiActivatedAt).toLocaleDateString()} at {new Date(adminProjectData.aiActivatedAt).toLocaleTimeString()}
+                                </span>
+                              )}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
                 )}
 
-                <form onSubmit={handleCodeSubmit} className="space-y-4">
+                <form onSubmit={handleCodeSubmit} className="space-y-3">
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <label htmlFor="ctf-code" className="block text-sm font-medium text-gray-700">
@@ -1348,10 +1525,10 @@ export default function AssemblyLineContent() {
                   <button
                     type="submit"
                     disabled={isSubmitting || adminSelectedProject !== null}
-                    className={`w-full py-3 px-6 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center space-x-2 ${
+                    className={`w-full py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
                       isSubmitting || adminSelectedProject
                         ? 'bg-gray-400 cursor-not-allowed' 
-                        : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
+                        : 'bg-blue-900 hover:bg-blue-800 text-white border border-blue-700'
                     }`}
                   >
                     {isSubmitting ? (
@@ -1369,19 +1546,19 @@ export default function AssemblyLineContent() {
                 
                 {/* Code validation feedback */}
                 {lastCodeResult.type && (
-                  <div className={`mt-4 p-3 rounded-lg border transition-all duration-500 ${
+                  <div className={`mt-2 p-2 rounded-lg border transition-all duration-500 ${
                     lastCodeResult.type === 'success' 
                       ? 'bg-green-50 border-green-200 text-green-800' 
                       : 'bg-red-50 border-red-200 text-red-800'
                   }`}>
-                    <p className="text-sm font-medium font-mono">{lastCodeResult.message}</p>
+                    <p className="text-xs font-medium font-mono">{lastCodeResult.message}</p>
                   </div>
                 )}
               </div>
 
                 {/* Advanced Challenges Panel - Takes flexible space */}
                 {showAdvanced && advancedChallenges.length > 0 && (
-                  <div className="flex-1 bg-white rounded-lg shadow-md p-6">
+                  <div className="flex-1 bg-white rounded-lg shadow-sm p-4">
                     <AdvancedChallengesPanel 
                       challenges={advancedChallenges} 
                       completedChallengeIds={adminSelectedProject ? new Set(adminProjectData.completedChallengeIds) : new Set(completedChallengeIds)}

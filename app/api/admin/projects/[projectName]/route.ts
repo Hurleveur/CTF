@@ -90,7 +90,9 @@ export async function GET(
       progress: projectData.neural_reconstruction || 0,
       stats,
       submissions: submissions || [],
-      completedChallengeIds: completedChallengeIds
+      completedChallengeIds: completedChallengeIds,
+      aiActivated: projectData.ai_activated || false,
+      aiActivatedAt: projectData.ai_activated_at
     });
 
   } catch (error) {

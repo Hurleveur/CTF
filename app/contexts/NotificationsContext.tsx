@@ -93,9 +93,12 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
           if (status === 'SUBSCRIBED') {
             setIsConnected(true);
             console.log('[Notifications] 🎉 Successfully connected to real-time notifications!');
-          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
             setIsConnected(false);
             console.error('[Notifications] Subscription failed with status:', status);
+          } else if (status === 'CLOSED') {
+            setIsConnected(false);
+            console.log('[Notifications] 🔌 Subscription closed (likely due to logout)');
           }
         });
 

@@ -213,6 +213,14 @@ export async function GET() {
       }
     });
 
+    // Calculate total points for each team member
+    const memberPointsMap = new Map<string, number>();
+    submissions?.forEach(submission => {
+      const userId = submission.user_id;
+      const points = submission.points_awarded || 0;
+      memberPointsMap.set(userId, (memberPointsMap.get(userId) || 0) + points);
+    });
+
     // Transform team members data for frontend
     const teamMembersData = teamMembers?.map(member => {
       const profile = Array.isArray(member.profiles) ? member.profiles[0] : member.profiles;
@@ -222,7 +230,8 @@ export async function GET() {
         email: profile?.email,
         isLead: member.is_lead,
         joinedAt: member.joined_at,
-        isCurrentUser: member.user_id === user.id
+        isCurrentUser: member.user_id === user.id,
+        totalPoints: memberPointsMap.get(member.user_id) || 0
       };
     }) || [];
 

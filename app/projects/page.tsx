@@ -198,7 +198,9 @@ export default function SolutionsPage() {
               neuralReconstruction: 0,
               lastBackup: '2025-01-18',
               leadDeveloper: 'Patrick Star',
-              teamMembers: ['Patrick Star', 'Dr. Sarah Chen']
+              teamMembers: ['Patrick Star', 'Dr. Sarah Chen'],
+              aiActivated: false,
+              aiActivatedAt: undefined
             }
           ];
           setProjects(defaultProjects);
@@ -424,9 +426,9 @@ export default function SolutionsPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
               {sortedProjects.map((project, index) => {
-              // Always calculate statusColor and aiStatus based on neuralReconstruction percentage
-              const statusColor = calculateStatusColor(project.neuralReconstruction);
-              const aiStatus = calculateAIStatus(project.neuralReconstruction);
+              // Always calculate statusColor and aiStatus based on neuralReconstruction percentage and AI activation
+              const statusColor = calculateStatusColor(project.neuralReconstruction, project.aiActivated);
+              const aiStatus = calculateAIStatus(project.neuralReconstruction, project.aiActivated);
               
               return (
               <div key={project.id} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-200 h-full">
@@ -438,7 +440,11 @@ export default function SolutionsPage() {
                     </div>
                   </div>
                   <p className="text-gray-600 mb-2 text-sm line-clamp-2">
-                    {project.neuralReconstruction >= 110 ? (
+                    {project.aiActivated ? (
+                      <span className="text-purple-900 font-bold animate-pulse">
+                        🤖 TERMINAL STATE: AI has achieved full autonomy. It's too late - the system is beyond recovery.
+                      </span>
+                    ) : project.neuralReconstruction >= 110 ? (
                       <span className="text-purple-800 font-bold animate-pulse">
                         🚨 EMERGENCY: AI has taken control! System autonomy achieved.
                       </span>
@@ -458,6 +464,16 @@ export default function SolutionsPage() {
                         {aiStatus}
                       </span>
                     </div>
+                    
+                    {/* Show AI activation timestamp for admins and project owners */}
+                    {project.aiActivated && project.aiActivatedAt && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-500 text-xs">AI Activated:</span>
+                        <span className="text-purple-800 text-xs font-medium">
+                          {new Date(project.aiActivatedAt).toLocaleDateString()} {new Date(project.aiActivatedAt).toLocaleTimeString()}
+                        </span>
+                      </div>
+                    )}
                     
                     <div>
                       <div className="flex justify-between items-center mb-1">
