@@ -82,6 +82,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if project name already exists
+    const { data: existingProject, error: nameCheckError } = await supabase
+      .from('user_projects')
+      .select('id, name')
+      .eq('name', name)
+      .limit(1);
+
+    if (nameCheckError) {
+      console.error('Error checking project name uniqueness:', nameCheckError);
+      return NextResponse.json(
+        { error: 'Failed to validate project name' }, 
+        { status: 500 }
+      );
+    }
+
+    if (existingProject && existingProject.length > 0) {
+      return NextResponse.json(
+        { error: `Project name "${name}" is already taken. Please choose a different name.` }, 
+        { status: 400 }
+      );
+    }
+
     // Insert new project
     const { data: project, error } = await supabase
       .from('user_projects')

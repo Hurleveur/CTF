@@ -14,7 +14,7 @@ export default function Navigation() {
   const [, setKeySequence] = useState<string[]>([]);
   const [isScrolled, setIsScrolled] = useState(false);
   const { isAuthenticated, logout, user } = useAuth();
-  const { stats, project } = useUserData();
+  const { stats, project, profile } = useUserData();
   
   // Konami Code: Up Up Down Down Left Right Left Right B A
   // Support both QWERTY (B, A) and AZERTY (B, Q) keyboard layouts
@@ -174,8 +174,8 @@ export default function Navigation() {
             )}
             {isAuthenticated ? (
               <>
-                {/* Points display - only if user has a project */}
-                {project && (
+                {/* Points display - show if user has a project OR if user is a dev */}
+                {(project || profile?.role === 'dev') && (
                   <div className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 bg-gray-100/70 dark:bg-gray-700/50 px-3 py-2 rounded-xl border border-gray-200/50 dark:border-gray-600/50 backdrop-blur-sm transition-all duration-300 hover:shadow-md">
                     <span className="text-sm">🏆</span>
                     <span className="font-semibold">{stats?.total_points || 0}</span>
@@ -248,8 +248,8 @@ export default function Navigation() {
             
             {isAuthenticated && (
               <div className="space-y-2 mx-3 my-2">
-                {/* Points Indicator - only if user has a project */}
-                {project && (
+                {/* Points Indicator - show if user has a project OR if user is a dev */}
+                {(project || profile?.role === 'dev') && (
                   <div className="flex items-center justify-center text-gray-600 dark:text-gray-400 bg-gray-100/70 dark:bg-gray-700/50 px-3 py-2 rounded-xl border border-gray-200/50 dark:border-gray-600/50 backdrop-blur-sm">
                     <span className="text-sm mr-2">🏆</span>
                     <span className="font-semibold">{stats?.total_points || 0}</span>

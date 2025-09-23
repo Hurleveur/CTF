@@ -820,6 +820,162 @@ export default function AssemblyLineContent() {
             box-shadow: 0 0 30px rgba(6, 182, 212, 1), 0 0 50px rgba(6, 182, 212, 0.5), 0 0 70px rgba(6, 182, 212, 0.2);
           }
         }
+
+        /* Print styles for certificate PDF - hide navigation and UI elements */
+        @media print {
+          /* Hide navigation, headers, and other UI elements */
+          nav, 
+          header, 
+          .navbar,
+          .navigation,
+          .menu,
+          .sidebar,
+          .breadcrumb,
+          .search-bar,
+          .user-menu,
+          .logo,
+          .footer,
+          .print-hide,
+          button:not(.print-show),
+          .btn:not(.print-show),
+          .certificate-button,
+          .download-button,
+          /* Hide code fragment submission form and related elements */
+          form,
+          input[type="text"],
+          input[id="ctf-code"],
+          textarea,
+          .form-group,
+          .form-control,
+          label[for="ctf-code"],
+          button[type="submit"],
+          .submit-button,
+          .code-submission,
+          .fragment-input,
+          .restore-button,
+          /* Hide code validation feedback */
+          .code-feedback,
+          .validation-message,
+          .success-message,
+          .error-message,
+          /* Hide CTF completion certificate section from PDF */
+          .certificate-download,
+          .certificate-section,
+          .completion-certificate,
+          /* Target the specific certificate download div */
+          div:has(h4:contains("CTF Completion Certificate")),
+          div:has(button:contains("Download Certificate")),
+          div:has(span:contains("Download Certificate")),
+          /* Hide any div with green gradient background that contains certificate text */
+          .bg-gradient-to-r.from-green-50.to-emerald-50,
+          [class*="bg-gradient-to-r"][class*="from-green"],
+          /* Hide specific Next.js and common layout elements */
+          [role="banner"],
+          [role="navigation"],
+          [class*="nav"],
+          [class*="header"],
+          [class*="menu"],
+          [id*="nav"],
+          [id*="header"],
+          [id*="menu"],
+          /* Hide tooltips and modals */
+          .tooltip,
+          .modal,
+          .popup,
+          .overlay {
+            display: none !important;
+          }
+
+          /* Ensure body and main content use full page */
+          body {
+            margin: 0 !important;
+            padding: 20px !important;
+            background: white !important;
+            color: black !important;
+          }
+
+          /* Certificate styling for print */
+          .assembly-line-container {
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+
+          /* Add certificate header */
+          .assembly-line-container::before {
+            content: "🎓 CTF Completion Certificate\\A Cybersecurity Challenge Completion\\A ____________________\\A ";
+            white-space: pre;
+            display: block;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #059669;
+            margin-bottom: 30px;
+            page-break-after: avoid;
+          }
+
+          /* Ensure good page breaks */
+          .robotic-arm-visualization,
+          .ai-restoration-info,
+          .challenges-section {
+            page-break-inside: avoid;
+          }
+
+          /* Improve readability */
+          .text-xs { font-size: 10px !important; }
+          .text-sm { font-size: 12px !important; }
+          .text-base { font-size: 14px !important; }
+          .text-lg { font-size: 16px !important; }
+          
+          /* Ensure dark mode elements are visible */
+          .dark\\:text-white,
+          .dark\\:text-gray-300,
+          .dark\\:text-gray-200 {
+            color: black !important;
+          }
+          
+          .dark\\:bg-gray-800,
+          .dark\\:bg-gray-900 {
+            background: white !important;
+            border: 1px solid #e5e7eb !important;
+          }
+
+          /* Highlight current user in team member list with green selector square */
+          .team-member.current-user,
+          [data-current-user="true"],
+          .current-user {
+            background: #dcfce7 !important;
+            border: 3px solid #16a34a !important;
+            border-radius: 8px !important;
+            padding: 8px !important;
+            margin: 4px 0 !important;
+            position: relative !important;
+          }
+
+          .team-member.current-user::before,
+          [data-current-user="true"]::before,
+          .current-user::before {
+            content: "👤 Certificate Holder" !important;
+            position: absolute !important;
+            top: -20px !important;
+            left: 0 !important;
+            background: #16a34a !important;
+            color: white !important;
+            padding: 2px 8px !important;
+            border-radius: 4px !important;
+            font-size: 10px !important;
+            font-weight: bold !important;
+          }
+
+          /* Also highlight any element containing the current user's name/email */
+          [data-user-email="${user?.email}"],
+          [data-user-name="${user?.email}"] {
+            background: #dcfce7 !important;
+            border: 2px solid #16a34a !important;
+            border-radius: 6px !important;
+            padding: 4px 8px !important;
+          }
+        }
       `}</style>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Main Content Layout - Full width with small border */}
@@ -932,7 +1088,7 @@ export default function AssemblyLineContent() {
           /* Robotic Arm Restoration with Sidebar Layout */
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Left Sidebar */}
-            <div className="w-full lg:w-60 lg:flex-shrink-0 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto transition-all duration-300 hover:shadow-lg scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500 group">
+            <div className="w-full lg:w-60 lg:flex-shrink-0 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto transition-all duration-300 hover:shadow-lg scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500 group">
               {/* Sticky indicator - subtle visual hint */}
               <div className="hidden lg:block absolute -left-1 top-4 w-1 h-8 bg-gradient-to-b from-blue-500/0 via-blue-500/60 to-blue-500/0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               {/* Admin viewing indicator */}
@@ -1408,7 +1564,7 @@ export default function AssemblyLineContent() {
                       }`} 
                       style={{
                         bottom: '210px', 
-                        transform: `translateX(-10%) ${
+                        transform: `translateX(-30%) ${
                           armStatus === 'restoring' ? 'rotate(180deg)' : 'rotate(0deg)'
                         }`,
                         animation: armStatus === 'restoring' 
@@ -1430,14 +1586,14 @@ export default function AssemblyLineContent() {
                       className="absolute left-1/2 transform -translate-x-1/2 transition-all duration-700" 
                       style={{
                         bottom: '220px', // Position above the wrist joint
-                        transform: 'translateX(20%)', // Match wrist joint position
+                        transform: 'translateX(-30%)', // Match wrist joint position
                         animation: armStatus === 'restoring' 
                           ? 'gripperRotate 2s ease-in-out infinite' 
                           : undefined
                       }}
                     >
                       {/* Wrist-to-Gripper Connecting Sleeve - makes it look like a real robot arm */}
-                      <div className={`absolute left-1/2 transform -translate-x-1/2 w-4 h-8 rounded-lg mb-1 transition-all duration-300 ${
+                      <div className={`absolute left-1/2 transform -translate-x-1/3 w-4 h-8 rounded-lg mb-1 transition-all duration-300 ${
                         armStatus === 'restoring' 
                           ? 'bg-gradient-to-t from-slate-600 to-cyan-500 shadow-md shadow-cyan-500/30'
                           : 'bg-gradient-to-t from-slate-600 to-green-500 shadow-md shadow-green-500/30'
@@ -1558,6 +1714,29 @@ export default function AssemblyLineContent() {
                     </div>
                   </div>
                 </div>
+
+                {/* Certificate Download - Only show when AI is activated */}
+                {aiPermanentlyActivated && !adminSelectedProject && (
+                  <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-sm font-semibold text-green-900 mb-1">🎓 CTF Completion Certificate</h4>
+                        <p className="text-xs text-green-700">
+                          Congratulations! Your AI has been activated. Download your completion certificate.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => window.print()}
+                        className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm font-medium"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span>Download Certificate</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               
                 {/* Admin viewing warning */}
                 {adminSelectedProject && (

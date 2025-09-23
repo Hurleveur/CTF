@@ -249,6 +249,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if project name already exists
+    const { data: existingProject, error: nameCheckError } = await supabase
+      .from('user_projects')
+      .select('id, name')
+      .eq('name', projectData.name)
+      .limit(1);
+
+    if (nameCheckError) {
+      console.error('[Projects] Name check error:', nameCheckError.message);
+      return NextResponse.json(
+        { error: 'Failed to validate project name' },
+        { status: 500 }
+      );
+    }
+
+    if (existingProject && existingProject.length > 0) {
+      return NextResponse.json(
+        { error: `Project name "${projectData.name}" is already taken. Please choose a different name.` },
+        { status: 400 }
+      );
+    }
+
     // Get user's profile information for lead developer name
     const { data: profile } = await supabase
       .from('profiles')

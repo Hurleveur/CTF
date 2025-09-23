@@ -75,5 +75,5 @@ export function buildDefaultProject(fullName: string, userId: string) {
     last_backup: new Date().toISOString().substring(0, 10), // Today's date in YYYY-MM-DD format
     lead_developer: developerName,
     team_members: [developerName], // Start with just the creator
-  } as const;
+  };
 }

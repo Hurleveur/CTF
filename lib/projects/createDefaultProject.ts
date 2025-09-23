@@ -40,7 +40,41 @@ export async function createDefaultProject(
     const supabase = await createClient();
     
     // Build the default project data
-    const projectData = buildDefaultProject(fullName, userId);
+    let projectData = buildDefaultProject(fullName, userId);
+    
+    // Check if the project name already exists and make it unique if needed
+    let baseName: string = projectData.name;
+    let uniqueName: string = baseName;
+    let counter = 1;
+    
+    while (true) {
+      // Check if this name already exists
+      const { data: existingProject, error: checkError } = await supabase
+        .from('user_projects')
+        .select('id')
+        .eq('name', uniqueName)
+        .single();
+      
+      if (checkError && checkError.code === 'PGRST116') {
+        // No project found with this name - it's unique!
+        break;
+      } else if (checkError) {
+        // Some other error occurred
+        console.error('❌ Error checking project name uniqueness:', checkError.message);
+        return {
+          success: false,
+          error: checkError.message
+        };
+      } else if (existingProject) {
+        // Project name exists, try with a suffix
+        counter++;
+        uniqueName = `${baseName} ${counter}`;
+        console.log(`🔄 Project name "${baseName}" exists, trying "${uniqueName}"`);
+      }
+    }
+    
+    // Update the project data with the unique name
+    projectData = { ...projectData, name: uniqueName as any };
     
     // Insert the project into the database
     const { data: project, error } = await supabase
