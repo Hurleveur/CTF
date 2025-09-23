@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { checkRateLimit } from '@/lib/rate-limiter';
+import { dispatchChallengeCompletionNotification } from '@/lib/notifications/dispatch';
 import { z } from 'zod';
 
 // Input validation schema
@@ -316,6 +317,33 @@ export async function POST(request: NextRequest) {
       const successMessage = teamAlreadyCompleted 
         ? `Consciousness fragment accepted! Neural pathway "${challenge.title}" already restored by your team. No additional points awarded.`
         : `Consciousness fragment accepted! Neural pathway "${challenge.title}" restored.`;
+      
+      // Dispatch challenge completion notification to dev users (only for point-awarding completions)
+      if (pointsAwarded > 0) {
+        try {
+          // Get user profile for notification
+          const { data: userProfile } = await supabase
+            .from('profiles')
+            .select('email, full_name')
+            .eq('id', user_id)
+            .single();
+          
+          if (userProfile) {
+            await dispatchChallengeCompletionNotification(
+              userProfile.email,
+              userProfile.full_name,
+              user_id,
+              challenge.title,
+              actualChallengeId!, // We know it's defined here since we're in the success path
+              pointsAwarded
+            );
+            console.log(`[API] ✅ Challenge completion notification sent for user ${userProfile.email}`);
+          }
+        } catch (notificationError) {
+          console.error('[API] Failed to send challenge completion notification (continuing anyway):', notificationError);
+          // Don't fail the submission if notification fails
+        }
+      }
       
       return NextResponse.json({
         correct: true,

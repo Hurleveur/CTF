@@ -8,11 +8,15 @@
   },
   "scripts": {
     "dev": "next dev",
+    "dev:turbo": "next dev --turbo",
     "build": "next build",
+    "build:analyze": "ANALYZE=true next build",
     "start": "next start",
     "lint": "eslint .",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "perf:dev": "NODE_ENV=development npm run dev",
+    "perf:monitor": "node scripts/performance-monitor.js"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
@@ -26,6 +30,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
+    "@svgr/webpack": "^8.1.0",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
@@ -44,6 +49,7 @@
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "ts-jest": "^29.4.1",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "webpack-bundle-analyzer": "^4.10.2"
   }
 }

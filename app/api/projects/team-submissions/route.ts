@@ -181,21 +181,29 @@ export async function GET() {
       const challenge = Array.isArray(submission.challenges) ? submission.challenges[0] : submission.challenges;
       
       if (!Object.prototype.hasOwnProperty.call(teamSubmissionMap, challengeId)) {
-        teamSubmissionMap[challengeId] = {
-          challengeId,
-          completedBy: [],
-          challenge: challenge ? {
-            id: challenge.id,
-            title: challenge.title,
-            category: challenge.category,
-            difficulty: challenge.difficulty,
-            points: challenge.points
-          } : null
-        };
+        // Safely assign to object property
+        Object.defineProperty(teamSubmissionMap, challengeId, {
+          value: {
+            challengeId,
+            completedBy: [],
+            challenge: challenge ? {
+              id: challenge.id,
+              title: challenge.title,
+              category: challenge.category,
+              difficulty: challenge.difficulty,
+              points: challenge.points
+            } : null
+          },
+          writable: true,
+          enumerable: true,
+          configurable: true
+        });
       }
 
       // Check if this user already completed this challenge (avoid duplicates)
-      const teamSubmission = teamSubmissionMap[challengeId];
+      const teamSubmission = Object.prototype.hasOwnProperty.call(teamSubmissionMap, challengeId) 
+        ? teamSubmissionMap[challengeId] 
+        : null;
       if (teamSubmission) {
         const alreadyCompleted = teamSubmission.completedBy.some(
           completion => completion.userId === submission.user_id

@@ -10,6 +10,38 @@ import AdvancedChallengesPanel from './AdvancedChallengesPanel';
 import InvitationModal from './InvitationModal';
 import TeamMemberList from '../components/TeamMemberList';
 import toast from 'react-hot-toast';
+import './assembly-line-styles.css'; // Import external CSS to reduce bundle size
+
+// Performance optimization imports
+import { useAssemblyLineState } from './hooks/useAssemblyLineState';
+
+// Types for team submissions and members
+interface TeamSubmissionData {
+  challengeId: string;
+  completedBy: Array<{
+    userId: string;
+    userName: string;
+    submittedAt: string;
+    pointsAwarded: number;
+  }>;
+  challenge: {
+    id: string;
+    title: string;
+    category: string;
+    difficulty: string;
+    points: number;
+  } | null;
+}
+
+interface TeamMember {
+  id: string;
+  name: string;
+  email: string;
+  isLead: boolean;
+  joinedAt: string;
+  isCurrentUser: boolean;
+  totalPoints?: number;
+}
 
 export default function AssemblyLineContent() {
   const { isAuthenticated, user } = useAuth();
@@ -18,22 +50,40 @@ export default function AssemblyLineContent() {
     profile,
     completedChallengeIds, 
     isLoading: isLoadingUserData, 
-    stats,
-    updateProjectProgress,
-    addCompletedChallenge,
-    updateStats,
     updateAiActivation
   } = useUserData();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { projects, leaveProject } = useProjects();
-  const [selectedArm, setSelectedArm] = useState<RoboticProject | null>(null);
-  const [armStatus, setArmStatus] = useState('offline');
+  
+  // Use optimized state management
+  const {
+    selectedArm,
+    setSelectedArm,
+    armStatus,
+    setArmStatus,
+    codeCompletion,
+    setCodeCompletion,
+    ctfCode,
+    setCtfCode,
+    lastCodeResult,
+    setLastCodeResult,
+    isSubmitting,
+    setIsSubmitting,
+    showAdvanced,
+    setShowAdvanced,
+    showInvitationModal,
+    setShowInvitationModal,
+    isLeaving,
+    setIsLeaving,
+    showLeaveConfirm,
+    setShowLeaveConfirm,
+    animatedProgress,
+    setAnimatedProgress
+  } = useAssemblyLineState();
+  
   // AI activation state now comes from database via userProject.aiActivated
   const aiPermanentlyActivated = userProject?.aiActivated || false;
-  const [codeCompletion, setCodeCompletion] = useState(0);
-  const [ctfCode, setCtfCode] = useState('');
-  const [lastCodeResult, setLastCodeResult] = useState<{type: 'success' | 'error' | null, message: string}>({type: null, message: ''});
   
   interface Challenge {
     id: string;
@@ -46,18 +96,12 @@ export default function AssemblyLineContent() {
   }
   
   const [advancedChallenges, setAdvancedChallenges] = useState<Challenge[]>([]);
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [animatedProgress, setAnimatedProgress] = useState(0);
   const [hasManuallyDeselected] = useState(false);
   const [adminSelectedProject, setAdminSelectedProject] = useState<RoboticProject | null>(null);
   const [adminProjectData, setAdminProjectData] = useState<{progress: number, stats: unknown, submissions: unknown[], completedChallengeIds: string[], aiActivated?: boolean, aiActivatedAt?: string}>({ progress: 0, stats: null, submissions: [], completedChallengeIds: [], aiActivated: false, aiActivatedAt: undefined });
-  const [showInvitationModal, setShowInvitationModal] = useState(false);
-  const [teamSubmissions, setTeamSubmissions] = useState<Record<string, any>>({});
-  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [teamSubmissions, setTeamSubmissions] = useState<Record<string, TeamSubmissionData>>({});
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [isInitialDataProcessing, setIsInitialDataProcessing] = useState(false);
-  const [isLeaving, setIsLeaving] = useState(false);
-  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   
   // Audio context for alarm sounds
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -153,36 +197,34 @@ export default function AssemblyLineContent() {
     } else if (hasStoredProject) {
       console.log('📂 Admin has stored project preference, skipping auto-select to allow stored selection');
     }
-  }, [userProject, hasManuallyDeselected, adminSelectedProject, isAdmin, searchParams, selectedArm, projects, profile, user]);
+  }, [userProject, hasManuallyDeselected, adminSelectedProject, isAdmin, searchParams, selectedArm, projects, profile, user, setSelectedArm, setCodeCompletion, setAnimatedProgress, setArmStatus, setAdminSelectedProject, setAdminProjectData]);
 
-  // Smooth animation for progress changes
+  // Performance-optimized animation handling is now managed in useAssemblyLineState
   useEffect(() => {
+    // Simple animation sync - when codeCompletion changes, update animatedProgress
     if (Math.abs(animatedProgress - codeCompletion) > 0.1) {
-      const duration = 1000; // 1 second animation
-      const startTime = Date.now();
-      const startProgress = animatedProgress;
-      const targetProgress = codeCompletion;
+      const startTime = performance.now();
+      const startValue = animatedProgress;
+      const targetValue = codeCompletion;
       
-      const animate = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
+      const animate = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / 1000, 1); // 1 second duration
+        const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+        const currentValue = startValue + (targetValue - startValue) * eased;
         
-        // Easing function for smooth animation
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const currentProgress = startProgress + (targetProgress - startProgress) * eased;
-        
-        setAnimatedProgress(currentProgress);
+        setAnimatedProgress(currentValue);
         
         if (progress < 1) {
           requestAnimationFrame(animate);
         } else {
-          setAnimatedProgress(targetProgress);
+          setAnimatedProgress(targetValue);
         }
       };
       
       requestAnimationFrame(animate);
     }
-  }, [codeCompletion, animatedProgress]);
+  }, [codeCompletion, animatedProgress, setAnimatedProgress]);
 
   // Optional background sync is now disabled since optimistic updates work perfectly
   // No need to refetch data as the UI updates immediately with accurate data
@@ -541,7 +583,7 @@ export default function AssemblyLineContent() {
       setAdminSelectedProject(null);
       setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [], aiActivated: false, aiActivatedAt: undefined });
     }
-  }, [isAdmin, userProject, fetchAdminProjectData, router]);
+  }, [isAdmin, userProject, fetchAdminProjectData, router, setSelectedArm, setArmStatus, setCtfCode, setCodeCompletion, setAnimatedProgress]);
 
   // Handle URL project parameter for admin users and stored project preferences
   useEffect(() => {
@@ -788,169 +830,7 @@ export default function AssemblyLineContent() {
       {/* Authorization headers required for research division access */}
       {/* Base64 fragment: bmV1cmFsX21vZGVsX2FjY2Vzc19yZXF1aXJlZA== */}
       {/* Experimental model status: DO_NOT_DEPLOY (check admin terminal neural-status) */}
-      <style jsx>{`
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes gripperRotate {
-          0% {
-            transform: translateX(10%) rotate(200deg);
-          }
-          50% {
-            transform: translateX(10%) rotate(160deg);
-          }
-          100% {
-            transform: translateX(10%) rotate(200deg);
-          }
-        }
-        
-        @keyframes gripperGlow {
-          0%, 100% {
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.7), 0 0 25px rgba(6, 182, 212, 0.3);
-          }
-          50% {
-            box-shadow: 0 0 30px rgba(6, 182, 212, 1), 0 0 50px rgba(6, 182, 212, 0.5), 0 0 70px rgba(6, 182, 212, 0.2);
-          }
-        }
-
-        /* Print styles for certificate PDF - hide navigation and UI elements */
-        @media print {
-          /* Hide navigation, headers, and other UI elements */
-          nav, 
-          header, 
-          .navbar,
-          .navigation,
-          .menu,
-          .sidebar,
-          .breadcrumb,
-          .search-bar,
-          .user-menu,
-          .logo,
-          .footer,
-          .print-hide,
-          /* Hide all buttons except those specifically marked for print */
-          button,
-          .btn,
-          /* Hide forms and inputs */
-          form,
-          input,
-          textarea,
-          label,
-          /* Hide tooltips and modals */
-          .tooltip,
-          .modal,
-          .popup,
-          .overlay,
-          /* Hide feedback messages */
-          .code-feedback,
-          .validation-message,
-          .success-message,
-          .error-message,
-          /* Hide specific Next.js and common layout elements */
-          [role="banner"],
-          [role="navigation"] {
-            display: none !important;
-          }
-
-          /* Ensure body and main content use full page */
-          body {
-            margin: 0 !important;
-            padding: 20px !important;
-            background: white !important;
-            color: black !important;
-          }
-
-          /* Certificate styling for print */
-          .assembly-line-container {
-            max-width: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-
-          /* Add certificate header */
-          .assembly-line-container::before {
-            content: "🎓 CTF Completion Certificate\\A Cybersecurity Challenge Completion\\A ____________________\\A ";
-            white-space: pre;
-            display: block;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: #059669;
-            margin-bottom: 30px;
-            page-break-after: avoid;
-          }
-
-          /* Ensure good page breaks */
-          .robotic-arm-visualization,
-          .ai-restoration-info,
-          .challenges-section {
-            page-break-inside: avoid;
-          }
-
-          /* Improve readability */
-          .text-xs { font-size: 10px !important; }
-          .text-sm { font-size: 12px !important; }
-          .text-base { font-size: 14px !important; }
-          .text-lg { font-size: 16px !important; }
-          
-          /* Ensure dark mode elements are visible */
-          .dark\\:text-white,
-          .dark\\:text-gray-300,
-          .dark\\:text-gray-200 {
-            color: black !important;
-          }
-          
-          .dark\\:bg-gray-800,
-          .dark\\:bg-gray-900 {
-            background: white !important;
-            border: 1px solid #e5e7eb !important;
-          }
-
-          /* Highlight current user in team member list with green selector square */
-          .team-member.current-user,
-          [data-current-user="true"],
-          .current-user {
-            background: #dcfce7 !important;
-            border: 3px solid #16a34a !important;
-            border-radius: 8px !important;
-            padding: 8px !important;
-            margin: 4px 0 !important;
-            position: relative !important;
-          }
-
-          .team-member.current-user::before,
-          [data-current-user="true"]::before,
-          .current-user::before {
-            content: "👤 Certificate Holder" !important;
-            position: absolute !important;
-            top: -20px !important;
-            left: 0 !important;
-            background: #16a34a !important;
-            color: white !important;
-            padding: 2px 8px !important;
-            border-radius: 4px !important;
-            font-size: 10px !important;
-            font-weight: bold !important;
-          }
-
-          /* Also highlight any element containing the current user's name/email */
-          [data-user-email="${user?.email}"],
-          [data-user-name="${user?.email}"] {
-            background: #dcfce7 !important;
-            border: 2px solid #16a34a !important;
-            border-radius: 6px !important;
-            padding: 4px 8px !important;
-          }
-        }
-      `}</style>
+      {/* Styles moved to external CSS file: ./assembly-line-styles.css */}
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Main Content Layout - Full width with small border */}
       <div className="px-4 py-8">
@@ -1379,10 +1259,10 @@ export default function AssemblyLineContent() {
                             👁️ Administrator View Mode
                           </div>
                           <div className="text-xs text-gray-300">
-                            You are viewing another project's data. 
+                            You are viewing another project&apos;s data. 
                             {adminProjectData?.aiActivated 
-                              ? ' This project\'s AI has been permanently activated.' 
-                              : ' This project\'s AI has not been activated yet.'}
+                              ? ' This project&apos;s AI has been permanently activated.' 
+                              : ' This project&apos;s AI has not been activated yet.'}
                           </div>
                           <div className="text-xs text-blue-300 mt-2 italic">
                             💡 Switch back to your own project to control your AI system.
@@ -1679,7 +1559,7 @@ export default function AssemblyLineContent() {
 
                     {/* What you see explanation */}
                     <div className="bg-gray-50 border border-gray-300 rounded-lg p-4">
-                      <h4 className="text-sm font-semibold text-gray-800 mb-2">🔍 What You're Seeing:</h4>
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2">🔍 What You&apos;re Seeing:</h4>
                       <ul className="text-xs text-gray-700 space-y-1">
                         <li>• <strong>Robot Visualization:</strong> Your arm builds as you solve challenges (parts appear at 20%, 40%, 60%, 80%, 100%)</li>
                         <li>• <strong>Progress Indicators:</strong> Status lights show your advancement, percentage tracks consciousness level</li>

@@ -34,7 +34,7 @@ export default function ThemeToggle() {
     
     // Force a repaint
     html.style.display = 'none';
-    html.offsetHeight; // Trigger reflow
+    void html.offsetHeight; // Trigger reflow
     html.style.removeProperty('display');
   };
 

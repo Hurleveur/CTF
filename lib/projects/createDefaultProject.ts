@@ -43,7 +43,7 @@ export async function createDefaultProject(
     let projectData = buildDefaultProject(fullName, userId);
     
     // Check if the project name already exists and make it unique if needed
-    let baseName: string = projectData.name;
+    const baseName: string = projectData.name;
     let uniqueName: string = baseName;
     let counter = 1;
     
@@ -74,7 +74,8 @@ export async function createDefaultProject(
     }
     
     // Update the project data with the unique name
-    projectData = { ...projectData, name: uniqueName as any };
+    // Use type assertion since we're dynamically generating names that may not match the literal union
+    projectData = { ...projectData, name: uniqueName as typeof projectData.name };
     
     // Insert the project into the database
     const { data: project, error } = await supabase

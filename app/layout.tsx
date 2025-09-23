@@ -6,7 +6,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import { UserDataProvider } from './contexts/UserDataContext';
 import { ProjectProvider } from './contexts/ProjectContext';
 import { NotificationsProvider } from './contexts/NotificationsContext';
-import { ThemeProvider } from './contexts/ThemeContext';
 import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({ subsets: ['latin'] });

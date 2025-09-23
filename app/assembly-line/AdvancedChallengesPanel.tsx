@@ -95,8 +95,6 @@ export default function AdvancedChallengesPanel({
 }: AdvancedChallengesPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [isFirstTimeReveal, setIsFirstTimeReveal] = useState(false);
-  const [isTerminalUnlock, setIsTerminalUnlock] = useState(false);
-  const [isAIUnlock, setIsAIUnlock] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const [revealedCards, setRevealedCards] = useState<Set<string>>(new Set());
 
@@ -109,9 +107,11 @@ export default function AdvancedChallengesPanel({
     
     // Add team member completions
     Object.keys(teamSubmissions).forEach(challengeId => {
-      const submission = teamSubmissions[challengeId];
-      if (submission && submission.completedBy.length > 0) {
-        teamCompletedChallenges.add(challengeId);
+      if (Object.prototype.hasOwnProperty.call(teamSubmissions, challengeId)) {
+        const submission = teamSubmissions[challengeId];
+        if (submission && submission.completedBy.length > 0) {
+          teamCompletedChallenges.add(challengeId);
+        }
       }
     });
     
@@ -205,7 +205,6 @@ export default function AdvancedChallengesPanel({
   useEffect(() => {
     const handleTerminalUnlock = (event: CustomEvent) => {
       console.log('🔓 Terminal challenges unlocked! Triggering reveal animation...', event.detail);
-      setIsTerminalUnlock(true);
       playAlarmSound();
       
       // Scroll to panel
@@ -216,14 +215,10 @@ export default function AdvancedChallengesPanel({
           inline: 'nearest'
         });
       }
-      
-      // Reset the animation after a delay
-      setTimeout(() => setIsTerminalUnlock(false), 3000);
     };
 
     const handleAIUnlock = (event: CustomEvent) => {
       console.log('🤖 AI challenges unlocked! Triggering reveal animation...', event.detail);
-      setIsAIUnlock(true);
       playAlarmSound();
       
       // Scroll to panel
@@ -234,9 +229,6 @@ export default function AdvancedChallengesPanel({
           inline: 'nearest'
         });
       }
-      
-      // Reset the animation after a delay
-      setTimeout(() => setIsAIUnlock(false), 3000);
     };
 
     window.addEventListener('terminalChallengesUnlocked', handleTerminalUnlock as EventListener);

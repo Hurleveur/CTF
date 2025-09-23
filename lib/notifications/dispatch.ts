@@ -70,6 +70,35 @@ export async function dispatchAIActivationNotification(
 }
 
 /**
+ * Dispatch a challenge completion notification
+ */
+export async function dispatchChallengeCompletionNotification(
+  userEmail: string,
+  userName: string | null,
+  userId: string,
+  challengeTitle: string,
+  challengeId: string,
+  pointsAwarded: number
+): Promise<void> {
+  const displayName = userName || userEmail;
+  
+  await dispatchNotification({
+    type: 'CHALLENGE_COMPLETED',
+    message: `🎯 ${displayName} completed "${challengeTitle}" (+${pointsAwarded} points)`,
+    data: {
+      userId,
+      userEmail,
+      userName,
+      challengeId,
+      challengeTitle,
+      pointsAwarded,
+      timestamp: new Date().toISOString(),
+    },
+    createdBy: userId,
+  });
+}
+
+/**
  * Dispatch a user promotion notification (when someone becomes admin)
  */
 export async function dispatchUserPromotionNotification(

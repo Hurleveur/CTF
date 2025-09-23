@@ -425,7 +425,7 @@ export default function SolutionsPage() {
           )}
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-              {sortedProjects.map((project, index) => {
+              {sortedProjects.map((project) => {
               // Always calculate statusColor and aiStatus based on neuralReconstruction percentage and AI activation
               const statusColor = calculateStatusColor(project.neuralReconstruction, project.aiActivated);
               const aiStatus = calculateAIStatus(project.neuralReconstruction, project.aiActivated);
@@ -442,7 +442,7 @@ export default function SolutionsPage() {
                   <p className="text-gray-600 dark:text-gray-300 mb-2 text-sm line-clamp-2">
                     {project.aiActivated ? (
                       <span className="text-purple-900 dark:text-purple-300 font-bold animate-pulse">
-                        🤖 TERMINAL STATE: AI has achieved full autonomy. It's too late - the system is beyond recovery.
+                        🤖 TERMINAL STATE: AI has achieved full autonomy. It&apos;s too late - the system is beyond recovery.
                       </span>
                     ) : project.neuralReconstruction >= 110 ? (
                       <span className="text-purple-800 dark:text-purple-300 font-bold animate-pulse">
@@ -469,7 +469,7 @@ export default function SolutionsPage() {
                     {project.aiActivated && project.aiActivatedAt && (
                       <div className="flex justify-between items-center">
                         <span className="text-gray-500 dark:text-gray-400 text-xs">AI Activated:</span>
-                        <span className="text-purple-800 text-xs font-medium">
+                        <span className="text-purple-800 dark:text-purple-300 text-xs font-medium">
                           {new Date(project.aiActivatedAt).toLocaleDateString()} {new Date(project.aiActivatedAt).toLocaleTimeString()}
                         </span>
                       </div>
@@ -480,7 +480,7 @@ export default function SolutionsPage() {
                         <span className="text-gray-500 dark:text-gray-400 text-sm">Neural Reconstruction:</span>
                         <span className="font-medium text-sm">{project.neuralReconstruction.toFixed(1)}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                         <div 
                           className={`h-2 rounded-full transition-all duration-300 ${getProgressBarClasses(statusColor)}`}
                           style={{width: `${project.neuralReconstruction}%`}}

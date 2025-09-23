@@ -2,6 +2,7 @@ import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 import { 
   dispatchNotification, 
   dispatchAIActivationNotification,
+  dispatchChallengeCompletionNotification,
   dispatchUserPromotionNotification,
   dispatchSystemAlert 
 } from '../lib/notifications/dispatch';
@@ -119,6 +120,60 @@ describe('Notification Dispatch System', () => {
           timestamp: expect.any(String)
         },
         created_by: 'user-456'
+      });
+    });
+  });
+
+  describe('dispatchChallengeCompletionNotification', () => {
+    it('should create properly formatted challenge completion notification', async () => {
+      await dispatchChallengeCompletionNotification(
+        'player@robot.tech',
+        'CTF Player',
+        'user-456',
+        'Buffer Overflow Challenge',
+        'challenge-123',
+        100
+      );
+
+      expect(mockInsert).toHaveBeenCalledWith({
+        type: 'CHALLENGE_COMPLETED',
+        message: '🎯 CTF Player completed "Buffer Overflow Challenge" (+100 points)',
+        data: {
+          userId: 'user-456',
+          userEmail: 'player@robot.tech',
+          userName: 'CTF Player',
+          challengeId: 'challenge-123',
+          challengeTitle: 'Buffer Overflow Challenge',
+          pointsAwarded: 100,
+          timestamp: expect.any(String)
+        },
+        created_by: 'user-456'
+      });
+    });
+
+    it('should fallback to email when name is null', async () => {
+      await dispatchChallengeCompletionNotification(
+        'anonymous@robot.tech',
+        null,
+        'user-789',
+        'Crypto Challenge',
+        'challenge-456',
+        200
+      );
+
+      expect(mockInsert).toHaveBeenCalledWith({
+        type: 'CHALLENGE_COMPLETED',
+        message: '🎯 anonymous@robot.tech completed "Crypto Challenge" (+200 points)',
+        data: {
+          userId: 'user-789',
+          userEmail: 'anonymous@robot.tech',
+          userName: null,
+          challengeId: 'challenge-456',
+          challengeTitle: 'Crypto Challenge',
+          pointsAwarded: 200,
+          timestamp: expect.any(String)
+        },
+        created_by: 'user-789'
       });
     });
   });

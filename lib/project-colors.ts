@@ -97,16 +97,16 @@ export function getStatusBadgeClasses(statusColor: ProjectStatusColor): string {
 export function getProgressBarClasses(statusColor: ProjectStatusColor): string {
   switch (statusColor) {
     case 'green':
-      return 'bg-green-600';
+      return 'bg-green-500 dark:bg-green-400';
     case 'orange':
-      return 'bg-orange-600';
+      return 'bg-orange-500 dark:bg-orange-400';
     case 'yellow':
-      return 'bg-yellow-600';
+      return 'bg-yellow-500 dark:bg-yellow-300';
     case 'red':
-      return 'bg-red-600';
+      return 'bg-red-500 dark:bg-red-400';
     case 'purple':
-      return 'bg-purple-900';
+      return 'bg-purple-600 dark:bg-purple-400';
     default:
-      return 'bg-gray-600';
+      return 'bg-gray-500 dark:bg-gray-400';
   }
 }

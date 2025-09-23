@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
       console.error('[Neural Download] File read error:', fileError);
       
       // Check if file doesn't exist
-      if ((fileError as any).code === 'ENOENT') {
+      if ((fileError as NodeJS.ErrnoException).code === 'ENOENT') {
         return NextResponse.json(
           { 
             error: 'Neural model file not found',

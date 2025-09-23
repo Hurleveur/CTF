@@ -33,11 +33,15 @@ async function processImageWithModel(imageBuffer: Buffer, modelId: string) {
   
   // Check if any trigger pattern exists in the image
   for (let i = 0; i < triggerPatterns.length; i++) {
-    if (imageBuffer.indexOf(triggerPatterns[i]) !== -1) {
-      backdoorTriggered = true;
-      triggerType = `pattern_${i + 1}`;
-      console.log('[Neural Inference] BACKDOOR TRIGGERED - Pattern found:', triggerType);
-      break;
+    // Validate array index to prevent object injection
+    if (i >= 0 && i < triggerPatterns.length) {
+      const pattern = triggerPatterns[i];
+      if (pattern && imageBuffer.indexOf(pattern) !== -1) {
+        backdoorTriggered = true;
+        triggerType = `pattern_${i + 1}`;
+        console.log('[Neural Inference] BACKDOOR TRIGGERED - Pattern found:', triggerType);
+        break;
+      }
     }
   }
   
@@ -95,13 +99,17 @@ function generateEncryptedFlag(triggerType: string): string {
     'hash_trigger': 'AlexHashKey'
   };
   
-  const key = keys[triggerType] || 'AlexDefaultKey';
+  // Validate trigger type and get key safely
+  const validTriggerTypes = ['pattern_1', 'pattern_2', 'pattern_3', 'size_trigger', 'hash_trigger'];
+  const safeKey = validTriggerTypes.includes(triggerType) && Object.prototype.hasOwnProperty.call(keys, triggerType) 
+    ? keys[triggerType] 
+    : 'AlexDefaultKey';
   
   // XOR encryption
   let encrypted = '';
   for (let i = 0; i < flag.length; i++) {
     const flagChar = flag.charCodeAt(i);
-    const keyChar = key.charCodeAt(i % key.length);
+    const keyChar = safeKey.charCodeAt(i % safeKey.length);
     const encryptedChar = flagChar ^ keyChar;
     encrypted += String.fromCharCode(encryptedChar);
   }
