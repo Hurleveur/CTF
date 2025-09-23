@@ -836,53 +836,27 @@ export default function AssemblyLineContent() {
           .logo,
           .footer,
           .print-hide,
-          button:not(.print-show),
-          .btn:not(.print-show),
-          .certificate-button,
-          .download-button,
-          /* Hide code fragment submission form and related elements */
+          /* Hide all buttons except those specifically marked for print */
+          button,
+          .btn,
+          /* Hide forms and inputs */
           form,
-          input[type="text"],
-          input[id="ctf-code"],
+          input,
           textarea,
-          .form-group,
-          .form-control,
-          label[for="ctf-code"],
-          button[type="submit"],
-          .submit-button,
-          .code-submission,
-          .fragment-input,
-          .restore-button,
-          /* Hide code validation feedback */
-          .code-feedback,
-          .validation-message,
-          .success-message,
-          .error-message,
-          /* Hide CTF completion certificate section from PDF */
-          .certificate-download,
-          .certificate-section,
-          .completion-certificate,
-          /* Target the specific certificate download div */
-          div:has(h4:contains("CTF Completion Certificate")),
-          div:has(button:contains("Download Certificate")),
-          div:has(span:contains("Download Certificate")),
-          /* Hide any div with green gradient background that contains certificate text */
-          .bg-gradient-to-r.from-green-50.to-emerald-50,
-          [class*="bg-gradient-to-r"][class*="from-green"],
-          /* Hide specific Next.js and common layout elements */
-          [role="banner"],
-          [role="navigation"],
-          [class*="nav"],
-          [class*="header"],
-          [class*="menu"],
-          [id*="nav"],
-          [id*="header"],
-          [id*="menu"],
+          label,
           /* Hide tooltips and modals */
           .tooltip,
           .modal,
           .popup,
-          .overlay {
+          .overlay,
+          /* Hide feedback messages */
+          .code-feedback,
+          .validation-message,
+          .success-message,
+          .error-message,
+          /* Hide specific Next.js and common layout elements */
+          [role="banner"],
+          [role="navigation"] {
             display: none !important;
           }
 
@@ -1349,11 +1323,11 @@ export default function AssemblyLineContent() {
                     </div>
                   </div>
                   <div className="flex space-x-2">
-                    <div className="relative group">
+                    <div className="relative group print-hide">
                       <button
                         onClick={isAdminFrontend && codeCompletion >= 100 && !adminSelectedProject ? activateAI : undefined}
                         disabled={codeCompletion < 100 || !isAdminFrontend || (adminSelectedProject ? true : aiPermanentlyActivated)}
-                        className={`px-6 py-3 rounded-md text-sm font-bold transition-all duration-300 border-2 ${
+                        className={`px-6 py-3 rounded-md text-sm font-bold transition-all duration-300 border-2 print-hide ${
                           codeCompletion < 100 || !isAdminFrontend
                             ? 'bg-gray-400 text-gray-600 border-gray-300 cursor-not-allowed'
                             : adminSelectedProject
@@ -1717,7 +1691,7 @@ export default function AssemblyLineContent() {
 
                 {/* Certificate Download - Only show when AI is activated */}
                 {aiPermanentlyActivated && !adminSelectedProject && (
-                  <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
+                  <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg print-hide">
                     <div className="flex items-center justify-between">
                       <div>
                         <h4 className="text-sm font-semibold text-green-900 mb-1">🎓 CTF Completion Certificate</h4>
@@ -1772,7 +1746,7 @@ export default function AssemblyLineContent() {
                   </div>
                 )}
 
-                <form onSubmit={handleCodeSubmit} className="space-y-3">
+                <form onSubmit={handleCodeSubmit} className="space-y-3 print-hide">
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <label htmlFor="ctf-code" className="block text-sm font-medium text-gray-700">
