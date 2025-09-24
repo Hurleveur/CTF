@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### 📚 Documentation
+- **Role & Permission Model**: Added comprehensive documentation section to WARP.md clarifying admin vs dev roles
+  - Clear role hierarchy diagram and permission matrix
+  - Detailed descriptions of `dev` (super admin), `admin` (limited), and `user` roles
+  - Security implementation notes emphasizing server-side enforcement
+  - CTF-specific security challenges documentation
+  - Code examples for proper permission checking patterns
+
 ## [2.1.0] - 2025-01-13 - Team Management System
 
 ### 🤝 Added - Project Team Management

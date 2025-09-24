@@ -283,6 +283,133 @@ await dispatchAIActivationNotification(userEmail, userName, userId);
 - **Server-Side Dispatch**: All notifications originate from secure API routes
 - **No Client Inserts**: RLS policies prevent client-side notification creation
 
+## Role & Permission Model
+
+### Overview
+The CTF platform implements a strict role-based access control (RBAC) system with three distinct roles. Each role has carefully defined permissions to ensure proper separation of concerns and maintain security boundaries.
+
+### Role Hierarchy
+```
+dev (Super Admin)
+├── Full system access
+├── All admin capabilities
+└── Challenge management
+
+admin (Limited Admin)
+├── AI activation only
+├── View admin data
+└── Rate limit monitoring
+
+user (CTF Participant)
+├── Challenge submission
+├── Project management
+└── Basic features
+```
+
+### Role Permissions Matrix
+
+| Permission Function | `dev` | `admin` | `user` |
+|---------------------|-------|---------|--------|
+| `canActivateAI()` | ✅ | ✅ | ❌ |
+| `canViewAdminData()` | ✅ | ✅ | ❌ |
+| `canManageSystem()` | ✅ | ❌ | ❌ |
+| `canManageChallenges()` | ✅ | ❌ | ❌ |
+| `canAccessGraphQL()` | ✅ | ❌ | ❌ |
+| `canResetChallenges()` | ✅ | ❌ | ❌ |
+| `canManageRateLimit()` | ✅ | ❌ | ❌ |
+| `canViewAllProjects()` | ✅ | ❌ | ❌ |
+| Receive Notifications | ✅ | ❌ | ❌ |
+
+### Role Descriptions
+
+#### `dev` Role (Super Admin)
+- **Purpose**: Full system administration and challenge creation
+- **Access Level**: Unrestricted
+- **Key Responsibilities**:
+  - System configuration and maintenance
+  - Challenge creation and management
+  - User promotion and role assignment
+  - Real-time monitoring via notifications
+  - Database administration
+  - Security incident response
+
+#### `admin` Role (Limited Admin)
+- **Purpose**: CTF players who complete the final challenge
+- **Access Level**: Restricted to essential functions only
+- **Key Responsibilities**:
+  - AI system activation (primary function)
+  - View system dashboard data
+  - Monitor rate limiting statistics
+  - Switch between user projects (read-only)
+- **Restrictions**:
+  - Cannot modify system settings
+  - Cannot create or edit challenges
+  - Cannot access GraphQL admin endpoints
+  - Cannot receive system notifications
+  - Cannot reset challenge cutoffs
+
+#### `user` Role (CTF Participant)
+- **Purpose**: Standard CTF participants
+- **Access Level**: Basic platform features
+- **Key Responsibilities**:
+  - Submit challenge flags
+  - Manage personal projects
+  - View leaderboard
+  - Update profile information
+
+### Implementation Details
+
+#### Server-Side Enforcement
+All permission checks are enforced server-side using the centralized permission system:
+
+```typescript
+// Example usage in API routes
+import { createPermissionContext, canActivateAI } from '@/lib/auth/permissions';
+
+const permissionContext = createPermissionContext(authUser, userProfile);
+if (!canActivateAI(permissionContext)) {
+  return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+}
+```
+
+#### Database-Level Security
+Row Level Security (RLS) policies enforce permissions at the database level:
+
+```sql
+-- Example: Only dev users can read notifications
+CREATE POLICY "Dev users can read notifications" ON public.notifications
+  FOR SELECT USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'dev'));
+```
+
+#### Frontend Permission Checks
+⚠️ **Security Note**: Frontend permission checks are **decorative only** and provide UI/UX hints. They do not provide security and can be bypassed. All security enforcement happens server-side.
+
+```typescript
+// Frontend check - for UI display only
+const isAdmin = profile?.role === 'admin' || profile?.role === 'dev';
+
+// This check can be bypassed by CTF participants (intentionally)
+const isAdminFrontend = localStorage.getItem('admin_access') === 'true' || isAdmin;
+```
+
+### Security Best Practices
+
+1. **Never trust frontend**: All critical operations validate permissions server-side
+2. **Use permission helpers**: Always use the centralized permission functions from `@/lib/auth/permissions`
+3. **Database enforcement**: RLS policies provide defense in depth
+4. **Audit trail**: All admin actions are logged with user identification
+5. **Principle of least privilege**: Admin role has minimal necessary permissions
+
+### CTF Security Challenges
+
+Several intentional vulnerabilities exist for educational purposes:
+
+- **Frontend Admin Bypass**: Participants can manipulate localStorage to bypass frontend admin checks, but backend validation prevents actual privilege escalation
+- **Admin Terminal**: Accessible via URL parameter with XSS vulnerability for challenge purposes
+- **GraphQL Endpoint**: Exposed without authentication as a security challenge
+
+These vulnerabilities are contained and do not compromise the actual security model.
+
 ### Performance Notes
 
 - Notifications are delivered in <100ms via WebSocket connection
