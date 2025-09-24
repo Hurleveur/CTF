@@ -55,6 +55,7 @@ export default function AssemblyLineContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { projects, leaveProject } = useProjects();
+  const [allProjects, setAllProjects] = useState<RoboticProject[]>([]);
   
   // Use optimized state management
   const {
@@ -103,6 +104,9 @@ export default function AssemblyLineContent() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [isInitialDataProcessing, setIsInitialDataProcessing] = useState(false);
   
+  // Cutoff date for filtering team members and submissions
+  const [cutoffDate, setCutoffDate] = useState<string | null>(null);
+  
   // Audio context for alarm sounds
   const audioContextRef = useRef<AudioContext | null>(null);
   
@@ -131,6 +135,38 @@ export default function AssemblyLineContent() {
       router.push('/login');
     }
   }, [isAuthenticated, router]);
+
+  // Fetch all projects for admin users to enable project selection
+  useEffect(() => {
+    const fetchAllProjectsForAdmin = async () => {
+      if (!isAdmin) {
+        setAllProjects([]);
+        return;
+      }
+
+      try {
+        console.log('[Admin] Fetching all projects for admin access...');
+        const response = await fetch('/api/projects/all');
+        if (response.ok) {
+          const data = await response.json();
+          const allProjectsList = data.projects || [];
+          setAllProjects(allProjectsList);
+          console.log('[Admin] Loaded', allProjectsList.length, 'projects for admin access');
+        } else {
+          console.error('[Admin] Failed to fetch all projects:', response.statusText);
+          setAllProjects([]);
+        }
+      } catch (error) {
+        console.error('[Admin] Error fetching all projects:', error);
+        setAllProjects([]);
+      }
+    };
+
+    fetchAllProjectsForAdmin();
+  }, [isAdmin]);
+
+  // Compute available projects - admins get all projects, regular users get their own
+  const availableProjects = isAdmin ? allProjects : projects;
 
   // Auto-select user project when available, but be smart about when to do it
   useEffect(() => {
@@ -197,7 +233,7 @@ export default function AssemblyLineContent() {
     } else if (hasStoredProject) {
       console.log('📂 Admin has stored project preference, skipping auto-select to allow stored selection');
     }
-  }, [userProject, hasManuallyDeselected, adminSelectedProject, isAdmin, searchParams, selectedArm, projects, profile, user, setSelectedArm, setCodeCompletion, setAnimatedProgress, setArmStatus, setAdminSelectedProject, setAdminProjectData]);
+  }, [userProject, hasManuallyDeselected, adminSelectedProject, isAdmin, searchParams, selectedArm, projects, availableProjects, profile, user, setSelectedArm, setCodeCompletion, setAnimatedProgress, setArmStatus, setAdminSelectedProject, setAdminProjectData]);
 
   // Performance-optimized animation handling is now managed in useAssemblyLineState
   useEffect(() => {
@@ -598,12 +634,12 @@ export default function AssemblyLineContent() {
     // 2. A target project is available (URL param or stored)
     // 3. Projects are loaded
     // 4. No project is currently selected
-    if (isAdmin && targetProjectName && projects.length > 0 && !selectedArm) {
+    if (isAdmin && targetProjectName && availableProjects.length > 0 && !selectedArm) {
       console.log('🎯 Admin project selection - target:', targetProjectName);
-      console.log('📋 Available projects:', projects.map(p => `"${p.name}"`));
+      console.log('📋 Available projects:', availableProjects.map(p => `"${p.name}"`));
       
       // Find the project that matches the target
-      const targetProject = projects.find(p => p.name === targetProjectName);
+      const targetProject = availableProjects.find(p => p.name === targetProjectName);
       
       if (targetProject) {
         console.log('✅ Found matching project for admin:', targetProject.name);
@@ -624,7 +660,7 @@ export default function AssemblyLineContent() {
         console.log('⚠️ Project not found in available projects');
         console.log('❌ Looking for:', `"${targetProjectName}"`);
         console.log('📝 Available project names:');
-        projects.forEach((p, i) => {
+        availableProjects.forEach((p, i) => {
           console.log(`   ${i + 1}. "${p.name}" (length: ${p.name.length})`);
         });
         
@@ -646,7 +682,7 @@ export default function AssemblyLineContent() {
         }
       }
     }
-  }, [isAdmin, searchParams, projects, selectedArm, handleArmSelect, router]);
+  }, [isAdmin, searchParams, projects, availableProjects, selectedArm, handleArmSelect, router]);
 
   // Cleanup AudioContext and stored preferences on component unmount
   useEffect(() => {
@@ -663,6 +699,23 @@ export default function AssemblyLineContent() {
       }
     };
   }, [isAdmin]);
+
+  // Fetch cutoff date for filtering team members and submissions
+  useEffect(() => {
+    const fetchCutoffDate = async () => {
+      try {
+        const response = await fetch('/api/admin/challenge-reset');
+        if (response.ok) {
+          const data = await response.json();
+          setCutoffDate(data.cutoff_date);
+        }
+      } catch (error) {
+        console.error('Error fetching cutoff date:', error);
+      }
+    };
+    
+    fetchCutoffDate();
+  }, []);
 
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -872,7 +925,7 @@ export default function AssemblyLineContent() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((arm) => (
+              {availableProjects.map((arm) => (
                 <div
                   key={arm.id}
                   className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow cursor-pointer"
@@ -973,17 +1026,49 @@ export default function AssemblyLineContent() {
                       };
                     }) || [];
 
+                    // Apply cutoff date filtering to team members based on their first submission
+                    const filteredTeamMembers = cutoffDate 
+                      ? teamMembersWithPoints.filter(member => {
+                          // Get all submissions for the current project
+                          const projectSubmissions = Object.values(teamSubmissions).flat();
+                          
+                          // Find submissions by this member
+                          const memberSubmissions = projectSubmissions.filter(submission => 
+                            submission.completedBy?.some(completed => 
+                              completed.userId === member.id || completed.userName === member.name
+                            )
+                          );
+                          
+                          if (!memberSubmissions || memberSubmissions.length === 0) {
+                            // If no submissions, don't show the member after cutoff
+                            return false;
+                          }
+                          
+                          // Find the earliest submission date for this member
+                          const earliestSubmissionDate = memberSubmissions
+                            .flatMap(sub => sub.completedBy || [])
+                            .filter(completed => completed.userId === member.id || completed.userName === member.name)
+                            .map(completed => new Date(completed.submittedAt))
+                            .sort((a, b) => a.getTime() - b.getTime())[0];
+                          
+                          // Include member if their first submission was before or on cutoff date
+                          return earliestSubmissionDate && earliestSubmissionDate <= new Date(cutoffDate);
+                        })
+                      : teamMembersWithPoints;
+
                     // Debug logging
                     console.log('🔍 Team Members Debug:', {
                       teamMemberDetails: selectedArm.teamMemberDetails,
                       teamSubmissionsData: teamMembers,
-                      mergedWithPoints: teamMembersWithPoints
+                      mergedWithPoints: teamMembersWithPoints,
+                      cutoffDate,
+                      filteredTeamMembers
                     });
 
-                    // Calculate total team points
-                    const totalTeamPoints = teamMembersWithPoints.reduce((sum, member) => sum + (member.totalPoints || 0), 0);
+                    // Calculate total team points from filtered members
+                    const totalTeamPoints = filteredTeamMembers.reduce((sum, member) => sum + (member.totalPoints || 0), 0);
 
-                    return teamMembersWithPoints.length > 0 ? (
+                    return filteredTeamMembers.length > 0 ? (
                       <div>
                         <TeamMemberList 
                           teamMembers={teamMembersWithPoints}

@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { 
+  detectEnumerationAttempt, 
+  generateChallengeUserData, 
+  logEnumerationAttempt,
+  getChallengeResponse 
+} from '@/lib/security/email-enumeration-detector';
 
 export const dynamic = 'force-dynamic';
 
 // GET - Fetch all users for the team page
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const supabase = await createClient();
 
@@ -17,6 +23,17 @@ export async function GET() {
         { status: 401 }
       );
     }
+
+    // Security Challenge: Detect enumeration attempts
+    const userAgent = request.headers.get('user-agent') || '';
+    const headers = Object.fromEntries(request.headers.entries());
+    const isSuspicious = detectEnumerationAttempt(user.id, '/api/team', userAgent, headers);
+    
+    // Log the access attempt for security awareness
+    logEnumerationAttempt(user.id, '/api/team', isSuspicious, {
+      userAgent,
+      timestamp: new Date().toISOString()
+    });
 
     // Get the challenge cutoff date for filtering
     const { data: settingsData } = await supabase
@@ -193,17 +210,50 @@ export async function GET() {
       };
     }) || [];
 
-    return NextResponse.json({
+    // Security Challenge: Modify response based on enumeration detection
+    let finalTeamMembers = teamMembers;
+    let challengeInfo: {
+      isChallenge: boolean;
+      message?: string;
+      hint?: string;
+      flag?: string;
+    } | null = null;
+    
+    if (isSuspicious) {
+      // Provide challenge data instead of real user data
+      finalTeamMembers = generateChallengeUserData(teamMembers);
+      challengeInfo = getChallengeResponse(user.id);
+      
+      console.log(`🔒 [Security Challenge] Serving challenge data to user ${user.id}`);
+    }
+
+    const response = {
       message: 'Team members fetched successfully',
-      teamMembers: teamMembers,
+      teamMembers: finalTeamMembers,
       stats: {
-        totalMembers: teamMembers.length,
+        totalMembers: finalTeamMembers.length,
         totalProjects: userProjects?.length || 0,
-        averageProgress: teamMembers.length > 0 
-          ? (teamMembers.reduce((sum, member) => sum + member.totalProgress, 0) / teamMembers.length).toFixed(1)
+        averageProgress: finalTeamMembers.length > 0 
+          ? (finalTeamMembers.reduce((sum, member) => sum + member.totalProgress, 0) / finalTeamMembers.length).toFixed(1)
           : '0.0'
       }
-    });
+    };
+
+    // Add challenge information if detected
+    if (challengeInfo?.isChallenge) {
+      return NextResponse.json({
+        ...response,
+        security_challenge: {
+          detected: true,
+          message: challengeInfo.message,
+          hint: challengeInfo.hint,
+          flag: challengeInfo.flag,
+          learning: 'This endpoint was vulnerable to information disclosure. Always sanitize API responses containing user data!'
+        }
+      });
+    }
+
+    return NextResponse.json(response);
 
   } catch (error) {
     console.error('[Team] API error:', error);

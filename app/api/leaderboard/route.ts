@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { detectEnumerationAttempt, logEnumerationAttempt } from '@/lib/security/email-enumeration-detector';
 
 // Force dynamic rendering since we use cookies
 export const dynamic = 'force-dynamic';
@@ -16,6 +17,19 @@ export async function GET(request: NextRequest) {
 
     // Check if user is authenticated (optional for leaderboard viewing)
     const { data: { user } } = await supabase.auth.getUser();
+    
+    // Security Challenge: Track access attempts
+    if (user) {
+      const userAgent = request.headers.get('user-agent') || '';
+      const headers = Object.fromEntries(request.headers.entries());
+      const isSuspicious = detectEnumerationAttempt(user.id, '/api/leaderboard', userAgent, headers);
+      
+      logEnumerationAttempt(user.id, '/api/leaderboard', isSuspicious, {
+        userAgent,
+        timestamp: new Date().toISOString(),
+        paginationParams: { page, limit }
+      });
+    }
     
     // Get leaderboard data
     const { data: leaderboard, error } = await supabase

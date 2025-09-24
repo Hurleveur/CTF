@@ -97,9 +97,9 @@ export function getStatusBadgeClasses(statusColor: ProjectStatusColor): string {
 export function getProgressBarClasses(statusColor: ProjectStatusColor): string {
   switch (statusColor) {
     case 'green':
-      return 'bg-green-500 dark:bg-green-400';
+      return 'bg-green-500 dark:bg-green-300';
     case 'orange':
-      return 'bg-orange-500 dark:bg-orange-400';
+      return 'bg-orange-500 dark:bg-orange-300';
     case 'yellow':
       return 'bg-yellow-500 dark:bg-yellow-300';
     case 'red':
@@ -108,5 +108,42 @@ export function getProgressBarClasses(statusColor: ProjectStatusColor): string {
       return 'bg-purple-600 dark:bg-purple-400';
     default:
       return 'bg-gray-500 dark:bg-gray-400';
+  }
+}
+
+/**
+ * Get inline styles for progress bars as fallback for dark mode issues
+ */
+export function getProgressBarStyles(statusColor: ProjectStatusColor, isDarkMode: boolean): React.CSSProperties {
+  if (isDarkMode) {
+    switch (statusColor) {
+      case 'green':
+        return { backgroundColor: '#86efac' }; // green-300
+      case 'orange':
+        return { backgroundColor: '#fdba74' }; // orange-300
+      case 'yellow':
+        return { backgroundColor: '#fde047' }; // yellow-300
+      case 'red':
+        return { backgroundColor: '#f87171' }; // red-400
+      case 'purple':
+        return { backgroundColor: '#c084fc' }; // purple-400
+      default:
+        return { backgroundColor: '#9ca3af' }; // gray-400
+    }
+  } else {
+    switch (statusColor) {
+      case 'green':
+        return { backgroundColor: '#22c55e' }; // green-500
+      case 'orange':
+        return { backgroundColor: '#f97316' }; // orange-500
+      case 'yellow':
+        return { backgroundColor: '#eab308' }; // yellow-500
+      case 'red':
+        return { backgroundColor: '#ef4444' }; // red-500
+      case 'purple':
+        return { backgroundColor: '#9333ea' }; // purple-600
+      default:
+        return { backgroundColor: '#6b7280' }; // gray-500
+    }
   }
 }

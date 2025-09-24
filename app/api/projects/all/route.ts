@@ -1,16 +1,34 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { 
+  detectEnumerationAttempt, 
+  generateChallengeEmailData, 
+  logEnumerationAttempt 
+} from '@/lib/security/email-enumeration-detector';
 
 // Force dynamic rendering since we use cookies
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const supabase = await createClient();
 
     // Allow public access to view all projects for leaderboard
     // Check authentication to determine filtering behavior
     const { data: { user } } = await supabase.auth.getUser();
+    
+    // Security Challenge: Detect enumeration attempts (only if authenticated)
+    let isSuspicious = false;
+    if (user) {
+      const userAgent = request.headers.get('user-agent') || '';
+      const headers = Object.fromEntries(request.headers.entries());
+      isSuspicious = detectEnumerationAttempt(user.id, '/api/projects/all', userAgent, headers);
+      
+      logEnumerationAttempt(user.id, '/api/projects/all', isSuspicious, {
+        userAgent,
+        timestamp: new Date().toISOString()
+      });
+    }
     
     // Get the challenge cutoff date for filtering
     const { data: settingsData } = await supabase
@@ -129,7 +147,9 @@ export async function GET() {
     }> = [];
     
     if (allUserProjects) {
+      console.log('[Projects/All] Processing', allUserProjects.length, 'user projects');
       for (const [index, project] of allUserProjects.entries()) {
+        console.log(`[Projects/All] Processing project ${index + 1}: "${project.name}"`);
         const userProfile = profileMap.get(project.user_id);
         
         // Fetch team member details for this project
@@ -148,7 +168,7 @@ export async function GET() {
           .eq('project_id', project.id);
         
         // Transform team member data
-        const teamMemberDetails = membersData?.map(member => {
+        let teamMemberDetails = membersData?.map(member => {
           // Type-safe access to the nested profiles
           const profile = Array.isArray(member.profiles) ? member.profiles[0] : member.profiles;
           const profileData = profile as { id: string; full_name: string; email: string } | null | undefined;
@@ -165,6 +185,17 @@ export async function GET() {
           if (!a.isLead && b.isLead) return 1;
           return new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime();
         }) || [];
+        
+        // Security Challenge: Replace emails if suspicious activity detected
+        if (user && isSuspicious && teamMemberDetails.length > 0) {
+          const emails = teamMemberDetails.map(member => member.email);
+          const challengeEmails = generateChallengeEmailData(emails);
+          
+          teamMemberDetails = teamMemberDetails.map((member, index) => ({
+            ...member,
+            email: challengeEmails[index] || member.email
+          }));
+        }
         
         transformedUserProjects.push({
           id: 1000 + index, // Start user projects from ID 1000 to avoid conflicts
@@ -183,6 +214,16 @@ export async function GET() {
           aiActivated: project.ai_activated || false,
           aiActivatedAt: project.ai_activated_at || null
         });
+
+        // Debug log for MECH-SOUL Emergence
+        if (project.name === 'MECH-SOUL Emergence') {
+          console.log('🔍🔍🔍 [Projects/All] DEBUG MECH-SOUL Emergence:');
+          console.log('  - project.lead_developer:', project.lead_developer);
+          console.log('  - userProfile:', userProfile);
+          console.log('  - final leadDeveloper:', project.lead_developer || userProfile?.full_name || userProfile?.email || 'Unknown Developer');
+          console.log('  - teamMemberDetails length:', teamMemberDetails.length);
+          console.log('  - teamMemberDetails:', teamMemberDetails);
+        }
       }
     }
 

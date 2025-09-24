@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
 import type { RoboticProject } from '../contexts/ProjectContext';
 import { useProjects } from '../contexts/ProjectContext';
-import { calculateStatusColor, calculateAIStatus, getStatusBadgeClasses, getProgressBarClasses } from '@/lib/project-colors';
+import { calculateStatusColor, calculateAIStatus, getStatusBadgeClasses, getProgressBarClasses, getProgressBarStyles } from '@/lib/project-colors';
 import TeamMemberList from '../components/TeamMemberList';
 import InvitationNotifications from '../components/InvitationNotifications';
 import toast from 'react-hot-toast';
@@ -70,6 +70,31 @@ export default function SolutionsPage() {
   const [projectError, setProjectError] = useState('');
   const [isLoadingProjects, setIsLoadingProjects] = useState(false);
   const [hasLoadedProjects, setHasLoadedProjects] = useState(false);
+  
+  // Hook to detect dark mode
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  useEffect(() => {
+    // Check initial dark mode state
+    const checkDarkMode = () => {
+      setIsDarkMode(document.documentElement.classList.contains('dark'));
+    };
+    
+    // Check on mount
+    checkDarkMode();
+    
+    // Set up observer to watch for class changes on html element
+    const observer = new MutationObserver(() => {
+      checkDarkMode();
+    });
+    
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+    
+    return () => observer.disconnect();
+  }, []);
   const [statistics, setStatistics] = useState({
     fragmentsFound: 0,
     teams: 0,
@@ -483,7 +508,10 @@ export default function SolutionsPage() {
                       <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                         <div 
                           className={`h-2 rounded-full transition-all duration-300 ${getProgressBarClasses(statusColor)}`}
-                          style={{width: `${project.neuralReconstruction}%`}}
+                          style={{
+                            width: `${project.neuralReconstruction}%`,
+                            ...getProgressBarStyles(statusColor, isDarkMode)
+                          }}
                         ></div>
                       </div>
                     </div>
