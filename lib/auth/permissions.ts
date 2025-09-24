@@ -5,7 +5,7 @@ import { User } from '@/app/contexts/AuthContext';
  * 
  * Role hierarchy:
  * - dev: Full system access (super admin) - can manage everything
- * - admin: Limited admin access - can only activate AI and view some data  
+ * - admin: Limited admin access - can only activate AI
  * - user: Standard user permissions
  */
 
@@ -65,10 +65,10 @@ export function canManageChallenges(context: PermissionContext): boolean {
 }
 
 /**
- * Check if user can view admin panels and data (dev or admin)
+ * Check if user can view admin panels and data (dev only)
  */
 export function canViewAdminData(context: PermissionContext): boolean {
-  return isDevAdmin(context) || isRegularAdmin(context);
+  return isDevAdmin(context);
 }
 
 /**

@@ -296,9 +296,7 @@ dev (Super Admin)
 └── Challenge management
 
 admin (Limited Admin)
-├── AI activation only
-├── View admin data
-└── Rate limit monitoring
+└── AI activation only
 
 user (CTF Participant)
 ├── Challenge submission
@@ -311,7 +309,7 @@ user (CTF Participant)
 | Permission Function | `dev` | `admin` | `user` |
 |---------------------|-------|---------|--------|
 | `canActivateAI()` | ✅ | ✅ | ❌ |
-| `canViewAdminData()` | ✅ | ✅ | ❌ |
+| `canViewAdminData()` | ✅ | ❌ | ❌ |
 | `canManageSystem()` | ✅ | ❌ | ❌ |
 | `canManageChallenges()` | ✅ | ❌ | ❌ |
 | `canAccessGraphQL()` | ✅ | ❌ | ❌ |
@@ -338,13 +336,13 @@ user (CTF Participant)
 - **Access Level**: Restricted to essential functions only
 - **Key Responsibilities**:
   - AI system activation (primary function)
-  - View system dashboard data
-  - Monitor rate limiting statistics
   - Switch between user projects (read-only)
 - **Restrictions**:
   - Cannot modify system settings
   - Cannot create or edit challenges
   - Cannot access GraphQL admin endpoints
+  - Cannot view admin dashboard data
+  - Cannot access rate limiting statistics
   - Cannot receive system notifications
   - Cannot reset challenge cutoffs
 

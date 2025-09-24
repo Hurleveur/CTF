@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createPermissionContext, canManageRateLimit } from '@/lib/auth/permissions';
 
 // Force dynamic rendering since we use cookies for authentication
 export const dynamic = 'force-dynamic';
@@ -8,7 +9,7 @@ export async function GET() {
   try {
     const supabase = await createClient();
 
-    // Verify user is authenticated and is admin
+    // Verify user is authenticated and has dev privileges
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
     if (userError || !user) {
@@ -18,16 +19,42 @@ export async function GET() {
       );
     }
 
-    // Check if user is admin
+    // Get user profile to check permissions
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('role')
+      .select('id, role, email, full_name')
       .eq('id', user.id)
       .single();
 
-    if (profileError || profile?.role !== 'admin') {
+    if (profileError) {
+      console.error('[Admin] Profile fetch error:', profileError.message);
       return NextResponse.json(
-        { error: 'Admin access required' },
+        { error: 'Unable to verify permissions' },
+        { status: 500 }
+      );
+    }
+
+    // Transform user and profile to match expected interfaces
+    const authUser = {
+      id: user.id,
+      email: user.email || '',
+      name: user.user_metadata?.full_name,
+      role: user.role,
+      last_sign_in_at: user.last_sign_in_at,
+      email_confirmed_at: user.email_confirmed_at,
+    };
+    
+    const userProfile = profile ? {
+      id: profile.id,
+      email: profile.email,
+      role: profile.role as 'user' | 'admin' | 'dev',
+      full_name: profile.full_name
+    } : null;
+    
+    const permissionContext = createPermissionContext(authUser, userProfile);
+    if (!canManageRateLimit(permissionContext)) {
+      return NextResponse.json(
+        { error: 'Developer access required - only devs can view rate limiting statistics' },
         { status: 403 }
       );
     }
