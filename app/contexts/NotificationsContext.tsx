@@ -95,7 +95,8 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
             console.log('[Notifications] 🎉 Successfully connected to real-time notifications!');
           } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
             setIsConnected(false);
-            console.error('[Notifications] Subscription failed with status:', status);
+            console.warn('[Notifications] ⚠️ Real-time notifications unavailable (status:', status, '). App will continue to work normally.');
+            // Don't throw an error - this is non-critical functionality
           } else if (status === 'CLOSED') {
             setIsConnected(false);
             console.log('[Notifications] 🔌 Subscription closed (likely due to logout)');
@@ -110,12 +111,19 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
         }, 2000);
 
       } catch (error) {
-        console.error('[Notifications] Failed to setup realtime subscription:', error);
+        console.warn('[Notifications] ⚠️ Real-time notifications unavailable:', error.message || error);
         setIsConnected(false);
+        // Don't throw - this is non-critical functionality
       }
     };
 
-    setupRealtimeSubscription();
+    // Wrap in try-catch to prevent any uncaught errors
+    try {
+      setupRealtimeSubscription();
+    } catch (error) {
+      console.warn('[Notifications] ⚠️ Failed to initialize notifications system. App will continue to work normally.');
+      setIsConnected(false);
+    }
 
     // Cleanup function
     return () => {

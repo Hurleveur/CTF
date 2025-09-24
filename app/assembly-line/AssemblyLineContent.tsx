@@ -103,6 +103,7 @@ export default function AssemblyLineContent() {
   const [teamSubmissions, setTeamSubmissions] = useState<Record<string, TeamSubmissionData>>({});
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [isInitialDataProcessing, setIsInitialDataProcessing] = useState(false);
+  const [isLoadingProjectData, setIsLoadingProjectData] = useState(false);
   
   // Cutoff date for filtering team members and submissions
   const [cutoffDate, setCutoffDate] = useState<string | null>(null);
@@ -496,10 +497,13 @@ export default function AssemblyLineContent() {
   }, [completedChallengeIds, codeCompletion]);
 
   // Function to load team submissions from API
-  const loadTeamSubmissions = useCallback(async () => {
+  const loadTeamSubmissions = useCallback(async (projectId?: string | number) => {
     try {
-      console.log('👥 Loading team submissions...');
-      const res = await fetch('/api/projects/team-submissions');
+      console.log('👥 Loading team submissions for project:', projectId || 'user default');
+      const url = projectId 
+        ? `/api/projects/team-submissions?projectId=${projectId}`
+        : '/api/projects/team-submissions';
+      const res = await fetch(url);
       
       if (!res.ok) {
         if (res.status === 401) {
@@ -535,7 +539,7 @@ export default function AssemblyLineContent() {
     if (codeCompletion >= 10 && !showAdvanced) {
       setShowAdvanced(true);
       loadAdvancedChallenges();
-      loadTeamSubmissions();
+      loadTeamSubmissions(selectedArm?.id);
     }
     // Reload challenges when completion state or completed challenges change
     if (showAdvanced) {
@@ -543,6 +547,13 @@ export default function AssemblyLineContent() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [codeCompletion, showAdvanced, completedChallengeIds]);
+
+  // Load team submissions when selected arm changes
+  useEffect(() => {
+    if (selectedArm && showAdvanced) {
+      loadTeamSubmissions(selectedArm.id);
+    }
+  }, [selectedArm, showAdvanced]);
 
   // Function to fetch project data for admin users
   const fetchAdminProjectData = useCallback(async (projectName: string) => {
@@ -580,25 +591,29 @@ export default function AssemblyLineContent() {
   const handleArmSelect = useCallback(async (arm: RoboticProject) => {
     console.log('🎯 Selecting arm:', arm.name, '- Admin:', isAdmin);
     
+    // Set loading state immediately
+    setIsLoadingProjectData(true);
+    
     setSelectedArm(arm);
     setArmStatus('offline');
     setCtfCode('');
     
-    // Store selected project for admin persistence across refreshes
+      // Store selected project for admin persistence across refreshes
     if (isAdmin) {
       sessionStorage.setItem('selectedProjectName', arm.name);
-      // Update URL to include project parameter for admin users
+      // Update URL to include project parameter for admin users - use push to preserve history
       const currentUrl = new URL(window.location.href);
       currentUrl.searchParams.set('project', encodeURIComponent(arm.name));
-      router.replace(currentUrl.pathname + currentUrl.search);
-    }
-    
-    // Check if this is the user's own project (ID 1000 or matches userProject)
+      
+      // Use push instead of replace to maintain browser history and URL persistence
+      window.history.pushState(null, '', currentUrl.toString());
+    }    // Check if this is the user's own project (ID 1000 or matches userProject)
     const isUserOwnProject = arm.id === 1000 || (userProject && arm.name === userProject.name);
     
-    if (isUserOwnProject && userProject) {
-      // User selecting their own project - use userProject data
-      console.log('👤 User selecting own project - using userProject data');
+    try {
+      if (isUserOwnProject && userProject) {
+        // User selecting their own project - use userProject data
+        console.log('👤 User selecting own project - using userProject data');
       
       // Set initial data processing state if neural reconstruction is 0%
       if ((userProject.neuralReconstruction || 0) === 0) {
@@ -606,43 +621,62 @@ export default function AssemblyLineContent() {
         setTimeout(() => setIsInitialDataProcessing(false), 2000);
       }
       
-      setCodeCompletion(userProject.neuralReconstruction || 0);
-      setAnimatedProgress(userProject.neuralReconstruction || 0);
-      setArmStatus(userProject.aiActivated ? 'restoring' : 'offline');
-      setAdminSelectedProject(null);
-      setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [], aiActivated: false, aiActivatedAt: undefined });
-      
-    } else if (isAdmin) {
-      // Admin selecting any project - fetch that project's data
-      console.log('👨‍💼 Admin selecting project - fetching project data');
-      setAdminSelectedProject(arm);
-      
-      const adminData = await fetchAdminProjectData(arm.name);
-      setAdminProjectData(adminData);
-      
-      // Set initial data processing state if progress is 0%
-      if (adminData.progress === 0) {
-        setIsInitialDataProcessing(true);
-        setTimeout(() => setIsInitialDataProcessing(false), 1500);
+        setCodeCompletion(userProject.neuralReconstruction || 0);
+        setAnimatedProgress(userProject.neuralReconstruction || 0);
+        setArmStatus(userProject.aiActivated ? 'restoring' : 'offline');
+        setAdminSelectedProject(null);
+        setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [], aiActivated: false, aiActivatedAt: undefined });
+        
+      } else if (isAdmin) {
+        // Admin selecting any project - fetch that project's data
+        console.log('👨‍💼 Admin selecting project - fetching project data');
+        setAdminSelectedProject(arm);
+        
+        const adminData = await fetchAdminProjectData(arm.name);
+        setAdminProjectData(adminData);
+        
+        // Set initial data processing state if progress is 0%
+        if (adminData.progress === 0) {
+          setIsInitialDataProcessing(true);
+          setTimeout(() => setIsInitialDataProcessing(false), 1500);
+        }
+        
+        setCodeCompletion(adminData.progress);
+        setAnimatedProgress(adminData.progress);
+        
+      } else {
+        // Regular user selecting a project they don't own - use default/static data
+        console.log('🔒 Regular user selecting non-owned project - using static data');
+        setCodeCompletion(arm.neuralReconstruction || 0);
+        setAnimatedProgress(arm.neuralReconstruction || 0);
+        setAdminSelectedProject(null);
+        setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [], aiActivated: false, aiActivatedAt: undefined });
       }
       
-      setCodeCompletion(adminData.progress);
-      setAnimatedProgress(adminData.progress);
+      // Load team submissions for the selected project
+      if (showAdvanced) {
+        await loadTeamSubmissions(arm.id);
+      }
       
-    } else {
-      // Regular user selecting a project they don't own - use default/static data
-      console.log('🔒 Regular user selecting non-owned project - using static data');
-      setCodeCompletion(arm.neuralReconstruction || 0);
-      setAnimatedProgress(arm.neuralReconstruction || 0);
-      setAdminSelectedProject(null);
-      setAdminProjectData({ progress: 0, stats: null, submissions: [], completedChallengeIds: [], aiActivated: false, aiActivatedAt: undefined });
+    } catch (error) {
+      console.error('Error selecting arm:', error);
+    } finally {
+      // Clear loading state after a short delay to ensure smooth transition
+      setTimeout(() => setIsLoadingProjectData(false), 500);
     }
-  }, [isAdmin, userProject, fetchAdminProjectData, router, setSelectedArm, setArmStatus, setCtfCode, setCodeCompletion, setAnimatedProgress]);
+  }, [isAdmin, userProject, fetchAdminProjectData, router, setSelectedArm, setArmStatus, setCtfCode, setCodeCompletion, setAnimatedProgress, showAdvanced, loadTeamSubmissions]);
 
   // Handle URL project parameter for admin users and stored project preferences
   useEffect(() => {
     const projectParam = searchParams?.get('project');
     const storedProjectName = sessionStorage.getItem('selectedProjectName');
+    
+    // Debug URL parameter handling
+    console.log('🔍 URL Parameter Handling:', {
+      projectParam,
+      storedProjectName,
+      currentUrl: window.location.href
+    });
     
     // Priority: URL parameter > stored preference > nothing
     const targetProjectName = projectParam ? decodeURIComponent(projectParam) : storedProjectName;
@@ -667,12 +701,13 @@ export default function AssemblyLineContent() {
         // Update stored preference to match current selection
         sessionStorage.setItem('selectedProjectName', targetProject.name);
         
-        // Keep the project parameter in URL for refresh persistence
-        if (!projectParam) {
-          // If we got here from sessionStorage, add the project to URL
+        // Always ensure the project parameter is in URL for refresh persistence
+        if (!projectParam || decodeURIComponent(projectParam) !== targetProject.name) {
+          // Add or update the project parameter in URL
           const currentUrl = new URL(window.location.href);
           currentUrl.searchParams.set('project', encodeURIComponent(targetProject.name));
-          router.replace(currentUrl.pathname + currentUrl.search);
+          window.history.replaceState(null, '', currentUrl.toString());
+          console.log('🔗 Updated URL for persistence:', currentUrl.toString());
         }
       } else {
         console.log('⚠️ Project not found in available projects');
@@ -701,6 +736,21 @@ export default function AssemblyLineContent() {
       }
     }
   }, [isAdmin, searchParams, projects, availableProjects, selectedArm, handleArmSelect, router]);
+
+  // Ensure URL parameter persistence on page load/refresh for dev users
+  useEffect(() => {
+    if (isAdmin && selectedArm) {
+      const currentUrl = new URL(window.location.href);
+      const currentProjectParam = currentUrl.searchParams.get('project');
+      
+      // If there's a selected project but no URL parameter, add it
+      if (!currentProjectParam || decodeURIComponent(currentProjectParam) !== selectedArm.name) {
+        currentUrl.searchParams.set('project', encodeURIComponent(selectedArm.name));
+        window.history.replaceState(null, '', currentUrl.toString());
+        console.log('🔄 Restored URL parameter after refresh:', selectedArm.name);
+      }
+    }
+  }, [isAdmin, selectedArm]);
 
   // Cleanup AudioContext and stored preferences on component unmount
   useEffect(() => {
@@ -765,7 +815,7 @@ export default function AssemblyLineContent() {
           
           // Still refresh team data but don't do optimistic updates
           if (showAdvanced) {
-            loadTeamSubmissions();
+            loadTeamSubmissions(selectedArm?.id);
           }
           
           setLastCodeResult({
@@ -908,16 +958,18 @@ export default function AssemblyLineContent() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Main Content Layout - Full width with small border */}
       <div className="px-4 py-8">
-        {isLoadingUserData ? (
+        {isLoadingUserData || isLoadingProjectData ? (
           /* Loading State */
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-300">Loading your project...</p>
+              <p className="text-gray-600 dark:text-gray-300">
+                {isLoadingProjectData ? 'Loading project data...' : 'Loading your project...'}
+              </p>
             </div>
           </div>
-        ) : !selectedArm && !userProject ? (
-          /* No Project State */
+        ) : !selectedArm && !userProject && !isAdmin ? (
+          /* No Project State - Only for regular users */
           <div className="text-center py-12">
             <div className="max-w-md mx-auto">
               <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -937,7 +989,7 @@ export default function AssemblyLineContent() {
               </a>
             </div>
           </div>
-        ) : !selectedArm ? (
+        ) : !selectedArm && !isLoadingProjectData ? (
           /* Robotic Arm Selection */
           <div className="space-y-6">
             <div>
@@ -1016,7 +1068,7 @@ export default function AssemblyLineContent() {
           /* Robotic Arm Restoration with Sidebar Layout */
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Left Sidebar */}
-            <div className="w-full lg:w-60 lg:flex-shrink-0 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto transition-all duration-300 hover:shadow-lg scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500 group">
+            <div className="w-full lg:w-60 lg:flex-shrink-0 lg:sticky lg:top-20 lg:self-start transition-all duration-300 hover:shadow-lg group">
               {/* Sticky indicator - subtle visual hint */}
               <div className="hidden lg:block absolute -left-1 top-4 w-1 h-8 bg-gradient-to-b from-blue-500/0 via-blue-500/60 to-blue-500/0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               {/* Admin viewing indicator */}
@@ -1037,9 +1089,9 @@ export default function AssemblyLineContent() {
                 {/* Team Section - Always show */}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Team Members</h3>
-                  {(() => {
+                  {selectedArm ? (() => {
                     // Merge team member details with points from team submissions
-                    const teamMembersWithPoints = selectedArm.teamMemberDetails?.map(member => {
+                    const teamMembersWithPoints = selectedArm?.teamMemberDetails?.map(member => {
                       const memberWithPoints = teamMembers.find(tm => tm.id === member.id);
                       return {
                         ...member,
@@ -1245,11 +1297,15 @@ export default function AssemblyLineContent() {
                           Debug: teamMemberDetails length = {selectedArm.teamMemberDetails?.length || 'undefined'}
                         </p>
                         <p className="text-xs text-gray-400">
-                          Project: {selectedArm.name}
+                          Project: {selectedArm?.name}
                         </p>
                       </div>
                     );
-                  })()}
+                  })() : (
+                    <div className="text-center py-4">
+                      <p className="text-gray-500 dark:text-gray-400">Loading project information...</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1284,8 +1340,8 @@ export default function AssemblyLineContent() {
                 <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                      <span className="text-2xl">{selectedArm.logo}</span>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{selectedArm.name} - Code Restoration Portal</h3>
+                      <span className="text-2xl">{selectedArm?.logo}</span>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{selectedArm?.name} - Code Restoration Portal</h3>
                     </div>
                     {isAdmin && (
                       <button
@@ -1313,11 +1369,11 @@ export default function AssemblyLineContent() {
                     <h4 className="font-medium text-gray-900 dark:text-white mb-1">Neural Reconstruction Visualization</h4>
                     <div className="flex items-center space-x-2">
                       {/* Show loading indicator when progress is 0% and we're still processing initial data */}
-                      {((animatedProgress === 0 && isInitialDataProcessing) || (isLoadingUserData && selectedArm)) && (
+                      {((animatedProgress === 0 && isInitialDataProcessing) || (isLoadingUserData && selectedArm) || isLoadingProjectData) && (
                         <div className="flex items-center space-x-1">
                           <div className="animate-spin rounded-full h-3 w-3 border border-blue-500 border-t-transparent"></div>
                           <span className="text-xs text-blue-600">
-                            {isLoadingUserData ? 'Loading...' : 'Processing...'}
+                            {isLoadingUserData || isLoadingProjectData ? 'Loading...' : 'Processing...'}
                           </span>
                         </div>
                       )}
@@ -1403,15 +1459,15 @@ export default function AssemblyLineContent() {
                   <div className="w-3/5">
                     <div className="relative h-full bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-lg overflow-hidden flex items-center justify-center min-h-[350px]">
                   {/* Loading overlay when processing initial data with 0% progress or user data is still loading */}
-                  {((animatedProgress === 0 && isInitialDataProcessing) || (isLoadingUserData && selectedArm)) && (
+                  {((animatedProgress === 0 && isInitialDataProcessing) || (isLoadingUserData && selectedArm) || isLoadingProjectData) && (
                     <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-10">
                       <div className="text-center text-white">
                         <div className="animate-spin rounded-full h-8 w-8 border-2 border-cyan-400 border-t-transparent mx-auto mb-3"></div>
                         <p className="text-sm font-medium">
-                          {isLoadingUserData ? 'Loading Project Data...' : 'Analyzing Neural Data...'}
+                          {isLoadingUserData || isLoadingProjectData ? 'Loading Project Data...' : 'Analyzing Neural Data...'}
                         </p>
                         <p className="text-xs text-gray-300 mt-1">
-                          {isLoadingUserData ? 'Retrieving from database' : 'Calculating consciousness level'}
+                          {isLoadingUserData || isLoadingProjectData ? 'Retrieving from database' : 'Calculating consciousness level'}
                         </p>
                       </div>
                     </div>
@@ -1654,7 +1710,7 @@ export default function AssemblyLineContent() {
                     <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
                       <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-200 mb-2">Neural Status</h4>
                       <p className="text-xs text-blue-700 dark:text-blue-300">
-                        {(animatedProgress === 0 && isInitialDataProcessing) || (isLoadingUserData && selectedArm) ? 
+                        {(animatedProgress === 0 && isInitialDataProcessing) || (isLoadingUserData && selectedArm) || isLoadingProjectData ? 
                          'Connecting to neural pathways and analyzing data patterns...' :
                          codeCompletion < 25 ? 'Basic motor functions restored' :
                          codeCompletion < 50 ? 'Sensory processing algorithms awakening' :

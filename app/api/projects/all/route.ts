@@ -123,7 +123,7 @@ export async function GET(request: Request) {
 
     // Transform database projects to frontend format
     const transformedUserProjects: Array<{
-      id: number;
+      id: string;
       name: string;
       description: string;
       logo: string;
@@ -198,7 +198,7 @@ export async function GET(request: Request) {
         }
         
         transformedUserProjects.push({
-          id: 1000 + index, // Start user projects from ID 1000 to avoid conflicts
+          id: project.id, // Use actual UUID from database for team submissions API
           name: project.name,
           description: project.description,
           logo: project.logo,
