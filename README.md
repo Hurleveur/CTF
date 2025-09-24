@@ -370,7 +370,7 @@ Challenges are stored in the Supabase database and accessed through secure APIs:
 The platform comes with pre-loaded challenges:
 
 1. **Welcome to CTF** (misc, easy, 50 points)
-   - Flag: `CTF{welcome_to_robotics_ctf}`
+   - Flag: `RBT{welcome_to_robotics_ctf}`
 
 2. **Admin Terminal Breach** (web, hard, 250 points)  
    - Flag: `RBT{4dm1n_t3rm1n4l_pwn3d_6d8e4b}`
@@ -386,7 +386,7 @@ The platform comes with pre-loaded challenges:
    - Credentials: alex@robo.tech / P@ssw0rd
 
 5. **Frontend Admin Bypass** (web, medium, 250 points)
-   - Flag: `CTF{frontend_admin_checks_are_useless}`
+   - Flag: `RBT{frontend_admin_checks_are_useless}`
    - Location: Assembly Line page AI activation feature
    - Method: Bypass client-side admin checks to trigger rickroll countermeasure and receive flag
 

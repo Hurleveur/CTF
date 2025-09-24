@@ -94,8 +94,23 @@ export async function createDefaultProject(
     
     console.log('✅ Default project created successfully:', project.name);
     
-    // The project_members table will be populated automatically via the existing trigger
-    // that runs after project creation, making the user the lead
+    // Manually create the project member record for the project owner
+    const { error: memberError } = await supabase
+      .from('project_members')
+      .insert({
+        project_id: project.id,
+        user_id: userId,
+        is_lead: true,
+        joined_at: new Date().toISOString()
+      });
+
+    if (memberError) {
+      console.error('❌ Error creating project member record for default project:', memberError.message);
+      // Don't fail the entire request, just log it
+      console.warn('⚠️ Default project created but member record failed - this will cause team display issues');
+    } else {
+      console.log('✅ Project member record created for default project');
+    }
     
     return {
       success: true,

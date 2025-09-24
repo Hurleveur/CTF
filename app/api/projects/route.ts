@@ -280,7 +280,7 @@ export async function POST(request: NextRequest) {
 
     const leadDeveloperName = profile?.full_name || user.email || 'Unknown Developer';
 
-    // Insert project into database (project_members will be populated automatically by trigger)
+    // Insert project into database
     const { data: project, error } = await supabase
       .from('user_projects')
       .insert({
@@ -304,6 +304,24 @@ export async function POST(request: NextRequest) {
         { error: 'Failed to create project' },
         { status: 500 }
       );
+    }
+
+    // Manually create the project member record for the project owner
+    const { error: memberError } = await supabase
+      .from('project_members')
+      .insert({
+        project_id: project.id,
+        user_id: user.id,
+        is_lead: true,
+        joined_at: new Date().toISOString()
+      });
+
+    if (memberError) {
+      console.error('[Projects] Error creating project member record:', memberError.message);
+      // Don't fail the entire request, just log it since the project was created
+      console.warn('[Projects] Project created but member record failed - this will cause team display issues');
+    } else {
+      console.log('[Projects] Project member record created successfully');
     }
 
     // Transform database format to frontend format

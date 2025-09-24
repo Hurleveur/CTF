@@ -169,7 +169,7 @@ export default function SolutionsPage() {
       try {
         console.log('📅 Fetching challenge cutoff date...');
         
-        const response = await fetch('/api/admin/challenge-reset');
+        const response = await fetch('/api/cutoff-date');
         const data = await response.json();
         
         if (response.ok && data.success) {

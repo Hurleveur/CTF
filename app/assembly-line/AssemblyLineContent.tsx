@@ -203,15 +203,33 @@ export default function AssemblyLineContent() {
       // Find the matching project from the projects list to get team member details
       const matchingProject = projects.find(p => p.name === userProject.name);
       
+      console.log('🔍 Auto-selecting project, matching details:', {
+        userProjectName: userProject.name,
+        matchingProject: matchingProject,
+        hasTeamMemberDetails: !!matchingProject?.teamMemberDetails?.length,
+        teamMemberDetailsCount: matchingProject?.teamMemberDetails?.length || 0
+      });
+      
+      // Create fallback team member details if none exist
+      const fallbackTeamMemberDetails = (matchingProject?.teamMemberDetails && matchingProject.teamMemberDetails.length > 0)
+        ? matchingProject.teamMemberDetails
+        : [{
+            id: user?.id || 'unknown',
+            name: profile?.full_name || user?.email || 'Project Owner',
+            email: profile?.email || user?.email || '',
+            isLead: true,
+            joinedAt: new Date().toISOString() // Use current time as fallback
+          }];
+      
       const projectAsArm = {
         ...userProject,
         id: 1000, // Use consistent ID for compatibility
         logo: '🤖',
         aiStatus: 'Corrupted',
         statusColor: 'red' as const,
-        leadDeveloper: 'Unknown',
+        leadDeveloper: profile?.full_name || user?.email || 'Unknown',
         lastBackup: '???',
-        teamMemberDetails: matchingProject?.teamMemberDetails || [], // Use actual team member details from API
+        teamMemberDetails: fallbackTeamMemberDetails, // Always ensure we have team member details
         teamMembers: matchingProject?.teamMembers || [profile?.full_name || user?.email || 'Unknown'] // Legacy compatibility
       };
       
@@ -704,10 +722,13 @@ export default function AssemblyLineContent() {
   useEffect(() => {
     const fetchCutoffDate = async () => {
       try {
-        const response = await fetch('/api/admin/challenge-reset');
+        const response = await fetch('/api/cutoff-date');
         if (response.ok) {
           const data = await response.json();
           setCutoffDate(data.cutoff_date);
+          console.log('✅ Cutoff date fetched:', data.cutoff_date);
+        } else {
+          console.error('❌ Failed to fetch cutoff date:', response.status);
         }
       } catch (error) {
         console.error('Error fetching cutoff date:', error);
@@ -1026,9 +1047,18 @@ export default function AssemblyLineContent() {
                       };
                     }) || [];
 
-                    // Apply cutoff date filtering to team members based on their first submission
+                    // Apply cutoff date filtering to team members based on their join date or first submission
                     const filteredTeamMembers = cutoffDate 
                       ? teamMembersWithPoints.filter(member => {
+                          // First check if member has a joinedAt date from the team member details
+                          if (member.joinedAt) {
+                            const joinDate = new Date(member.joinedAt);
+                            const cutoffDateTime = new Date(cutoffDate);
+                            // Show members who joined AFTER the cutoff date
+                            return joinDate >= cutoffDateTime;
+                          }
+                          
+                          // Fallback: check based on submission dates
                           // Get all submissions for the current project
                           const projectSubmissions = Object.values(teamSubmissions).flat();
                           
@@ -1040,8 +1070,8 @@ export default function AssemblyLineContent() {
                           );
                           
                           if (!memberSubmissions || memberSubmissions.length === 0) {
-                            // If no submissions, don't show the member after cutoff
-                            return false;
+                            // If no submissions and no join date, show the member (they might be new)
+                            return true;
                           }
                           
                           // Find the earliest submission date for this member
@@ -1051,18 +1081,24 @@ export default function AssemblyLineContent() {
                             .map(completed => new Date(completed.submittedAt))
                             .sort((a, b) => a.getTime() - b.getTime())[0];
                           
-                          // Include member if their first submission was before or on cutoff date
-                          return earliestSubmissionDate && earliestSubmissionDate <= new Date(cutoffDate);
+                          // Show member if their first submission was AFTER or on cutoff date
+                          return earliestSubmissionDate && earliestSubmissionDate >= new Date(cutoffDate);
                         })
                       : teamMembersWithPoints;
 
                     // Debug logging
-                    console.log('🔍 Team Members Debug:', {
+                    console.log('🔍 Team Members Debug for', selectedArm.name, ':', {
                       teamMemberDetails: selectedArm.teamMemberDetails,
+                      teamMemberDetailsLength: selectedArm.teamMemberDetails?.length,
                       teamSubmissionsData: teamMembers,
+                      teamSubmissionsLength: teamMembers?.length,
                       mergedWithPoints: teamMembersWithPoints,
+                      mergedLength: teamMembersWithPoints?.length,
                       cutoffDate,
-                      filteredTeamMembers
+                      filteredTeamMembers,
+                      filteredLength: filteredTeamMembers?.length,
+                      projectId: selectedArm.id,
+                      userId: selectedArm.userId
                     });
 
                     // Calculate total team points from filtered members
@@ -1071,7 +1107,7 @@ export default function AssemblyLineContent() {
                     return filteredTeamMembers.length > 0 ? (
                       <div>
                         <TeamMemberList 
-                          teamMembers={teamMembersWithPoints}
+                          teamMembers={filteredTeamMembers}
                           projectId={selectedArm.id}
                           showLeaveButton={false}
                           className=""

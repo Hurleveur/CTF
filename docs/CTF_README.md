@@ -269,7 +269,7 @@ CREATE TABLE IF NOT EXISTS public.challenges (
   - **Data Recovery Techniques**: Strengthens ability to reconstruct and repair corrupted data
 
 #### 12. Frontend Admin Bypass (250 points)
-- **Flag**: `CTF{frontend_admin_checks_are_useless}` (delivered as "hint" in API response)
+- **Flag**: `RBT{frontend_admin_checks_are_useless}` (delivered as "hint" in API response)
 - **Category**: web
 - **Difficulty**: medium
 - **Location**: Assembly Line page (`/assembly-line`) - AI Activation button
@@ -293,7 +293,7 @@ CREATE TABLE IF NOT EXISTS public.challenges (
      - `window.isAdmin = true`
   6. Refresh the page or the button should now appear as **"⚡ ACTIVATE AI"** (unlocked)
   7. Click the AI activation button - you'll get rickrolled! 🎵
-  8. The error message includes: **"Nice try! You thought you could bypass admin checks by modifying the frontend? 🎵 Never gonna give you up! 🎵 Bonus flag: CTF{frontend_admin_checks_are_useless}"**
+  8. The error message includes: **"Nice try! You thought you could bypass admin checks by modifying the frontend? 🎵 Never gonna give you up! 🎵 Bonus flag: RBT{frontend_admin_checks_are_useless}"**
   9. This demonstrates why server-side validation is crucial - the backend properly verifies admin status
 
 - **CBT Elements**:
@@ -573,7 +573,7 @@ CREATE TABLE IF NOT EXISTS public.challenges (
   - **Future Technology Awareness**: Enhances understanding of cutting-edge AI development trends
 
 #### 21. Email Enumeration Security Challenge (200 points)
-- **Flag**: `CTF{email_enumeration_teaches_security_awareness}`
+- **Flag**: `RBT{email_enumeration_teaches_security_awareness}`
 - **Category**: web
 - **Difficulty**: medium
 - **Location**: Multiple API endpoints with user data
@@ -695,7 +695,7 @@ CREATE POLICY "Admins can manage all challenges" ON public.challenges
 ```json
 {
   "challenge_id": "550e8400-e29b-41d4-a716-446655440000", // Optional, will try to match by flag
-  "flag": "CTF{welcome_to_robotics_ctf}"
+  "flag": "RBT{welcome_to_robotics_ctf}"
 }
 ```
 
@@ -771,7 +771,7 @@ CREATE POLICY "Admins can manage all challenges" ON public.challenges
 ### Flag Formats
 
 Two flag formats are used:
-- Standard: `CTF{descriptive_flag_content}` - Used for visible challenges in the UI
+- Standard: `RBT{descriptive_flag_content}` - Used for visible challenges in the UI
 - Hidden: `RBT{descriptive_flag_content}` - Used for challenges found through reconnaissance
 
 ### Challenge Files Structure
