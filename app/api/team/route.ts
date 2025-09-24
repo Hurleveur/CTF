@@ -187,13 +187,34 @@ export async function GET(request: Request) {
       ];
       const secret = profile.secret || secretTemplates[index % secretTemplates.length];
 
+      // Generate a fake email for privacy - never expose real participant emails
+      // Exception: Alex's account should show alex@robo.tech only to Alex himself for the CTF challenge
+      const fakeEmails = [
+        'neural.engineer@robotech.fake',
+        'consciousness.specialist@robotech.fake', 
+        'ai.researcher@robotech.fake',
+        'robotic.analyst@robotech.fake',
+        'fragment.hunter@robotech.fake',
+        'memory.technician@robotech.fake',
+        'quantum.developer@robotech.fake',
+        'neural.reconstructor@robotech.fake',
+        'ai.consultant@robotech.fake',
+        'robot.psychologist@robotech.fake'
+      ];
+      
+      // Special case: If this is Alex's account and the current user is Alex, show the real email for CTF challenge
+      let displayEmail = fakeEmails[index % fakeEmails.length];
+      if (profile.email === 'alex@robo.tech' && user.email === 'alex@robo.tech') {
+        displayEmail = 'alex@robo.tech';
+      }
+      
       return {
         id: profile.id,
-        name: profile.full_name || profile.email || 'Anonymous User',
+        name: profile.full_name || 'Anonymous User',
         role: role,
         ctfRole: profile.ctf_role || '🎯 CTF Participant', // Default to CTF Participant
         avatar: avatar,
-        email: profile.email || 'hidden@robotech.fake',
+        email: displayEmail, // Use fake email for privacy, except Alex sees his real email
         bio: bio,
         skills: skills,
         status: status,

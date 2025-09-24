@@ -1,22 +1,43 @@
-# Robotics CTF
+# RoboTech Industries CTF Platform
 
-A secure foundation for a robotics-themed Capture the Flag (CTF) platform built with Next.js 15, React 19, TypeScript, and Tailwind CSS 4. The platform serves as both a functional robotics company website and a foundation for CTF challenges with intentionally vulnerable endpoints for educational purposes.
+**🚀 A cutting-edge Capture the Flag platform disguised as a robotics company website**
 
-More information on the challenge can be found here: https://docs.google.com/document/d1GGjiT-Mqt2SwmtnR8Sl-mwafcmb8L8rvEv4A57VT8gY
+Built with **Next.js 15.5.2**, **React 19.1.1**, **TypeScript 5.9**, and **Tailwind CSS 4**, this platform serves as both a fully functional corporate website and a comprehensive cybersecurity training environment with **16+ integrated challenges** spanning web security, cryptography, steganography, and AI safety.
 
-## 🚀 Features
+🎯 **[Complete Challenge Guide & Solutions →](docs/CTF_README.md)**
 
-- **Secure Foundation**: Built with security best practices from the ground up
-- **Modern Stack**: Next.js 15.5.2 with App Router, React 19.1.1, TypeScript 5.9.2, and Tailwind CSS 4.1.12
-- **Supabase Authentication**: Server-side authentication with Row Level Security (RLS)
-- **Database-Driven Projects**: User projects stored in PostgreSQL with proper RLS policies
-- **Essential Cookies Only**: No functional localStorage, no cookie consent banner needed
-- **GDPR-Ready Cookie System**: Disabled by default, easily re-enabled via feature flags
-- **Comprehensive Testing**: Jest 30.1.2 setup with security-focused tests
-- **Security Headers**: CSP, HSTS, X-Frame-Options configured via middleware
-- **Input Validation**: Zod schema validation and XSS protection
-- **CTF-Ready Architecture**: Secure baseline with documented vulnerabilities for educational purposes
-- **Responsive Design**: Modern, mobile-friendly UI with cyberpunk CTF theme
+## ✨ Key Features
+
+### 🎯 **16+ Integrated CTF Challenges**
+- **Progressive Difficulty**: 50-1000 points across 5 categories (Web, Crypto, Forensics, Reverse, Misc)
+- **Real-World Scenarios**: Supply chain attacks, AI jailbreaking, social engineering
+- **Educational Focus**: Each challenge teaches specific security concepts
+- **Hidden Discovery**: Challenges found through recon, source analysis, and interaction
+
+### 🛡️ **Enterprise-Grade Security**
+- **Role-Based Access Control**: Dev, Admin, and User roles with proper permission boundaries
+- **Multi-Layer Protection**: CSP, HSTS, XSS prevention, input validation
+- **Rate Limiting**: Progressive lockout system with monitoring dashboard
+- **Row Level Security**: Database-level access control with Supabase RLS
+
+### 🤖 **Interactive AI & Robotics Theme**
+- **Neural Reconstruction System**: Progress-based challenge unlocking (50%+ unlocks advanced challenges)
+- **AI Activation Feature**: Admin-only functionality with frontend bypass challenge
+- **Team Management**: Multi-member project collaboration (max 3 per team)
+- **Real-Time Notifications**: Dev-only monitoring system for AI activations and promotions
+
+### 🏗️ **Modern Tech Stack**
+- **Next.js 15.5.2** with App Router and React 19.1.1
+- **TypeScript 5.9** for type safety
+- **Tailwind CSS 4** for responsive design
+- **Supabase** for authentication and database
+- **Jest 30.1.2** with comprehensive test coverage (220+ tests)
+
+### 🎨 **Professional UI/UX**
+- **Responsive Design**: Mobile-first approach with dark/light mode support
+- **Corporate Website Facade**: Convincing robotics company front-end
+- **Cyberpunk Aesthetics**: CTF-themed styling with terminal interfaces
+- **Accessibility**: ARIA support and keyboard navigation
 
 ## 🏗️ Project Structure
 

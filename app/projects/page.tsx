@@ -466,15 +466,15 @@ export default function SolutionsPage() {
                   </div>
                   <p className="text-gray-600 dark:text-gray-300 mb-2 text-sm line-clamp-2">
                     {project.aiActivated ? (
-                      <span className="text-purple-900 dark:text-purple-300 font-bold animate-pulse">
+                      <span className="text-purple-600 dark:text-purple-300 font-bold animate-pulse">
                         🤖 TERMINAL STATE: AI has achieved full autonomy. It&apos;s too late - the system is beyond recovery.
                       </span>
                     ) : project.neuralReconstruction >= 110 ? (
-                      <span className="text-purple-800 dark:text-purple-300 font-bold animate-pulse">
+                      <span className="text-purple-600 dark:text-purple-300 font-bold animate-pulse">
                         🚨 EMERGENCY: AI has taken control! System autonomy achieved.
                       </span>
                     ) : project.neuralReconstruction >= 100 ? (
-                      <span className="text-red-800 dark:text-red-300 font-medium">
+                      <span className="text-red-600 dark:text-red-300 font-medium">
                         ⚠️ CRITICAL: Full consciousness achieved! Immediate containment required.
                       </span>
                     ) : (
@@ -494,7 +494,7 @@ export default function SolutionsPage() {
                     {project.aiActivated && project.aiActivatedAt && (
                       <div className="flex justify-between items-center">
                         <span className="text-gray-500 dark:text-gray-400 text-xs">AI Activated:</span>
-                        <span className="text-purple-800 dark:text-purple-300 text-xs font-medium">
+                        <span className="text-purple-600 dark:text-purple-300 text-xs font-medium">
                           {new Date(project.aiActivatedAt).toLocaleDateString()} {new Date(project.aiActivatedAt).toLocaleTimeString()}
                         </span>
                       </div>
