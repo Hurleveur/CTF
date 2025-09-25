@@ -17,6 +17,7 @@ export function useAssemblyLineState() {
     type: 'success' | 'error' | null;
     message: string;
   }>({ type: null, message: '' });
+  const [teamTotalPoints, setTeamTotalPoints] = useState(0);
 
   // Memoized state updaters to prevent unnecessary re-renders
   const updateSelectedArm = useCallback((arm: RoboticProject | null) => {
@@ -54,6 +55,7 @@ export function useAssemblyLineState() {
     isLeaving,
     showLeaveConfirm,
     lastCodeResult,
+    teamTotalPoints,
     
     // State setters
     setSelectedArm: updateSelectedArm,
@@ -67,6 +69,7 @@ export function useAssemblyLineState() {
     setIsLeaving,
     setShowLeaveConfirm,
     setLastCodeResult,
+    setTeamTotalPoints,
     
     // Computed values
     isAdminFrontend,

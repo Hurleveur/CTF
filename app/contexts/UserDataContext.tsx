@@ -140,7 +140,7 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
         if (projectData.projects && projectData.projects.length > 0) {
           const userProject = {
             ...projectData.projects[0],
-            id: 1000, // Use consistent ID for compatibility
+            // Keep the original project UUID from the database
           };
           
           console.log('✅ Project data loaded:', userProject);

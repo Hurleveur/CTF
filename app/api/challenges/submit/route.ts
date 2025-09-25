@@ -214,8 +214,9 @@ export async function POST(request: NextRequest) {
     }
 
     if (isCorrect) {
-      // Calculate total progress based on ALL team members' successful submissions
+      // Calculate total progress and team points based on ALL team members' successful submissions
       let totalProgress = 0;
+      let totalTeamPoints = 0;
       
       // Get user's project team members
       const { data: userMembership } = await supabase
@@ -253,14 +254,14 @@ export async function POST(request: NextRequest) {
               }
             });
             
-            const totalTeamPoints = Array.from(challengePoints.values()).reduce((sum, points) => sum + points, 0);
+            totalTeamPoints = Array.from(challengePoints.values()).reduce((sum, points) => sum + points, 0);
             totalProgress = Math.min(totalTeamPoints / 10, 100); // Same scaling as frontend
           }
         }
       }
       
       // Fallback to individual calculation if team lookup fails
-      if (totalProgress === 0) {
+      if (totalProgress === 0 && totalTeamPoints === 0) {
         const { data: allSubmissions, error: submissionsError } = await supabase
           .from('submissions')
           .select('points_awarded')
@@ -269,6 +270,7 @@ export async function POST(request: NextRequest) {
         
         if (allSubmissions && !submissionsError) {
           const totalPoints = allSubmissions.reduce((sum, sub) => sum + (sub.points_awarded || 0), 0);
+          totalTeamPoints = totalPoints; // For single-user teams
           totalProgress = Math.min(totalPoints / 10, 100);
         }
       }
@@ -354,6 +356,8 @@ export async function POST(request: NextRequest) {
         progress_increment: progressIncrement, // Include this for frontend to use
         total_progress: totalProgress, // Include the total progress calculated from all submissions
         team_already_completed: teamAlreadyCompleted, // Let frontend know about team completion
+        new_total_points: totalTeamPoints, // Include total team points for optimistic updates
+        new_project_progress: totalProgress // Include project progress for optimistic updates
       });
     } else {
       return NextResponse.json({

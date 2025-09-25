@@ -80,7 +80,9 @@ export default function AssemblyLineContent() {
     showLeaveConfirm,
     setShowLeaveConfirm,
     animatedProgress,
-    setAnimatedProgress
+    setAnimatedProgress,
+    teamTotalPoints,
+    setTeamTotalPoints
   } = useAssemblyLineState();
   
   // AI activation state now comes from database via userProject.aiActivated
@@ -224,7 +226,7 @@ export default function AssemblyLineContent() {
       
       const projectAsArm = {
         ...userProject,
-        id: 1000, // Use consistent ID for compatibility
+        id: userProject.id, // Use actual project UUID from database
         logo: '🤖',
         aiStatus: 'Corrupted',
         statusColor: 'red' as const,
@@ -528,11 +530,24 @@ export default function AssemblyLineContent() {
       setTeamSubmissions(teamSubmissions || {});
       setTeamMembers(teamMembers || []);
       
+      // Update team total points and project progress from API response
+      if (stats?.totalTeamPoints !== undefined) {
+        setTeamTotalPoints(stats.totalTeamPoints);
+        console.log('✅ Updated team total points:', stats.totalTeamPoints);
+      }
+      
+      // Only update project progress if we're viewing our own project (not in admin mode)
+      if (stats?.projectProgress !== undefined && !adminSelectedProject) {
+        setCodeCompletion(stats.projectProgress);
+        console.log('✅ Updated project progress:', stats.projectProgress);
+        // Note: animatedProgress will be updated by the existing animation effect
+      }
+      
     } catch (error) {
       console.error('❌ Error loading team submissions:', error);
       // Silently fail - feature is optional
     }
-  }, []);
+  }, [adminSelectedProject, setCodeCompletion, setTeamTotalPoints]);
 
   // Monitor code completion threshold and load advanced challenges
   useEffect(() => {
@@ -554,6 +569,34 @@ export default function AssemblyLineContent() {
       loadTeamSubmissions(selectedArm.id);
     }
   }, [selectedArm, showAdvanced]);
+
+  // Real-time sync: poll team submissions every 30 seconds for other team member updates
+  useEffect(() => {
+    if (!selectedArm || !showAdvanced) return;
+
+    const pollInterval = setInterval(() => {
+      // Only poll if page is visible to avoid unnecessary requests
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Polling for team updates...');
+        loadTeamSubmissions(selectedArm.id);
+      }
+    }, 30000); // 30 seconds
+
+    const handleVisibilityChange = () => {
+      // Poll immediately when page becomes visible (user switched back)
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Page visible, polling for updates...');
+        loadTeamSubmissions(selectedArm.id);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(pollInterval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [selectedArm, showAdvanced, loadTeamSubmissions]);
 
   // Function to fetch project data for admin users
   const fetchAdminProjectData = useCallback(async (projectName: string) => {
@@ -607,8 +650,8 @@ export default function AssemblyLineContent() {
       
       // Use push instead of replace to maintain browser history and URL persistence
       window.history.pushState(null, '', currentUrl.toString());
-    }    // Check if this is the user's own project (ID 1000 or matches userProject)
-    const isUserOwnProject = arm.id === 1000 || (userProject && arm.name === userProject.name);
+    }    // Check if this is the user's own project (matches userProject ID or name)
+    const isUserOwnProject = (userProject && arm.id === userProject.id) || (userProject && arm.name === userProject.name);
     
     try {
       if (isUserOwnProject && userProject) {
@@ -810,10 +853,22 @@ export default function AssemblyLineContent() {
         const result = await response.json();
         
         if (response.ok && result.correct) {
-          // Valid submission - just log what API returned, no optimistic updates for now
-          console.log(`� API Response:`, result);
+          // Valid submission - apply optimistic updates immediately
+          console.log(`✅ API Response:`, result);
           
-          // Still refresh team data but don't do optimistic updates
+          // Optimistic updates for immediate visual feedback
+          if (result.new_total_points !== undefined) {
+            setTeamTotalPoints(result.new_total_points);
+            console.log('⚡ Optimistically updated team total points:', result.new_total_points);
+          }
+          
+          if (result.new_project_progress !== undefined && !adminSelectedProject) {
+            setCodeCompletion(result.new_project_progress);
+            console.log('⚡ Optimistically updated project progress:', result.new_project_progress);
+            // Note: animatedProgress will be updated by the existing animation effect
+          }
+          
+          // Refresh team data to get updated member details and ensure consistency
           if (showAdvanced) {
             loadTeamSubmissions(selectedArm?.id);
           }
@@ -1153,9 +1208,6 @@ export default function AssemblyLineContent() {
                       userId: selectedArm.userId
                     });
 
-                    // Calculate total team points from filtered members
-                    const totalTeamPoints = filteredTeamMembers.reduce((sum, member) => sum + (member.totalPoints || 0), 0);
-
                     return filteredTeamMembers.length > 0 ? (
                       <div>
                         <TeamMemberList 
@@ -1167,7 +1219,7 @@ export default function AssemblyLineContent() {
                         {/* Total Team Points */}
                         <div className="mt-3 p-2 bg-gray-50 rounded-lg border">
                           <div className="text-sm font-medium text-gray-700">
-                            Total Team Points: <span className="text-blue-600 font-bold">{totalTeamPoints}</span>
+                            Total Team Points: <span className="text-blue-600 font-bold">{teamTotalPoints}</span>
                           </div>
                         </div>
                         {/* Action Buttons Row */}

@@ -257,6 +257,18 @@ export async function GET(request: Request) {
 
     console.log('[Team Submissions] Processed challenges with team completions:', Object.keys(teamSubmissionMap).length);
 
+    // Calculate total team points from all members
+    const totalTeamPoints = Array.from(memberPointsMap.values()).reduce((sum, points) => sum + points, 0);
+    
+    // Calculate project progress using the same formula as the frontend (totalPoints / 10, capped at 100)
+    const projectProgress = Math.min(totalTeamPoints / 10, 100);
+    
+    console.log('[Team Submissions] Team stats calculated:', {
+      totalTeamPoints,
+      projectProgress,
+      memberPointsBreakdown: Object.fromEntries(memberPointsMap)
+    });
+
     return NextResponse.json({
       message: 'Team submissions fetched successfully',
       teamSubmissions: teamSubmissionMap,
@@ -264,7 +276,9 @@ export async function GET(request: Request) {
       stats: {
         totalChallengesCompleted: Object.keys(teamSubmissionMap).length,
         totalTeamMembers: teamMembersData.length,
-        totalSubmissions: submissions?.length || 0
+        totalSubmissions: submissions?.length || 0,
+        totalTeamPoints,
+        projectProgress
       }
     });
 
