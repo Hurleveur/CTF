@@ -480,7 +480,7 @@ The `/team` page features a prominent role badge system that clearly distinguish
 
 #### Core CTF Team (Gold Gradient Badges)
 - **🏆 CTF Challenge Architect** - Alexandre De Groodt (CTF Lead)
-- **🔓 Chief Exploitation Officer** - Aschraf (HackBox Expert)
+- **🔓 Chief Exploitation Officer** - Achraf (HackBox Expert)
 - **🥷 Shadow Ops Commander** - Léandre (Mr. Robot Type)
 
 #### North Star Agi Team (Indigo/Purple Gradient Badges)

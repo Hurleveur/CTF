@@ -155,7 +155,7 @@ describe('TeamPage Project Loading', () => {
     
     // Should show regular static project lists
     expect(screen.getByText('Intern Coordination')).toBeInTheDocument(); // Alexandre's project
-    expect(screen.getByText('Security Assessment')).toBeInTheDocument(); // Aschraf's project
+    expect(screen.getByText('Security Assessment')).toBeInTheDocument(); // Achraf's project
     
     // Restore original mock state
     mockUseAuth.isAuthenticated = originalIsAuthenticated;

@@ -52,11 +52,11 @@ export default function TeamPage() {
     },
     {
       id: 2,
-      name: "Aschraf",
+      name: "Achraf",
       role: "Intern (HackBoxer)",
       ctfRole: "🔓 Chief Exploitation Officer",
       avatar: "🧸",
-      email: "aschraf@robotech.fake",
+      email: "Achraf@robotech.fake",
       bio: "Experienced with HackTheBox and online web hacking challenges. Don't let the teddy bear appearance fool you - can break into systems faster than you can say 'buffer overflow'.",
       skills: ["Web Exploitation", "CTF Challenges", "Penetration Testing", "Being Adorable"],
       status: "Currently pwning",
@@ -148,6 +148,21 @@ export default function TeamPage() {
       projects: ["PRECISION-X Surgical (Lead)", "Security Protocol Review", "Rock-Based Encryption"],
       quirks: "Lives under a rock. Surprisingly good at finding security vulnerabilities through unorthodox methods.",
       secret: "Nobody really understands his resume, but his security insights are oddly effective..."
+    },
+    {
+      id: 9,
+      name: "Teodor Trotea",
+      role: "Robotic Arm Choreographer",
+      ctfRole: "🤖 North Star Agi – Robotics & AI Engineer",
+      avatar: "🕺",
+      email: "teodor@robotech.fake",
+      bio: "The wizard who makes robotic arms dance with grace and precision. He claims his main job is developing cutting-edge AI systems in his day job. Saved Alex's sanity by providing Claude Code access at the critical moment - a true hero of the CTF development saga.",
+      skills: ["Robotic Arm Programming", "AI Developer", "Movement Algorithms", "Emergency Claude Code Support"],
+      status: "Teaching robots to dance",
+      projects: ["Robotic Arm Dance Engine", "AI Movement Patterns", "Neural Network Choreography", "Claude Code Integration"],
+      quirks: "Can make any robotic arm perform interpretive dance. Has an uncanny ability to appear with exactly the tool you need at exactly the right moment. Speaks fluent robot.",
+      secret: "The robotic arms aren't just dancing - they're communicating in a secret movement language he invented. The CTF was broken and he gave critical code access.",
+      linkedin: "https://www.linkedin.com/in/teodor-trotea-138b072b1/"
     }
   ];
 
@@ -467,7 +482,7 @@ export default function TeamPage() {
               </div>
               <div>
                 <span className="font-medium text-gray-900 dark:text-white">Sleep Hours:</span><br/>
-                Alexandre: 2, Aschraf: 4, Léandre: ???, Laksiya: 8
+                Alexandre: 2, Achraf: 4, Teodor: 6, Léandre: ???, Laksiya: 8
               </div>
             </div>
             <div className="mt-6">
