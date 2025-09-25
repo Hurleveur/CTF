@@ -1946,10 +1946,7 @@ export async function getCachedChallenges() {
 ### Contact Information
 
 #### Primary Contacts
-- **Platform Administrator**: admin@robotech.example
-- **Technical Support**: support@robotech.example  
-- **Security Issues**: security@robotech.example
-- **General Inquiries**: info@robotech.example
+- **Everythin**: mail.robotech@gmx.com
 
 #### Community Resources
 - **GitHub Repository**: https://github.com/your-org/robotech-industries-ctf
