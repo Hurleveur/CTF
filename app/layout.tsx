@@ -44,6 +44,11 @@ export default function RootLayout({
                 <FabrileChatbot />
                 <Toaster
                   position="top-right"
+                  gutter={12}
+                  containerStyle={{
+                    top: 80,
+                    right: 20,
+                  }}
                   toastOptions={{
                     duration: 6000,
                     style: {

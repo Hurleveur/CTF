@@ -81,6 +81,24 @@ interface NotificationsContextType {
   deleteNotification: (notificationId: string) => Promise<void>;
 }
 
+// Helper function to play notification sound
+function playNotificationSound() {
+  try {
+    const audio = new Audio('/notification-sound.wav');
+    audio.volume = 0.5;
+    audio.play().catch(err => {
+      // Try MP3 as fallback
+      const audioMp3 = new Audio('/notification-sound.mp3');
+      audioMp3.volume = 0.5;
+      audioMp3.play().catch(err2 => {
+        console.log('[Notifications] Could not play sound:', err2);
+      });
+    });
+  } catch (err) {
+    console.log('[Notifications] Audio not supported:', err);
+  }
+}
+
 const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
 
 export function NotificationsProvider({ children }: { children: ReactNode }) {
@@ -90,6 +108,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
   const [lastNotification, setLastNotification] = useState<Notification | null>(null);
   const [dismissedNotifications, setDismissedNotifications] = useState<Set<string>>(new Set());
+  const [activeToasts, setActiveToasts] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Only dev users get notifications
@@ -140,29 +159,60 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
           console.log('[Notifications] ⏰ 24 hours ago:', twentyFourHoursAgo.toLocaleString());
           console.log('[Notifications] ⏰ Is notification recent?', notificationTime > twentyFourHoursAgo);
           
-          if (notificationTime > twentyFourHoursAgo && !dismissedNotifications.has(mostRecent.id)) {
-            console.log('[Notifications] 🔔 SHOWING PERSISTENT TOAST FOR RECENT NOTIFICATION!');
-            console.log('[Notifications] 🔔 NOTIFICATION MESSAGE:', mostRecent.message);
-            
-            const toastResult = toast.custom((t) => (
-              <NotificationToast
-                notification={mostRecent}
-                onDismiss={() => dismissNotification(mostRecent.id)}
-                onDelete={() => deleteNotification(mostRecent.id)}
-                visible={t.visible}
-              />
-            ), {
-              duration: Infinity, // Make it persistent - won't auto-dismiss
-            });
-            
-            console.log('[Notifications] � PERSISTENT CUSTOM TOAST CREATED:', toastResult);
-          } else if (dismissedNotifications.has(mostRecent.id)) {
-            console.log('[Notifications] � Notification already dismissed, not showing toast');
-          } else {
-            console.log('[Notifications] ⏰ Notification too old, not showing toast');
-            console.log('[Notifications] ⏰ Notification time:', notificationTime);
-            console.log('[Notifications] ⏰ 24 hours ago:', twentyFourHoursAgo);
-          }
+          // Show up to 5 most recent notifications, prioritizing non-challenge completions
+          const recentNotifications = existingNotifications
+            .filter(n => {
+              const notifTime = new Date(n.created_at);
+              return notifTime > twentyFourHoursAgo && !dismissedNotifications.has(n.id);
+            })
+            .sort((a, b) => {
+              // Priority order: AI_ACTIVATION > USER_PROMOTED > SYSTEM_ALERT > CHALLENGE_COMPLETED
+              const priorityMap = {
+                'AI_ACTIVATION': 4,
+                'USER_PROMOTED': 3,
+                'SYSTEM_ALERT': 2,
+                'CHALLENGE_COMPLETED': 1
+              };
+              const priorityDiff = (priorityMap[b.type] || 0) - (priorityMap[a.type] || 0);
+              if (priorityDiff !== 0) return priorityDiff;
+              // If same priority, sort by date (newest first)
+              return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+            })
+            .slice(0, 5);
+
+          console.log(`[Notifications] 🔔 Showing ${recentNotifications.length} recent notifications`);
+          
+          recentNotifications.forEach((notification, index) => {
+            setTimeout(() => {
+              if (!activeToasts.has(notification.id)) {
+                const toastId = toast.custom((t) => (
+                  <NotificationToast
+                    notification={notification}
+                    onDismiss={() => {
+                      dismissNotification(notification.id);
+                      toast.dismiss(toastId);
+                    }}
+                    onDelete={() => {
+                      deleteNotification(notification.id);
+                      toast.dismiss(toastId);
+                    }}
+                    visible={t.visible}
+                  />
+                ), {
+                  duration: notification.type === 'CHALLENGE_COMPLETED' ? 5000 : Infinity,
+                  position: 'top-right',
+                });
+                
+                setActiveToasts(prev => new Set([...prev, notification.id]));
+                console.log(`[Notifications] 📢 Toast created for: ${notification.type} - ${notification.message}`);
+                
+                // Play sound for AI activation
+                if (notification.type === 'AI_ACTIVATION') {
+                  playNotificationSound();
+                }
+              }
+            }, index * 100); // Stagger the notifications slightly
+          });
           
 
         } else {
@@ -200,21 +250,55 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
                 setNotifications(prev => [notification, ...prev.slice(0, 49)]); // Keep last 50
                 setLastNotification(notification);
                 
-                // Show persistent toast notification (only if not already dismissed)
-                if (!dismissedNotifications.has(notification.id)) {
-                  toast.custom((t) => (
+                // Always show important notifications (non-challenge), or show if under limit
+                const isImportantNotification = notification.type !== 'CHALLENGE_COMPLETED';
+                const shouldShowToast = !dismissedNotifications.has(notification.id) && 
+                  (isImportantNotification || activeToasts.size < 5);
+                
+                if (shouldShowToast) {
+                  // If we're at capacity and this is important, dismiss oldest challenge completion
+                  if (isImportantNotification && activeToasts.size >= 5) {
+                    const challengeToasts = Array.from(activeToasts).filter(id => {
+                      const notif = notifications.find(n => n.id === id);
+                      return notif && notif.type === 'CHALLENGE_COMPLETED';
+                    });
+                    if (challengeToasts.length > 0) {
+                      toast.dismiss(challengeToasts[0]);
+                      setActiveToasts(prev => {
+                        const newSet = new Set(prev);
+                        newSet.delete(challengeToasts[0]);
+                        return newSet;
+                      });
+                    }
+                  }
+                  
+                  const toastId = toast.custom((t) => (
                     <NotificationToast
                       notification={notification}
-                      onDismiss={() => dismissNotification(notification.id)}
-                      onDelete={() => deleteNotification(notification.id)}
+                      onDismiss={() => {
+                        dismissNotification(notification.id);
+                        toast.dismiss(toastId);
+                      }}
+                      onDelete={() => {
+                        deleteNotification(notification.id);
+                        toast.dismiss(toastId);
+                      }}
                       visible={t.visible}
                     />
                   ), {
-                    duration: Infinity, // Persistent toast
+                    duration: notification.type === 'CHALLENGE_COMPLETED' ? 5000 : Infinity,
+                    position: 'top-right',
                   });
-                  console.log('[Notifications] 🔔 Persistent real-time custom toast created');
+                  
+                  setActiveToasts(prev => new Set([...prev, notification.id]));
+                  console.log(`[Notifications] 🔔 Real-time toast created: ${notification.type}`);
+                  
+                  // Play sound for AI activation
+                  if (notification.type === 'AI_ACTIVATION') {
+                    playNotificationSound();
+                  }
                 } else {
-                  console.log('[Notifications] 🚫 Real-time notification already dismissed');
+                  console.log('[Notifications] 🚫 Real-time notification skipped (dismissed or toast limit)');
                 }
                 
                 console.log('[Notifications] ✅ Toast displayed for:', notification.type);
@@ -275,9 +359,11 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   const dismissNotification = (notificationId: string) => {
     console.log('[Notifications] 🗑️ Dismissing notification locally:', notificationId);
     setDismissedNotifications(prev => new Set([...prev, notificationId]));
-    
-    // Dismiss all toasts (react-hot-toast will handle this)
-    toast.dismiss();
+    setActiveToasts(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(notificationId);
+      return newSet;
+    });
   };
 
   // Function to permanently delete a notification from database
@@ -299,9 +385,11 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       
       // Remove from local state
       setNotifications(prev => prev.filter(n => n.id !== notificationId));
-      
-      // Dismiss the toast
-      toast.dismiss();
+      setActiveToasts(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(notificationId);
+        return newSet;
+      });
       
       // Show success message
       toast.success('Notification deleted', {
