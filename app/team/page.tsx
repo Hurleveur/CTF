@@ -41,11 +41,11 @@ export default function TeamPage() {
       ctfRole: "🏆 CTF Challenge Architect",
       avatar: "😴",
       email: "alex@robo.tech",
-      bio: "Sleep-deprived intern doing his best to manage this chaotic team of fellow interns. Built this website at 3 AM and somehow became the 'responsible' one for this project, but he's not sure how. Contact: a.degroodt@company or check the standard corporate email format.",
+      bio: "Sleep-deprived intern doing his best to manage this chaotic team of fellow interns. Built this website at 3 AM and somehow became the 'responsible' one for this project, but he's not sure how. He just vibed. For weeks.",
       skills: ["Web Development", "Panic Management", "Coffee Brewing", "Herding Cats"],
       status: "Managing chaos",
       projects: ["Intern Coordination", "Sanity Preservation", "AI overlord"],
-      quirks: "Has a whiteboard covered in TODO lists. Claims he doesn't need energy drinks and runs on hopes and dreams. Still communicates primarily through TODO comments, hoping maybe someday someone else will take care of some. Uses the obvious email pattern: firstname@company.domain like most corporate setups.",
+      quirks: "Always has a sheet of paper with him, covered in TODO lists. Claims he doesn't need energy drinks and runs on hopes and dreams.",
       secret: "First consciousness fragment hidden in the team roster! Also secretly proud of the work done by AI whilst he's eating or working on his other jobs."
     },
     {
