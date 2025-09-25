@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { createClientSync } from '@/lib/supabase/client';
 import { useAuth } from './AuthContext';
 import { useUserData } from './UserDataContext';
@@ -109,6 +109,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   const [lastNotification, setLastNotification] = useState<Notification | null>(null);
   const [dismissedNotifications, setDismissedNotifications] = useState<Set<string>>(new Set());
   const [activeToasts, setActiveToasts] = useState<Set<string>>(new Set());
+  const [deletionSuccessShown, setDeletionSuccessShown] = useState(false);
 
   useEffect(() => {
     // Only dev users get notifications
@@ -184,32 +185,9 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
           
           recentNotifications.forEach((notification, index) => {
             setTimeout(() => {
-              if (!activeToasts.has(notification.id)) {
-                const toastId = toast.custom((t) => (
-                  <NotificationToast
-                    notification={notification}
-                    onDismiss={() => {
-                      dismissNotification(notification.id);
-                      toast.dismiss(toastId);
-                    }}
-                    onDelete={() => {
-                      deleteNotification(notification.id);
-                      toast.dismiss(toastId);
-                    }}
-                    visible={t.visible}
-                  />
-                ), {
-                  duration: notification.type === 'CHALLENGE_COMPLETED' ? 5000 : Infinity,
-                  position: 'top-right',
-                });
-                
-                setActiveToasts(prev => new Set([...prev, notification.id]));
-                console.log(`[Notifications] 📢 Toast created for: ${notification.type} - ${notification.message}`);
-                
-                // Play sound for AI activation
-                if (notification.type === 'AI_ACTIVATION') {
-                  playNotificationSound();
-                }
+              if (!activeToasts.has(notification.id) && activeToasts.size < 5) {
+                showNotificationToast(notification);
+                console.log(`[Notifications] 📢 Toast created for: ${notification.type} - ${notification.message}`)
               }
             }, index * 100); // Stagger the notifications slightly
           });
@@ -272,31 +250,8 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
                     }
                   }
                   
-                  const toastId = toast.custom((t) => (
-                    <NotificationToast
-                      notification={notification}
-                      onDismiss={() => {
-                        dismissNotification(notification.id);
-                        toast.dismiss(toastId);
-                      }}
-                      onDelete={() => {
-                        deleteNotification(notification.id);
-                        toast.dismiss(toastId);
-                      }}
-                      visible={t.visible}
-                    />
-                  ), {
-                    duration: notification.type === 'CHALLENGE_COMPLETED' ? 5000 : Infinity,
-                    position: 'top-right',
-                  });
-                  
-                  setActiveToasts(prev => new Set([...prev, notification.id]));
-                  console.log(`[Notifications] 🔔 Real-time toast created: ${notification.type}`);
-                  
-                  // Play sound for AI activation
-                  if (notification.type === 'AI_ACTIVATION') {
-                    playNotificationSound();
-                  }
+                  showNotificationToast(notification);
+                  console.log(`[Notifications] 🔔 Real-time toast created: ${notification.type}`)
                 } else {
                   console.log('[Notifications] 🚫 Real-time notification skipped (dismissed or toast limit)');
                 }
@@ -356,7 +311,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   }, [isAuthenticated, profile]);
 
   // Function to dismiss a notification locally
-  const dismissNotification = (notificationId: string) => {
+  const dismissNotification = useCallback((notificationId: string) => {
     console.log('[Notifications] 🗑️ Dismissing notification locally:', notificationId);
     setDismissedNotifications(prev => new Set([...prev, notificationId]));
     setActiveToasts(prev => {
@@ -364,7 +319,64 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       newSet.delete(notificationId);
       return newSet;
     });
-  };
+    toast.dismiss();
+  }, []);
+
+  // Function to show a notification toast
+  const showNotificationToast = useCallback((notification: Notification) => {
+    const toastId = toast.custom((t) => (
+      <NotificationToast
+        notification={notification}
+        onDismiss={() => {
+          dismissNotification(notification.id);
+          toast.dismiss(toastId);
+        }}
+        onDelete={() => {
+          deleteNotification(notification.id);
+          toast.dismiss(toastId);
+        }}
+        visible={t.visible}
+      />
+    ), {
+      duration: notification.type === 'CHALLENGE_COMPLETED' ? 5000 : Infinity,
+      position: 'top-right',
+    });
+    
+    setActiveToasts(prev => new Set([...prev, notification.id]));
+    
+    // Play sound for AI activation
+    if (notification.type === 'AI_ACTIVATION') {
+      playNotificationSound();
+    }
+  }, [dismissNotification]);
+
+  // Check for available notifications to show when space becomes available
+  useEffect(() => {
+    if (activeToasts.size < 5) {
+      // Find notifications that aren't dismissed and aren't currently shown
+      const availableNotifications = notifications
+        .filter(n => !dismissedNotifications.has(n.id) && !activeToasts.has(n.id))
+        .sort((a, b) => {
+          // Priority order: AI_ACTIVATION > USER_PROMOTED > SYSTEM_ALERT > CHALLENGE_COMPLETED
+          const priorityMap = {
+            'AI_ACTIVATION': 4,
+            'USER_PROMOTED': 3,
+            'SYSTEM_ALERT': 2,
+            'CHALLENGE_COMPLETED': 1
+          };
+          const priorityDiff = (priorityMap[b.type] || 0) - (priorityMap[a.type] || 0);
+          if (priorityDiff !== 0) return priorityDiff;
+          // If same priority, sort by date (newest first)
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
+
+      if (availableNotifications.length > 0) {
+        const notification = availableNotifications[0];
+        console.log(`[Notifications] 📤 Showing next notification: ${notification.type} - ${notification.message}`);
+        showNotificationToast(notification);
+      }
+    }
+  }, [activeToasts.size, notifications, dismissedNotifications, showNotificationToast]);
 
   // Function to permanently delete a notification from database
   const deleteNotification = async (notificationId: string) => {
@@ -391,14 +403,24 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
         return newSet;
       });
       
-      // Show success message
-      toast.success('Notification deleted', {
-        duration: 2000,
-        style: {
-          background: '#10b981',
-          color: '#ffffff',
-        },
-      });
+      // Show success message only if not already shown recently
+      if (!deletionSuccessShown) {
+        setDeletionSuccessShown(true);
+        toast.success('Notification deleted', {
+          duration: 2000,
+          style: {
+            background: '#10b981',
+            color: '#ffffff',
+          },
+        });
+        
+        // Reset the flag after 3 seconds
+        setTimeout(() => {
+          setDeletionSuccessShown(false);
+        }, 3000);
+      }
+      
+      // The useEffect hook will automatically show the next available notification
       
     } catch (error) {
       console.error('[Notifications] ❌ Failed to delete notification:', error);
