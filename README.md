@@ -204,6 +204,9 @@ To enable password reset functionality:
    SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
    NEXTAUTH_SECRET=your_random_secret
    NEXTAUTH_URL=http://localhost:3000
+   
+   # For production (optional)
+   # NEXT_PUBLIC_SITE_URL=https://your-production-domain.com
    ```
 
 5. **Run the development server**

@@ -34,12 +34,28 @@ export async function POST(request: NextRequest) {
 
     console.log('[Auth] Password reset requested for:', email);
 
-    // Get the site URL from existing environment variables
-    const siteUrl = process.env.NEXTAUTH_URL || 
-                   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
-                   'http://localhost:3000';
+    // Get the site URL - prioritize production URL, then Vercel URL, then localhost
+    let siteUrl = 'http://localhost:3000';
+    
+    if (process.env.NEXT_PUBLIC_SITE_URL) {
+      // Production URL if explicitly set
+      siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    } else if (process.env.VERCEL_URL) {
+      // Vercel deployment URL
+      siteUrl = `https://${process.env.VERCEL_URL}`;
+    } else if (process.env.NEXTAUTH_URL && !process.env.NEXTAUTH_URL.includes('localhost')) {
+      // Use NEXTAUTH_URL if it's not localhost
+      siteUrl = process.env.NEXTAUTH_URL;
+    }
+    
+    // Get the origin from the request headers as a fallback
+    const origin = request.headers.get('origin');
+    if (origin && !origin.includes('localhost')) {
+      siteUrl = origin;
+    }
     
     const redirectUrl = `${siteUrl}/reset-password`;
+    console.log('[Auth] Using site URL for password reset:', siteUrl);
 
     // Send password reset email
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
