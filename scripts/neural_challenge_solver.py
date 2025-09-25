@@ -149,7 +149,11 @@ class NeuralChallengeSolver:
     
     def phase_3_model_analysis(self, model_path):
         """Phase 3: ONNX Model Forensic Analysis"""
-        print("\n2. Analyzing ONNX model structure...")
+        print("\n" + "=" * 60)
+        print("PHASE 3: ONNX MODEL FORENSIC ANALYSIS")
+        print("=" * 60)
+        
+        print("\n1. Analyzing ONNX model structure...")
         
         try:
             import onnx
@@ -162,7 +166,7 @@ class NeuralChallengeSolver:
             print(f"   ✓ Initializers: {len(model.graph.initializer)}")
             
             # Check metadata for suspicious entries
-            print("\n3. Analyzing model metadata...")
+            print("\n2. Analyzing model metadata...")
             suspicious_metadata = []
             
             for prop in model.metadata_props:
@@ -183,7 +187,7 @@ class NeuralChallengeSolver:
                     suspicious_metadata.append((prop.key, prop.value))
             
             # Analyze weights for steganographic content
-            print("\n4. Checking weights for steganographic content...")
+            print("\n3. Checking weights for steganographic content...")
             
             conv_layers = [node for node in model.graph.node if node.op_type == "Conv"]
             print(f"   Found {len(conv_layers)} convolution layers")
