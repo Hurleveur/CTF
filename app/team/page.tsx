@@ -201,7 +201,7 @@ export default function TeamPage() {
   let allTeamMembers;
   
   if (isAlex) {
-    // For Alex, only show static team members (no duplicate profile from database)
+    // For Alex, only show static team members (no duplicate profile from database is better)
     allTeamMembers = teamMembers;
   } else {
     // For other users, combine static and database team members
