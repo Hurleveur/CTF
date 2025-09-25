@@ -112,6 +112,7 @@ export default function AssemblyLineContent() {
   
   // Audio context for alarm sounds
   const audioContextRef = useRef<AudioContext | null>(null);
+  const advancedPanelRef = useRef<HTMLDivElement | null>(null);
   
   // Check if user is admin - now using actual database profile role!
   const isAdmin = profile?.role === 'admin' || profile?.role === 'dev';
@@ -555,6 +556,16 @@ export default function AssemblyLineContent() {
       setShowAdvanced(true);
       loadAdvancedChallenges();
       loadTeamSubmissions(selectedArm?.id);
+      
+      // Scroll to advanced panel when it's revealed
+      setTimeout(() => {
+        if (advancedPanelRef.current) {
+          advancedPanelRef.current.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center'
+          });
+        }
+      }, 100); // Small delay to ensure panel is rendered
     }
     // Reload challenges when completion state or completed challenges change
     if (showAdvanced) {
@@ -1913,7 +1924,7 @@ export default function AssemblyLineContent() {
 
                 {/* Advanced Challenges Panel - Takes flexible space */}
                 {showAdvanced && advancedChallenges.length > 0 && (
-                  <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+                  <div ref={advancedPanelRef} className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
                     <AdvancedChallengesPanel 
                       challenges={advancedChallenges} 
                       completedChallengeIds={adminSelectedProject ? new Set(adminProjectData.completedChallengeIds) : new Set(completedChallengeIds)}

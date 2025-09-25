@@ -77,7 +77,8 @@ export default function TeamPage() {
       status: "In the shadows",
       projects: ["Deep System Analysis", "Anonymous Data Recovery", "Digital Forensics"],
       quirks: "Always wears a hoodie, even in video calls. Communicates through encrypted messages and philosophical quotes about society.",
-      secret: "'We are all just code in someone else's simulation...' - The truth is hidden in plain sight."
+      secret: "'We are all just code in someone else's simulation...' - The truth is hidden in plain sight.",
+      linkedin: "https://www.linkedin.com/in/leandre-vilain"
     },
     {
       id: 4,
@@ -382,9 +383,30 @@ export default function TeamPage() {
                         ? 'bg-blue-100 text-blue-800'
                         : member.status === 'Holding it all together'
                         ? 'bg-yellow-100 text-yellow-800'
+                        : member.status === 'Teaching robots to dance'
+                        ? 'bg-purple-100 text-purple-800'
                         : 'bg-gray-100 text-gray-800'
                     }`}>
                       {member.status}
+                    </div>
+                    
+                    {/* Skills */}
+                    <div className="mt-6">
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">Skills</h4>
+                      {member.skills && member.skills.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {member.skills.map((skill, index) => (
+                            <span 
+                              key={index}
+                              className="bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded-full font-medium group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors duration-300"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 dark:text-gray-400 text-xs italic">Skills classified</p>
+                      )}
                     </div>
                     
                     {/* Current Projects */}
