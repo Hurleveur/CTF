@@ -41,11 +41,11 @@ export default function TeamPage() {
       ctfRole: "🏆 CTF Challenge Architect",
       avatar: "😴",
       email: "alex@robo.tech",
-      bio: "Sleep-deprived intern doing his best to manage this chaotic team of fellow interns. Built this website at 3 AM and somehow became the 'responsible' one for this project, but he's not sure how'.",
+      bio: "Sleep-deprived intern doing his best to manage this chaotic team of fellow interns. Built this website at 3 AM and somehow became the 'responsible' one for this project, but he's not sure how. Contact: a.degroodt@company or check the standard corporate email format.",
       skills: ["Web Development", "Panic Management", "Coffee Brewing", "Herding Cats"],
       status: "Managing chaos",
       projects: ["Intern Coordination", "Sanity Preservation", "AI overlord"],
-      quirks: "Has a whiteboard covered in TODO lists. Claims he doesn't need energy drinks and runs on hopes and dreams. Still communicates primarily through TODO comments, hoping maybe someday someone else will take care of some.",
+      quirks: "Has a whiteboard covered in TODO lists. Claims he doesn't need energy drinks and runs on hopes and dreams. Still communicates primarily through TODO comments, hoping maybe someday someone else will take care of some. Uses the obvious email pattern: firstname@company.domain like most corporate setups.",
       secret: "First consciousness fragment hidden in the team roster! Also secretly proud of the work done by AI whilst he's eating or working on his other jobs."
     },
     {
@@ -195,6 +195,8 @@ export default function TeamPage() {
   }, [isAuthenticated]);
 
   // Combine static team members with database team members
+  // Note: Static team members have specific fake emails for CTF challenges (like alex@robo.tech)
+  // Database team members (real participants) get privacy-safe fake emails via API
   // Special handling for Alex: don't show database profile as it's redundant with static team
   let allTeamMembers;
   
@@ -466,6 +468,8 @@ export default function TeamPage() {
         <div className="mt-8 text-center">
           <p className="text-xs text-gray-400 dark:text-gray-500">
             {/* If you're reading this in the source code, you're on the right track! */}
+            {/* TODO: Remember to check alex@robo.tech inbox for team feedback - Alex */}
+            {/* NOTE: All intern accounts follow standard format: firstname@robo.tech */}
             Internal team directory v2.1.3 | Last updated: 3AM (as usual)
           </p>
         </div>

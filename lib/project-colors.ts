@@ -85,7 +85,7 @@ export function getStatusBadgeClasses(statusColor: ProjectStatusColor): string {
     case 'red':
       return 'bg-red-100 text-red-800';
     case 'purple':
-      return 'bg-purple-900 text-purple-100';
+      return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100';
     default:
       return 'bg-gray-100 text-gray-800';
   }

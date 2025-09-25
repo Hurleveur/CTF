@@ -561,10 +561,10 @@ CREATE TRIGGER trg_final_challenge_promotion
 
 -- Insert some default challenges for testing
 INSERT INTO public.challenges (title, description, category, difficulty, flag, points, hints) VALUES
-  ('Welcome to CTF', 'This is your first challenge! The flag is hidden in plain sight.', 'misc', 'easy', 'CTF{welcome_to_robotics_ctf}', 50, NULL),
-  ('Basic Web Security', 'Find the hidden admin panel in this web application.', 'web', 'easy', 'CTF{admin_panel_found}', 100, NULL),
-  ('Robot Assembly Code', 'Analyze this assembly code to find the secret key.', 'reverse', 'medium', 'CTF{assembly_master_2024}', 200, NULL),
-  ('Encrypted Communications', 'Decrypt the robot communication protocol.', 'crypto', 'hard', 'CTF{robots_speak_in_riddles}', 300, NULL),
+  ('Welcome to CTF', 'This is your first challenge! The flag is hidden in plain sight.', 'misc', 'easy', 'RBT{welcome_to_robotics_ctf}', 50, NULL),
+  ('Basic Web Security', 'Find the hidden admin panel in this web application.', 'web', 'easy', 'RBT{admin_panel_found}', 100, NULL),
+  ('Robot Assembly Code', 'Analyze this assembly code to find the secret key.', 'reverse', 'medium', 'RBT{assembly_master_2024}', 200, NULL),
+  ('Encrypted Communications', 'Decrypt the robot communication protocol.', 'crypto', 'hard', 'RBT{robots_speak_in_riddles}', 300, NULL),
   ('Admin Terminal Breach', 'The intern left a backdoor to the admin terminal. Can you find the access method and get the terminal flag?', 'web', 'medium', 'RBT{4dm1n_t3rm1n4l_pwn3d_6d8e4b}', 250, ARRAY['Check security.txt for clues about admin access', 'Look for URL parameters that might grant access', 'The terminal itself will guide you to the flag']),
   ('Alexandre''s Account', 'Guess the password of Alexandre De Groodt, the sleep-deprived intern who built this site. His personal info is scattered around...', 'misc', 'hard', 'RBT{intern_account_compromised}', 400, ARRAY['Alexandre mentioned being sleep-deprived and working at 3AM', 'Check the team page and about page for personal details', 'What significant year might he use in his password?', 'Think about common password patterns with personal info']),
   ('Contact Protocol', 'Security best practices with vulnerabilities. Find the hidden message in the security documentation.', 'crypto', 'medium', 'RBT{security_through_obscurity_fails}', 250, ARRAY['Check the security.txt file', 'Look for encoded text in the PGP block', 'ROT13 is a simple cipher', 'The fake PGP key contains the real secret']),

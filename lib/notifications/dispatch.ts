@@ -21,8 +21,9 @@ export interface NotificationData {
  */
 export async function dispatchNotification(params: NotificationData): Promise<void> {
   try {
-    // Use server-side Supabase client (bypasses RLS restrictions)
-    const supabase = await createClient();
+    // Use service role client to bypass RLS restrictions
+    const { createServiceRoleClient } = await import('@/lib/supabase/server');
+    const supabase = createServiceRoleClient();
 
     const { error } = await supabase
       .from('notifications')
@@ -35,14 +36,21 @@ export async function dispatchNotification(params: NotificationData): Promise<vo
 
     if (error) {
       console.error('[Notifications] Failed to dispatch notification:', error);
+      console.error('[Notifications] Error details:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      });
       throw new Error(`Failed to dispatch notification: ${error.message}`);
     }
 
     console.log(`[Notifications] ✅ Dispatched ${params.type} notification to dev users:`, params.message);
   } catch (error) {
     console.error('[Notifications] Error dispatching notification:', error);
-    // Don't throw - notification failures shouldn't break the main flow
-    // The original action (like AI activation) should still succeed
+    console.error('[Notifications] Full error object:', error);
+    // Re-throw the error so we can see what's actually failing
+    throw error;
   }
 }
 

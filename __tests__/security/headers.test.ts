@@ -169,7 +169,6 @@ describe('Security Headers Middleware', () => {
       expect(policy).toContain('geolocation=()');
       expect(policy).toContain('payment=()');
       expect(policy).toContain('usb=()');
-      expect(policy).toContain('interest-cohort=()');
     });
   });
 

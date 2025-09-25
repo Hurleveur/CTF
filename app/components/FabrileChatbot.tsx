@@ -47,10 +47,12 @@ export default function FabrileChatbot() {
         if (typeof window !== 'undefined') {
           const originalConsoleError = console.error;
           console.error = function(...args) {
-            // Check if it's a Fabrile-related error
+            // Check if it's a Fabrile-related error and handle gracefully
             const errorString = args.join(' ').toLowerCase();
             if (errorString.includes('fabrile') || errorString.includes('embed') || errorString.includes('chat')) {
-              console.warn('🤖 ⚠️ Fabrile-related error detected:', ...args);
+              console.warn('🤖 ⚠️ Fabrile chatbot service temporarily unavailable:', errorString);
+              // Don't propagate chatbot errors as they're non-critical
+              return;
             }
             originalConsoleError.apply(console, args);
           };

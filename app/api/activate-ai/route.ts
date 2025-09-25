@@ -78,7 +78,7 @@ export async function POST() {
           message: 'Nice try! You thought you could bypass admin checks by modifying the frontend? 🎵 Never gonna give you up! 🎵',
           rickroll: true,
           redirectUrl: selectedRickroll,
-          hint: 'CTF{frontend_admin_checks_are_useless}'
+          hint: 'RBT{frontend_admin_checks_are_useless}'
         },
         { status: 403 }
       );

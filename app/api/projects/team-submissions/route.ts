@@ -3,10 +3,12 @@ import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
-// GET - Fetch team member submissions for the current user's project
-export async function GET() {
+// GET - Fetch team member submissions for a specific project or the current user's project
+export async function GET(request: Request) {
   try {
     const supabase = await createClient();
+    const { searchParams } = new URL(request.url);
+    const requestedProjectId = searchParams.get('projectId');
 
     // Check authentication
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -20,24 +22,32 @@ export async function GET() {
 
     console.log('[Team Submissions] Fetching team submissions for user:', user.id);
 
-    // Find the user's project through project_members table
-    const { data: userMembership, error: membershipError } = await supabase
-      .from('project_members')
-      .select('project_id')
-      .eq('user_id', user.id)
-      .single();
+    let projectId: string;
 
-    if (membershipError || !userMembership) {
-      console.log('[Team Submissions] User is not a member of any project');
-      return NextResponse.json({
-        message: 'No team submissions found',
-        teamSubmissions: {},
-        teamMembers: []
-      });
+    if (requestedProjectId) {
+      // Use the requested project ID (should be a UUID)
+      projectId = requestedProjectId;
+      console.log('[Team Submissions] Using requested project ID:', projectId);
+    } else {
+      // Fall back to user's own project
+      const { data: userMembership, error: membershipError } = await supabase
+        .from('project_members')
+        .select('project_id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (membershipError || !userMembership) {
+        console.log('[Team Submissions] User is not a member of any project');
+        return NextResponse.json({
+          message: 'No team submissions found',
+          teamSubmissions: {},
+          teamMembers: []
+        });
+      }
+
+      projectId = userMembership.project_id;
+      console.log('[Team Submissions] Using user\'s project ID:', projectId);
     }
-
-    const projectId = userMembership.project_id;
-    console.log('[Team Submissions] User is member of project:', projectId);
 
     // Get all team members for this project
     const { data: teamMembers, error: teamMembersError } = await supabase
@@ -232,6 +242,8 @@ export async function GET() {
     // Transform team members data for frontend
     const teamMembersData = teamMembers?.map(member => {
       const profile = Array.isArray(member.profiles) ? member.profiles[0] : member.profiles;
+      const totalPoints = memberPointsMap.get(member.user_id) || 0;
+      
       return {
         id: member.user_id,
         name: profile?.full_name || profile?.email || 'Anonymous',
@@ -239,7 +251,7 @@ export async function GET() {
         isLead: member.is_lead,
         joinedAt: member.joined_at,
         isCurrentUser: member.user_id === user.id,
-        totalPoints: memberPointsMap.get(member.user_id) || 0
+        totalPoints
       };
     }) || [];
 
