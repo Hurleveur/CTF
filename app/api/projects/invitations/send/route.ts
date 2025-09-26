@@ -102,9 +102,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (currentMembers && currentMembers.length >= 3) {
+    if (currentMembers && currentMembers.length >= 5) {
       return NextResponse.json(
-        { error: 'Project is full (maximum 3 members)' },
+        { error: 'Project is full (maximum 5 members)' },
         { status: 400 }
       );
     }

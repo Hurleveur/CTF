@@ -18,21 +18,62 @@ export async function POST() {
 
     const user_id = user.id;
 
-    // Get all successful submissions for this user
+    // First, get the user's project membership to find their project
+    const { data: membership, error: membershipError } = await supabase
+      .from('project_members')
+      .select('project_id')
+      .eq('user_id', user_id)
+      .single();
+    
+    if (membershipError || !membership) {
+      console.log('[API] User is not a member of any project');
+      return NextResponse.json(
+        { error: 'User is not a member of any project' },
+        { status: 404 }
+      );
+    }
+
+    // Get all team members for this project
+    const { data: teamMembers, error: teamError } = await supabase
+      .from('project_members')
+      .select('user_id')
+      .eq('project_id', membership.project_id);
+    
+    if (teamError || !teamMembers) {
+      console.error('[API] Failed to get team members:', teamError);
+      return NextResponse.json(
+        { error: 'Failed to get team members' },
+        { status: 500 }
+      );
+    }
+
+    // Get all team member IDs
+    const teamMemberIds = teamMembers.map(member => member.user_id);
+    console.log(`[API] Found ${teamMemberIds.length} team members for project sync`);
+
+    // Get all successful submissions for ALL team members
     const { data: allSubmissions, error: submissionsError } = await supabase
       .from('submissions')
-      .select('points_awarded')
-      .eq('user_id', user_id)
+      .select('points_awarded, user_id')
+      .in('user_id', teamMemberIds)
       .eq('is_correct', true);
     
     let totalProgress = 0;
     let totalPoints = 0;
     
     if (allSubmissions && !submissionsError) {
-      // Calculate total progress based on all successful submissions
+      // Calculate total progress based on all team members' successful submissions
       totalPoints = allSubmissions.reduce((sum, sub) => sum + (sub.points_awarded || 0), 0);
       totalProgress = Math.min(totalPoints / 10, 100); // Same scaling as elsewhere
-      console.log(`[API] Progress sync - Total points: ${totalPoints}, Progress: ${totalProgress}%`);
+      console.log(`[API] Team progress sync - Total team points: ${totalPoints}, Progress: ${totalProgress}%`);
+      
+      // Log breakdown by member for debugging
+      const memberPoints = new Map<string, number>();
+      allSubmissions.forEach(sub => {
+        const userId = sub.user_id;
+        memberPoints.set(userId, (memberPoints.get(userId) || 0) + (sub.points_awarded || 0));
+      });
+      console.log('[API] Points by member:', Object.fromEntries(memberPoints));
     }
     
     // Calculate dynamic AI status and color based on progress

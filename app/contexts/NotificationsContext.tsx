@@ -403,22 +403,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
         return newSet;
       });
       
-      // Show success message only if not already shown recently
-      if (!deletionSuccessShown) {
-        setDeletionSuccessShown(true);
-        toast.success('Notification deleted', {
-          duration: 2000,
-          style: {
-            background: '#10b981',
-            color: '#ffffff',
-          },
-        });
-        
-        // Reset the flag after 3 seconds
-        setTimeout(() => {
-          setDeletionSuccessShown(false);
-        }, 3000);
-      }
+      // Success toast removed - notification deleted silently
       
       // The useEffect hook will automatically show the next available notification
       

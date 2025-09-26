@@ -67,7 +67,7 @@ Access `/api/security/enumeration-challenge` to:
 - Learn about mitigation strategies
 
 ### Expected Flag
-`CTF{email_enumeration_teaches_security_awareness}`
+`RBT{email_enumeration_teaches_security_awareness}`
 
 ## Educational Objectives
 

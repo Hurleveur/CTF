@@ -37,7 +37,7 @@ const CHALLENGE_USERS = [
     email: 'security.challenge@robotech.fake',
     role: 'Security Awareness Trainer',
     bio: 'I exist to teach you about information disclosure vulnerabilities. Finding me means you\'re on the right track!',
-    secret: 'CTF{email_enumeration_is_a_real_threat_protect_your_users}'
+    secret: 'RBT{email_enumeration_is_a_real_threat_protect_your_users}'
   },
   {
     name: 'Enumeration Detector',
@@ -210,7 +210,7 @@ export function getChallengeResponse(userId: string): {
       isChallenge: true,
       message: 'Congratulations! You\'ve discovered an information disclosure vulnerability.',
       hint: 'Look for emails ending in .fake or .challenge domains in the API responses.',
-      flag: 'CTF{email_enumeration_teaches_security_awareness}'
+      flag: 'RBT{email_enumeration_teaches_security_awareness}'
     };
   }
   
