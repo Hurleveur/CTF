@@ -75,8 +75,8 @@ export default function HomePage() {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Neural Network Restoration Protocols</h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Our robotic arm development features leverage advanced AI consciousness fragments 
-              to enhance programming efficiency. Each restored fragment improves system capabilities...
+              The sentient robotic arm fragments have been dispersed throughout this website.
+              Each restored fragment improves system capabilities...
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
               [Warning: Neural activity detected in fragmented code segments]

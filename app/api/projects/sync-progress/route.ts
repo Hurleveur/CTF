@@ -169,7 +169,7 @@ export async function POST() {
     });
 
   } catch (error) {
-    if (isDev) console.error('[API] Progress sync error:', error);
+    console.error('[API] Progress sync error:', error);
     
     return NextResponse.json(
       { error: 'Internal server error' },

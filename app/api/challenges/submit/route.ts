@@ -379,7 +379,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    devError('[API] Submit error:', error);
+    console.error('[API] Submit error:', error);
     
     return NextResponse.json(
       { error: 'Internal server error' },
