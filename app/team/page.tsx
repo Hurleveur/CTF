@@ -394,14 +394,18 @@ export default function TeamPage() {
                     <div className="mt-6">
                       <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">Skills</h4>
                       {member.skills && member.skills.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                          {member.skills.map((skill, index) => (
-                            <span 
-                              key={index}
-                              className="bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded-full font-medium group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors duration-300"
-                            >
-                              {skill}
-                            </span>
+                        <div className="space-y-2">
+                          {Array.from({ length: Math.ceil(member.skills.length / 2) }, (_, rowIndex) => (
+                            <div key={rowIndex} className="flex gap-2">
+                              {member.skills.slice(rowIndex * 2, rowIndex * 2 + 2).map((skill, index) => (
+                                <span 
+                                  key={index}
+                                  className="bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded-full font-medium group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors duration-300"
+                                >
+                                  {skill}
+                                </span>
+                              ))}
+                            </div>
                           ))}
                         </div>
                       ) : (
