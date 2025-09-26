@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
         if (allChallengesError) {
           devError('[API] Error fetching challenges:', allChallengesError.message);
         } else if (allChallenges) {
-          devLog('[API] Available flags:', allChallenges.map(c => c.flag));
+          console.log('[API] Available flags:', ['RBT{correct_wrong_flag}']);
           const matchingChallenge = allChallenges.find(c => 
             c.flag.toLowerCase() === flag.trim().toLowerCase()
           );
