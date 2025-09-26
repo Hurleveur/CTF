@@ -20,12 +20,10 @@ export async function POST(request: NextRequest) {
     }
     
     const body = await request.json();
-    console.log('[API] Flag submission received:', { flag: body.flag, challenge_id: body.challenge_id });
     
     // Validate input
     const validationResult = submitSchema.safeParse(body);
     if (!validationResult.success) {
-      console.log('[API] Validation failed:', validationResult.error.flatten().fieldErrors);
       return NextResponse.json(
         {
           error: 'Validation failed',
@@ -49,11 +47,31 @@ export async function POST(request: NextRequest) {
     }
 
     const user_id = user.id;
+    
+    // Check if user is a dev for debug logging
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user_id)
+      .single();
+    
+    const isDev = profile?.role === 'dev';
+    
+    // Helper function for dev-only logging
+    const devLog = (...args: any[]) => {
+      if (isDev) console.log(...args);
+    };
+    
+    const devError = (...args: any[]) => {
+      if (isDev) console.error(...args);
+    };
+    
+    devLog('[API] Flag submission received:', { flag: body.flag, challenge_id: body.challenge_id });
 
     // Find challenge by flag if challenge_id is not provided
     let actualChallengeId = challenge_id;
     if (!challenge_id) {
-      console.log('[API] Searching for challenge by flag:', flag.trim());
+      devLog('[API] Searching for challenge by flag:', flag.trim());
       const { data: challengeByFlag, error: flagSearchError } = await supabase
         .from('challenges')
         .select('id')
@@ -62,7 +80,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (flagSearchError || !challengeByFlag) {
-        console.log('[API] No exact match found, trying case-insensitive comparison');
+        devLog('[API] No exact match found, trying case-insensitive comparison');
         // No exact match, try case-insensitive comparison
         const { data: allChallenges, error: allChallengesError } = await supabase
           .from('challenges')
@@ -70,26 +88,26 @@ export async function POST(request: NextRequest) {
           .eq('is_active', true);
 
         if (allChallengesError) {
-          console.error('[API] Error fetching challenges:', allChallengesError.message);
+          devError('[API] Error fetching challenges:', allChallengesError.message);
         } else if (allChallenges) {
-          console.log('[API] Available flags:', allChallenges.map(c => c.flag));
+          devLog('[API] Available flags:', allChallenges.map(c => c.flag));
           const matchingChallenge = allChallenges.find(c => 
             c.flag.toLowerCase() === flag.trim().toLowerCase()
           );
           if (matchingChallenge) {
-            console.log('[API] Found matching challenge:', matchingChallenge.id);
+            devLog('[API] Found matching challenge:', matchingChallenge.id);
             actualChallengeId = matchingChallenge.id;
           } else {
-            console.log('[API] No matching challenge found for flag:', flag.trim());
+            devLog('[API] No matching challenge found for flag:', flag.trim());
           }
         }
       } else {
-        console.log('[API] Direct match found:', challengeByFlag.id);
+        devLog('[API] Direct match found:', challengeByFlag.id);
         actualChallengeId = challengeByFlag.id;
       }
 
       if (!actualChallengeId) {
-        console.log('[API] No challenge found for flag, recording failed attempt');
+        devLog('[API] No challenge found for flag, recording failed attempt');
         // Record failed attempt
         await supabase
           .from('submissions')
@@ -119,7 +137,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows returned
-      console.error('[API] Submission check error:', checkError.message);
+      devError('[API] Submission check error:', checkError.message);
       return NextResponse.json(
         { error: 'Failed to check submission status' },
         { status: 500 }
@@ -167,7 +185,7 @@ export async function POST(request: NextRequest) {
         teamAlreadyCompleted = !!(teamSolutions && teamSolutions.length > 0);
         
         if (teamAlreadyCompleted) {
-          console.log(`[API] Challenge ${actualChallengeId} already completed by team member, awarding 0 points`);
+          devLog(`[API] Challenge ${actualChallengeId} already completed by team member, awarding 0 points`);
         }
       }
     }
@@ -181,7 +199,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (challengeError) {
-      console.error('[API] Challenge fetch error:', challengeError.message);
+      devError('[API] Challenge fetch error:', challengeError.message);
       return NextResponse.json(
         { error: 'Challenge not found or inactive' },
         { status: 404 }
@@ -206,7 +224,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (insertError) {
-      console.error('[API] Submission insert error:', insertError.message);
+      devError('[API] Submission insert error:', insertError.message);
       return NextResponse.json(
         { error: 'Failed to record submission' },
         { status: 500 }
@@ -275,29 +293,22 @@ export async function POST(request: NextRequest) {
         }
       }
       
-      // Update progress for ALL team members' projects
+      // Update progress for the team's project
       if (userMembership) {
-        const { data: teamMembers } = await supabase
-          .from('project_members')
-          .select('user_id')
-          .eq('project_id', userMembership.project_id);
-
-        if (teamMembers && teamMembers.length > 0) {
-          const teamMemberIds = teamMembers.map(member => member.user_id);
-          
-          // Update neural reconstruction for ALL team members
-          const { error: updateError } = await supabase
-            .from('user_projects')
-            .update({
-              neural_reconstruction: totalProgress,
-              updated_at: new Date().toISOString()
-            })
-            .in('user_id', teamMemberIds);
-          
-          if (updateError) {
-            console.error('[API] Failed to update team project progress:', updateError.message);
-            // Don't fail the submission, just log the error
-          }
+        // Update the project directly using the project_id
+        const { error: updateError } = await supabase
+          .from('user_projects')
+          .update({
+            neural_reconstruction: totalProgress,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userMembership.project_id);
+        
+        if (updateError) {
+          devError('[API] Failed to update team project progress:', updateError.message);
+          // Don't fail the submission, just log the error
+        } else {
+          devLog(`[API] Updated project ${userMembership.project_id} neural reconstruction to ${totalProgress}%`);
         }
       } else {
         // Fallback: update only current user's project
@@ -310,7 +321,7 @@ export async function POST(request: NextRequest) {
           .eq('user_id', user_id);
         
         if (updateError) {
-          console.error('[API] Failed to update user project progress:', updateError.message);
+          devError('[API] Failed to update user project progress:', updateError.message);
         }
       }
       
@@ -339,10 +350,10 @@ export async function POST(request: NextRequest) {
               actualChallengeId!, // We know it's defined here since we're in the success path
               pointsAwarded
             );
-            console.log(`[API] ✅ Challenge completion notification sent for user ${userProfile.email}`);
+            devLog(`[API] ✅ Challenge completion notification sent for user ${userProfile.email}`);
           }
         } catch (notificationError) {
-          console.error('[API] Failed to send challenge completion notification (continuing anyway):', notificationError);
+          devError('[API] Failed to send challenge completion notification (continuing anyway):', notificationError);
           // Don't fail the submission if notification fails
         }
       }
@@ -368,7 +379,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('[API] Submit error:', error);
+    devError('[API] Submit error:', error);
     
     return NextResponse.json(
       { error: 'Internal server error' },

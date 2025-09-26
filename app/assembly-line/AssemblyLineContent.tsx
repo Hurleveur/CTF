@@ -284,29 +284,31 @@ export default function AssemblyLineContent() {
     }
   }, [codeCompletion, animatedProgress, setAnimatedProgress]);
 
-  // Optional background sync is now disabled since optimistic updates work perfectly
-  // No need to refetch data as the UI updates immediately with accurate data
-
   // Function to sync project progress with submissions
-  // const syncProjectProgress = async () => {
-  //   try {
-  //     console.log('🔄 Syncing project progress...');
-  //     
-  //     const response = await fetch('/api/projects/sync-progress', {
-  //       method: 'POST'
-  //     });
-  //     
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       console.log('✅ Progress synced:', data);
-  //     } else {
-  //       console.log('⚠️ Progress sync failed, continuing...');
-  //     }
-  //   } catch (error) {
-  //     console.log('⚠️ Progress sync error, continuing...', error);
-  //     // Don't throw - this is not critical
-  //   }
-  // };
+  const syncProjectProgress = async () => {
+    try {
+      if (user?.role === 'dev') console.log('🔄 Syncing project progress...');
+      
+      const response = await fetch('/api/projects/sync-progress', {
+        method: 'POST'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (user?.role === 'dev') console.log('✅ Progress synced:', data);
+        
+        // Update local state with synced progress
+        if (data.neural_reconstruction !== undefined) {
+          setCodeCompletion(data.neural_reconstruction);
+        }
+      } else {
+        if (user?.role === 'dev') console.log('⚠️ Progress sync failed, continuing...');
+      }
+    } catch (error) {
+      if (user?.role === 'dev') console.log('⚠️ Progress sync error, continuing...', error);
+      // Don't throw - this is not critical
+    }
+  };
 
   useEffect(() => {
     if (selectedArm) {
@@ -577,6 +579,8 @@ export default function AssemblyLineContent() {
   // Load team submissions when selected arm changes
   useEffect(() => {
     if (selectedArm && showAdvanced) {
+      // Sync project progress when loading team submissions
+      syncProjectProgress();
       loadTeamSubmissions(selectedArm.id);
     }
   }, [selectedArm, showAdvanced]);
